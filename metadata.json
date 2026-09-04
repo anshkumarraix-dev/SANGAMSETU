@@ -1,0 +1,7 @@
+{
+  "name": "SangamSetu - Innovation Procurement Platform",
+  "description": "Government of India initiative connecting departments with DPIIT-recognized startups through transparent AI scoring, testing, and pilot scaling.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+

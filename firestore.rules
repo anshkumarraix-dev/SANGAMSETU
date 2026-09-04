@@ -1,0 +1,90 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helpers
+    function isSignedIn() {
+      return request.auth != null && request.auth.token.email_verified == true;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Role-based Access Control
+    function isAdmin() {
+      // NOTE: Bootstrapping an admin email. In a real production scenario, 
+      // rely on an explicit admins collection or strict matching.
+      return isSignedIn() && (
+        request.auth.token.email == 'ak9818774144@gmail.com' ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
+      );
+    }
+
+    // Validation Blueprints
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['email', 'contactEmail', 'orgId', 'role', 'organizationName', 'createdAt', 'updatedAt', 'isApproved'])
+        && data.email is string && data.email.size() <= 200
+        && data.contactEmail is string && data.contactEmail.size() <= 200
+        && data.orgId is string && data.orgId.size() <= 100
+        && data.role is string && (data.role == 'startup' || data.role == 'government' || data.role == 'testing_org' || data.role == 'admin')
+        && data.organizationName is string && data.organizationName.size() <= 200
+        && data.createdAt is number
+        && data.updatedAt is number
+        && data.isApproved is bool;
+    }
+
+    // Collections
+    
+    // USERS COLLECTION
+    match /users/{userId} {
+      // Any authenticated user can read their own profile. Admins can read all.
+      allow get: if (isOwner(userId) || isAdmin()) && isValidId(userId);
+      
+      // We don't allow list for users to prevent scraping, unless admin
+      allow list: if isAdmin();
+      
+      // User can create their own profile upon registration. 
+      // isApproved MUST be false by default (except for initial admin bootstrapping, but we'll enforce false here for safety).
+      allow create: if isOwner(userId) 
+        && isValidId(userId)
+        && isValidUser(incoming())
+        && incoming().createdAt == request.time.toMillis()
+        && incoming().updatedAt == request.time.toMillis()
+        && (incoming().isApproved == false || isAdmin())
+        && incoming().role != 'admin'; // Cannot self-assign admin
+      
+      // Update constraints
+      allow update: if (isOwner(userId) || isAdmin())
+        && isValidId(userId)
+        && isValidUser(incoming())
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time.toMillis()
+        && (
+          isAdmin() || 
+          (incoming().diff(existing()).affectedKeys().hasOnly(['organizationName', 'updatedAt']) 
+            && incoming().role == existing().role
+            && incoming().email == existing().email
+            && incoming().isApproved == existing().isApproved)
+        );
+    }
+  }
+}
