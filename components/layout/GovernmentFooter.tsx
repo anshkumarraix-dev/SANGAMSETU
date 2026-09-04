@@ -26,10 +26,15 @@ export default function GovernmentFooter() {
               SangamSetu (संगमसेतु) is the official Government of India innovation procurement portal connecting Central & State Ministries with DPIIT-recognized startups for transparent, AI-driven problem solving and scale-up deployment.
             </p>
             <div className="flex items-center gap-3 pt-2">
-              <GovernmentEmblem color="white" className="h-10 w-auto" />
+              <img
+                src="/images/emblem-india.svg"
+                alt="State Emblem of India"
+                className="h-12 w-auto object-contain drop-shadow-sm bg-white/10 p-1 rounded-sm border border-white/20"
+                referrerPolicy="no-referrer"
+              />
               <div className="text-[11px] text-slate-300">
                 <p className="font-bold text-white">Department for Promotion of Industry and Internal Trade (DPIIT)</p>
-                <p className="text-slate-400">Ministry of Commerce & Industry</p>
+                <p className="text-slate-400">Ministry of Commerce & Industry • Govt. of India</p>
               </div>
             </div>
           </div>

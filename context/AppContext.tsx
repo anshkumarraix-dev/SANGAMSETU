@@ -27,7 +27,24 @@ import {
   INITIAL_NOTIFICATIONS,
   INITIAL_AUDIT_LOGS,
 } from '@/lib/store';
+import {
+  SIMULATION_EXTRA_STARTUPS,
+  SIMULATION_EXTRA_CHALLENGES,
+  SIMULATION_EXTRA_PROPOSALS,
+  SIMULATION_EXTRA_PROTOTYPES,
+  SIMULATION_EXTRA_TEST_REPORTS,
+  SIMULATION_EXTRA_WINNERS,
+  SIMULATION_EXTRA_PILOTS,
+  SIMULATION_EXTRA_NOTIFICATIONS,
+  SIMULATION_EXTRA_AUDIT_LOGS,
+} from '@/lib/simulation-data';
 import { evaluateProposalAI, rankAndCategorizeProposals } from '@/lib/ai-scoring';
+
+export type SimulationStep =
+  | 'SUBMIT_PROPOSAL'
+  | 'ISSUE_LAB_CERT'
+  | 'SANCTION_PILOT'
+  | 'PAY_MILESTONE';
 
 interface AppContextType {
   role: UserRole;
@@ -48,6 +65,15 @@ interface AppContextType {
   pilots: Pilot[];
   notifications: NotificationItem[];
   auditLogs: AuditLogItem[];
+
+  // Simulation controls
+  isSimulationLoaded: boolean;
+  isSimulationModalOpen: boolean;
+  setIsSimulationModalOpen: (open: boolean) => void;
+  simulationToast: { show: boolean; message: string; type: 'success' | 'info' } | null;
+  dismissSimulationToast: () => void;
+  loadSimulationData: () => void;
+  simulateStep: (step: SimulationStep) => { success: boolean; message: string };
 
   // Action methods
   addChallenge: (challengeData: Omit<Challenge, 'id' | 'slug' | 'publishedAt' | 'totalApplications' | 'shortlistedCount' | 'winnerCount'>) => Challenge;
@@ -72,7 +98,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [currentUser, setCurrentUser] = useState<User>(INITIAL_USERS[0]);
 
   const [users] = useState<User[]>(INITIAL_USERS);
-  const [startups] = useState<StartupProfile[]>(INITIAL_STARTUPS);
+  const [startups, setStartups] = useState<StartupProfile[]>(INITIAL_STARTUPS);
   const [challenges, setChallenges] = useState<Challenge[]>(INITIAL_CHALLENGES);
   const [proposals, setProposals] = useState<Proposal[]>(INITIAL_PROPOSALS);
   const [prototypes, setPrototypes] = useState<Prototype[]>(INITIAL_PROTOTYPES);
@@ -81,6 +107,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [pilots, setPilots] = useState<Pilot[]>(INITIAL_PILOTS);
   const [notifications, setNotifications] = useState<NotificationItem[]>(INITIAL_NOTIFICATIONS);
   const [auditLogs, setAuditLogs] = useState<AuditLogItem[]>(INITIAL_AUDIT_LOGS);
+
+  // Simulation states
+  const [isSimulationLoaded, setIsSimulationLoaded] = useState<boolean>(false);
+  const [isSimulationModalOpen, setIsSimulationModalOpen] = useState<boolean>(false);
+  const [simulationToast, setSimulationToast] = useState<{ show: boolean; message: string; type: 'success' | 'info' } | null>(null);
+
+  const dismissSimulationToast = () => {
+    setSimulationToast(null);
+  };
 
   // Sync current user when role changes
   const setRole = (newRole: UserRole) => {
@@ -518,7 +553,456 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
+  const loadSimulationData = () => {
+    // Merge startups
+    setStartups(prev => {
+      const existingIds = new Set(prev.map(s => s.id));
+      const toAdd = SIMULATION_EXTRA_STARTUPS.filter(s => !existingIds.has(s.id));
+      return [...prev, ...toAdd];
+    });
+
+    // Merge challenges
+    setChallenges(prev => {
+      const existingIds = new Set(prev.map(c => c.id));
+      const toAdd = SIMULATION_EXTRA_CHALLENGES.filter(c => !existingIds.has(c.id));
+      return [...prev, ...toAdd];
+    });
+
+    // Merge proposals
+    setProposals(prev => {
+      const existingIds = new Set(prev.map(p => p.id));
+      const toAdd = SIMULATION_EXTRA_PROPOSALS.filter(p => !existingIds.has(p.id));
+      return [...prev, ...toAdd];
+    });
+
+    // Merge prototypes
+    setPrototypes(prev => {
+      const existingIds = new Set(prev.map(pr => pr.id));
+      const toAdd = SIMULATION_EXTRA_PROTOTYPES.filter(pr => !existingIds.has(pr.id));
+      return [...prev, ...toAdd];
+    });
+
+    // Merge test reports
+    setTestReports(prev => {
+      const existingIds = new Set(prev.map(tr => tr.id));
+      const toAdd = SIMULATION_EXTRA_TEST_REPORTS.filter(tr => !existingIds.has(tr.id));
+      return [...prev, ...toAdd];
+    });
+
+    // Merge winners
+    setWinners(prev => {
+      const existingIds = new Set(prev.map(w => w.id));
+      const toAdd = SIMULATION_EXTRA_WINNERS.filter(w => !existingIds.has(w.id));
+      return [...prev, ...toAdd];
+    });
+
+    // Merge pilots
+    setPilots(prev => {
+      const existingIds = new Set(prev.map(pl => pl.id));
+      const toAdd = SIMULATION_EXTRA_PILOTS.filter(pl => !existingIds.has(pl.id));
+      return [...prev, ...toAdd];
+    });
+
+    // Merge notifications
+    setNotifications(prev => {
+      const existingIds = new Set(prev.map(n => n.id));
+      const toAdd = SIMULATION_EXTRA_NOTIFICATIONS.filter(n => !existingIds.has(n.id));
+      return [...toAdd, ...prev];
+    });
+
+    // Merge audit logs
+    setAuditLogs(prev => {
+      const existingIds = new Set(prev.map(al => al.id));
+      const toAdd = SIMULATION_EXTRA_AUDIT_LOGS.filter(al => !existingIds.has(al.id));
+      return [...toAdd, ...prev];
+    });
+
+    setIsSimulationLoaded(true);
+    setSimulationToast({
+      show: true,
+      message: '⚡ Complete National Simulation Loaded! 8 Challenges, 6 Startups, 5 Proposals, 3 Live Pilots, 3 STQC Lab Certificates.',
+      type: 'success',
+    });
+  };
+
+  const simulateStep = (step: SimulationStep): { success: boolean; message: string } => {
+    const timestamp = new Date().toISOString();
+
+    if (step === 'SUBMIT_PROPOSAL') {
+      const targetChallenge = challenges.find(c => c.id === 'ch-jal-04') || challenges[0];
+      const newPropId = `prop-sim-${Date.now()}`;
+      const newProp: Proposal = {
+        id: newPropId,
+        challengeId: targetChallenge.id,
+        challengeTitle: targetChallenge.title,
+        startupId: 'startup-jal',
+        startupName: 'JalVigyan Technologies Pvt Ltd',
+        dpiitNumber: 'DIPP-64192',
+        title: 'GangaSentinel Pro: Autonomous Solar Multi-Spectral Buoy Network',
+        slug: `gangasentinel-pro-${Date.now()}`,
+        solutionOverview: 'High-frequency telemetry buoys measuring BOD, COD, and Heavy Metals every 15 minutes along industrial river outfalls with automated CPCB alert push.',
+        technicalApproach: 'Ultrasonic anti-biofouling transducer array with optical fluorometers and LoRaWAN/NB-IoT dual redundancy telemetry node.',
+        innovation: 'Autonomous 180-day biofouling resistance without human maintenance.',
+        teamDetails: 'IIT Kanpur environmental instrumentation team led by Dr. Alok Tripathi.',
+        budgetBreakdown: {
+          rdDevelopment: 1200000,
+          hardwareInfrastructure: 1500000,
+          pilotTesting: 600000,
+          teamManpower: 600000,
+          contingency: 150000,
+        },
+        totalBudget: 4050000,
+        timelineMonths: 6,
+        impactMetrics: 'Covers 85 km river basin monitoring 24 industrial effluent discharge channels in real-time.',
+        scalability: 'Assembly line supports 50 buoys/month in Kanpur.',
+        riskAnalysis: 'High river velocity handled by hydrodynamic low-drag catamaran hull.',
+        documents: [{ name: 'GangaSentinel_Spec.pdf', size: '4.2 MB', url: '#' }],
+        status: 'SHORTLISTED',
+        aiScore: 93.8,
+        aiScoreBreakdown: {
+          problemSolutionFit: 98,
+          technicalFeasibility: 94,
+          innovation: 95,
+          impactPotential: 96,
+          teamCapability: 93,
+          scalability: 91,
+          riskManagement: 89,
+          costEffectiveness: 88,
+          overall: 93.8,
+        },
+        aiExplanation: 'Exemplary solution solving critical bio-fouling and real-time CPCB telemetry bottlenecks. Ranked G1 Leader.',
+        g1Category: true,
+        g2Category: false,
+        rankG1: 1,
+        submittedAt: timestamp,
+        prototypeSubmitted: true,
+      };
+
+      setProposals(prev => [newProp, ...prev]);
+      setChallenges(prev =>
+        prev.map(c => (c.id === targetChallenge.id ? { ...c, totalApplications: c.totalApplications + 1 } : c))
+      );
+      setNotifications(prev => [
+        {
+          id: `notif-${Date.now()}`,
+          userId: 'user-govt-1',
+          title: 'Simulated Proposal Received: JalVigyan Technologies',
+          message: `Solution submitted for "${targetChallenge.title.slice(0, 35)}...". AI Evaluation Score: 93.8/100 (G1 Leader).`,
+          type: 'SUCCESS',
+          read: false,
+          createdAt: timestamp,
+        },
+        ...prev,
+      ]);
+      setAuditLogs(prev => [
+        {
+          id: `log-${Date.now()}`,
+          userId: 'user-startup-jal',
+          userName: 'Dr. Alok Tripathi (JalVigyan Tech)',
+          action: 'PROPOSAL_SUBMITTED',
+          entity: 'Proposal',
+          entityId: newPropId,
+          timestamp,
+          ipAddress: '117.240.18.91 (DPIIT Startup Gateway)',
+        },
+        ...prev,
+      ]);
+
+      setSimulationToast({
+        show: true,
+        message: '🚀 Simulated Startup Proposal: JalVigyan Tech submitted GangaSentinel (AI Score: 93.8/100, G1 Category)!',
+        type: 'success',
+      });
+      return { success: true, message: 'Proposal submitted successfully with instant AI evaluation score.' };
+    }
+
+    if (step === 'ISSUE_LAB_CERT') {
+      const certNumber = `STQC/DEL/2026/BENCH-${Math.floor(1000 + Math.random() * 9000)}`;
+      const targetProto = prototypes.find(p => p.status === 'UNDER_TESTING') || prototypes[0];
+      const newReportId = `rep-stqc-sim-${Date.now()}`;
+
+      const newReport: TestReport = {
+        id: newReportId,
+        prototypeId: targetProto.id,
+        proposalId: targetProto.proposalId,
+        challengeId: targetProto.challengeId,
+        startupName: targetProto.startupName,
+        solutionTitle: targetProto.solutionTitle,
+        testingOrgId: 'org-stqc',
+        testingOrgName: 'STQC Directorate (MeitY Govt of India)',
+        functionalityScore: 10,
+        performanceScore: 9,
+        securityScore: 10,
+        usabilityScore: 9,
+        integrationScore: 9,
+        overallScore: 94,
+        functionalityReport: 'Benchmarked against NABL laboratory standards. Measurement drift under 3.1% over 14-day continuous test loop.',
+        performanceReport: 'Edge computing response time < 850 ms. Battery endurance exceeds specifications by 24%.',
+        securityReport: 'Encrypted telemetry stream verified by CERT-In security norms with zero high-severity vulnerabilities.',
+        usabilityReport: 'Field deployment demonstrated by 2 technical staff in under 20 minutes.',
+        integrationReport: 'National portal API webhook connection successfully validated.',
+        issues: ['Recommended 316L marine grade stainless steel for river mooring pins.'],
+        recommendations: 'Unconditionally recommended for National Procurement Pilot Sanction by Ministry.',
+        verdict: 'PASS',
+        certificateNumber: certNumber,
+        submittedAt: timestamp,
+      };
+
+      setTestReports(prev => [newReport, ...prev]);
+      setPrototypes(prev =>
+        prev.map(p => (p.id === targetProto.id ? { ...p, status: 'TEST_PASSED', testReportId: newReportId } : p))
+      );
+      setNotifications(prev => [
+        {
+          id: `notif-${Date.now()}`,
+          userId: 'user-govt-1',
+          title: `STQC Test Certificate Issued (${certNumber})`,
+          message: `${targetProto.startupName} passed STQC laboratory benchmark testing with overall score 94/100 (Verdict: PASS).`,
+          type: 'LAB_REPORT',
+          read: false,
+          createdAt: timestamp,
+        },
+        ...prev,
+      ]);
+      setAuditLogs(prev => [
+        {
+          id: `log-${Date.now()}`,
+          userId: 'user-test-1',
+          userName: 'Shri K. S. Sundaram (STQC Director)',
+          action: 'TEST_REPORT_SUBMITTED',
+          entity: 'TestReport',
+          entityId: newReportId,
+          timestamp,
+          ipAddress: '10.14.88.12 (STQC MeitY)',
+        },
+        ...prev,
+      ]);
+
+      setSimulationToast({
+        show: true,
+        message: `🔬 STQC Lab Certificate Issued: ${certNumber} (Overall Score: 94/100, Verdict: PASS)!`,
+        type: 'success',
+      });
+      return { success: true, message: `Lab Certificate ${certNumber} issued successfully.` };
+    }
+
+    if (step === 'SANCTION_PILOT') {
+      const eligibleProp = proposals.find(p => p.status === 'SHORTLISTED') || proposals[0];
+      const winId = `win-sim-${Date.now()}`;
+      const contractNum = `GOVT/PILOT/2026/SANCTION-${Math.floor(100 + Math.random() * 900)}`;
+
+      const newWinner: Winner = {
+        id: winId,
+        challengeId: eligibleProp.challengeId,
+        proposalId: eligibleProp.id,
+        startupId: eligibleProp.startupId,
+        startupName: eligibleProp.startupName,
+        solutionTitle: eligibleProp.title,
+        rank: 1,
+        prizeAmount: eligibleProp.totalBudget,
+        selectedAt: timestamp,
+        notes: `Sanctioned by Ministry Technical Evaluation Committee under GFR 2017 Rule 194. Pilot work order issued.`,
+        contractNumber: contractNum,
+      };
+
+      const newPilotId = `pilot-sim-${Date.now()}`;
+      const advanceAmount = Math.round(eligibleProp.totalBudget * 0.4);
+      const newPilot: Pilot = {
+        id: newPilotId,
+        challengeId: eligibleProp.challengeId,
+        challengeTitle: eligibleProp.challengeTitle,
+        winnerId: winId,
+        startupId: eligibleProp.startupId,
+        startupName: eligibleProp.startupName,
+        location: 'Field Pilot Deployment Zone - Phase 1 Sector',
+        startDate: timestamp,
+        endDate: new Date(Date.now() + 180 * 86400000).toISOString(),
+        status: 'IN_PROGRESS',
+        totalBudget: eligibleProp.totalBudget,
+        totalSanctionedAmount: eligibleProp.totalBudget,
+        disbursedAmount: advanceAmount,
+        progress: 40,
+        currentPhase: 'Phase 1: Hardware Fabrication & Baseline Calibration',
+        kpis: [
+          { metric: 'Telemetry Latency', target: '<15s', achieved: '9.2s (Exceeding Benchmark)' },
+          { metric: 'Uptime Reliability', target: '>99.5%', achieved: '99.9% Continuous' },
+          { metric: 'Measurement Drift', target: '<5%', achieved: '2.4% over 30 days' },
+        ],
+        milestones: [
+          {
+            id: `ms-sim-${Date.now()}-1`,
+            pilotId: newPilotId,
+            title: 'Initial Provisioning & Fabrication Benchmark',
+            description: 'Manufacture operational units and complete baseline sensor calibration.',
+            paymentPercentage: 40,
+            paymentAmount: advanceAmount,
+            dueDate: new Date(Date.now() + 30 * 86400000).toISOString(),
+            status: 'COMPLETED',
+            paymentStatus: 'PAID',
+            deliverablesUrl: 'https://nic.gov.in/milestones/phase1-verification.pdf',
+            paidAt: timestamp,
+            utrNumber: `RBI-NEFT-2026-PFMS-${Math.floor(100000 + Math.random() * 900000)}`,
+          },
+          {
+            id: `ms-sim-${Date.now()}-2`,
+            pilotId: newPilotId,
+            title: 'Field Deployment & Live Cloud Telemetry Feed',
+            description: 'Deploy hardware on site and integrate continuous data feed with Ministry SCADA portal.',
+            paymentPercentage: 35,
+            paymentAmount: Math.round(eligibleProp.totalBudget * 0.35),
+            dueDate: new Date(Date.now() + 90 * 86400000).toISOString(),
+            status: 'IN_PROGRESS',
+            paymentStatus: 'REQUESTED',
+            deliverablesUrl: 'https://nic.gov.in/milestones/telemetry-proof.pdf',
+          },
+          {
+            id: `ms-sim-${Date.now()}-3`,
+            pilotId: newPilotId,
+            title: 'Final Acceptance & GeM National Scale-out Transition',
+            description: 'Final performance audit and conversion to GeM Direct Procurement Order.',
+            paymentPercentage: 25,
+            paymentAmount: Math.round(eligibleProp.totalBudget * 0.25),
+            dueDate: new Date(Date.now() + 180 * 86400000).toISOString(),
+            status: 'PENDING',
+            paymentStatus: 'PENDING',
+          },
+        ],
+      };
+
+      setWinners(prev => [newWinner, ...prev]);
+      setPilots(prev => [newPilot, ...prev]);
+      setChallenges(prev =>
+        prev.map(c =>
+          c.id === eligibleProp.challengeId
+            ? { ...c, status: 'PILOT_IN_PROGRESS', winnerCount: c.winnerCount + 1 }
+            : c
+        )
+      );
+      setNotifications(prev => [
+        {
+          id: `notif-${Date.now()}`,
+          userId: 'user-startup-1',
+          title: `Pilot Sanction Order Issued (${contractNum})`,
+          message: `Ministry has sanctioned your pilot grant of ₹${(eligibleProp.totalBudget / 100000).toFixed(2)} Lakhs under GFR 149/194.`,
+          type: 'AWARDED',
+          read: false,
+          createdAt: timestamp,
+        },
+        ...prev,
+      ]);
+      setAuditLogs(prev => [
+        {
+          id: `log-${Date.now()}`,
+          userId: 'user-govt-1',
+          userName: 'Dr. Rajesh Verma, IAS',
+          action: 'PILOT_SANCTIONED',
+          entity: 'Pilot',
+          entityId: newPilotId,
+          timestamp,
+          ipAddress: '10.14.22.9 (NIC Govt Portal)',
+        },
+        ...prev,
+      ]);
+
+      setSimulationToast({
+        show: true,
+        message: `🏛️ Pilot Sanctioned: Contract ${contractNum} (₹${(eligibleProp.totalBudget / 100000).toFixed(1)} Lakhs) with 40% advance released!`,
+        type: 'success',
+      });
+      return { success: true, message: `Pilot Sanctioned under Contract ${contractNum}.` };
+    }
+
+    if (step === 'PAY_MILESTONE') {
+      let paidPilotName = '';
+      let paidAmount = 0;
+      let utr = `RBI-NEFT-2026-DISB-${Math.floor(100000 + Math.random() * 900000)}`;
+
+      setPilots(prev => {
+        let milestoneHandled = false;
+        return prev.map(pilot => {
+          if (milestoneHandled) return pilot;
+
+          // Find requested or pending milestone
+          const milestoneToPay = pilot.milestones.find(
+            m => m.paymentStatus === 'REQUESTED' || (m.status === 'IN_PROGRESS' && m.paymentStatus !== 'PAID')
+          );
+
+          if (milestoneToPay) {
+            milestoneHandled = true;
+            paidPilotName = pilot.startupName;
+            paidAmount = milestoneToPay.paymentAmount;
+
+            const updatedMilestones = pilot.milestones.map(m =>
+              m.id === milestoneToPay.id
+                ? {
+                    ...m,
+                    status: 'COMPLETED' as const,
+                    paymentStatus: 'PAID' as const,
+                    paidAt: timestamp,
+                    utrNumber: utr,
+                  }
+                : m
+            );
+
+            return {
+              ...pilot,
+              disbursedAmount: pilot.disbursedAmount + paidAmount,
+              progress: Math.min(100, pilot.progress + 30),
+              milestones: updatedMilestones,
+            };
+          }
+          return pilot;
+        });
+      });
+
+      if (paidAmount > 0) {
+        setNotifications(prev => [
+          {
+            id: `notif-${Date.now()}`,
+            userId: 'user-startup-1',
+            title: `PFMS Electronic Payment Disbursed (₹${(paidAmount / 100000).toFixed(2)} Lakhs)`,
+            message: `Funds credited to verified bank account via RBI-NEFT. Transaction UTR: ${utr}.`,
+            type: 'PAYMENT_RECEIVED',
+            read: false,
+            createdAt: timestamp,
+          },
+          ...prev,
+        ]);
+        setAuditLogs(prev => [
+          {
+            id: `log-${Date.now()}`,
+            userId: 'user-govt-1',
+            userName: 'Dr. Rajesh Verma, IAS (Financial Advisor)',
+            action: 'PAYMENT_RELEASED',
+            entity: 'Milestone',
+            entityId: utr,
+            timestamp,
+            ipAddress: '10.14.22.9 (PFMS Gateway)',
+          },
+          ...prev,
+        ]);
+
+        setSimulationToast({
+          show: true,
+          message: `💳 Milestone Payment Released: ₹${(paidAmount / 100000).toFixed(2)} Lakhs credited to ${paidPilotName} (UTR: ${utr})!`,
+          type: 'success',
+        });
+        return { success: true, message: `Disbursed ₹${(paidAmount / 100000).toFixed(2)} Lakhs (UTR: ${utr}).` };
+      } else {
+        setSimulationToast({
+          show: true,
+          message: 'All available milestones are already settled or no pending milestone was found.',
+          type: 'info',
+        });
+        return { success: false, message: 'No pending milestone found to disburse.' };
+      }
+    }
+
+    return { success: false, message: 'Invalid simulation step.' };
+  };
+
   const resetAllData = () => {
+    setStartups(INITIAL_STARTUPS);
     setChallenges(INITIAL_CHALLENGES);
     setProposals(INITIAL_PROPOSALS);
     setPrototypes(INITIAL_PROTOTYPES);
@@ -527,6 +1011,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setPilots(INITIAL_PILOTS);
     setNotifications(INITIAL_NOTIFICATIONS);
     setAuditLogs(INITIAL_AUDIT_LOGS);
+    setIsSimulationLoaded(false);
+    setSimulationToast({
+      show: true,
+      message: 'All simulation data reset to clean default baseline.',
+      type: 'info',
+    });
   };
 
   return (
@@ -550,6 +1040,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         pilots,
         notifications,
         auditLogs,
+        isSimulationLoaded,
+        isSimulationModalOpen,
+        setIsSimulationModalOpen,
+        simulationToast,
+        dismissSimulationToast,
+        loadSimulationData,
+        simulateStep,
         addChallenge,
         submitProposal,
         runAIScoring,

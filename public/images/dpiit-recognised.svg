@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 350" width="100%" height="100%">
+  <defs>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F59E0B"/>
+      <stop offset="50%" stop-color="#D97706"/>
+      <stop offset="100%" stop-color="#B45309"/>
+    </linearGradient>
+    <linearGradient id="leafGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FBBF24"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Golden Laurel Wreath (Symmetrical Left and Right Arcs) -->
+  <g fill="url(#leafGrad)" stroke="#B45309" stroke-width="0.75">
+    <!-- Left Laurel Wreath Leaves -->
+    <!-- Lower Leaves -->
+    <path d="M190 320 C140 315 90 280 60 220 C45 190 40 150 45 110" fill="none" stroke="url(#goldGrad)" stroke-width="4"/>
+    
+    <!-- Leaves along left curve -->
+    <path d="M170 310 C150 325 130 310 145 295 C160 280 180 295 170 310 Z"/>
+    <path d="M130 295 C105 305 90 285 110 270 C130 255 145 275 130 295 Z"/>
+    <path d="M95 270 C70 275 60 250 80 235 C100 220 115 245 95 270 Z"/>
+    <path d="M65 230 C40 230 35 205 60 195 C85 185 95 210 65 230 Z"/>
+    <path d="M48 185 C25 180 25 155 50 150 C75 145 80 170 48 185 Z"/>
+    <path d="M45 140 C25 130 30 105 55 105 C80 105 80 130 45 140 Z"/>
+    <path d="M52 95 C35 80 45 60 70 65 C95 70 90 95 52 95 Z"/>
+    <path d="M72 60 C60 40 75 25 95 35 C115 45 105 70 72 60 Z"/>
+    <path d="M102 35 C95 15 115 5 130 20 C145 35 130 55 102 35 Z"/>
+
+    <!-- Right Laurel Wreath Leaves -->
+    <path d="M210 320 C260 315 310 280 340 220 C355 190 360 150 355 110" fill="none" stroke="url(#goldGrad)" stroke-width="4"/>
+
+    <path d="M230 310 C250 325 270 310 255 295 C240 280 220 295 230 310 Z"/>
+    <path d="M270 295 C295 305 310 285 290 270 C270 255 255 275 270 295 Z"/>
+    <path d="M305 270 C330 275 340 250 320 235 C300 220 285 245 305 270 Z"/>
+    <path d="M335 230 C360 230 365 205 340 195 C315 185 305 210 335 230 Z"/>
+    <path d="M352 185 C375 180 375 155 350 150 C325 145 320 170 352 185 Z"/>
+    <path d="M355 140 C375 130 370 105 345 105 C320 105 320 130 355 140 Z"/>
+    <path d="M348 95 C365 80 355 60 330 65 C305 70 310 95 348 95 Z"/>
+    <path d="M328 60 C340 40 325 25 305 35 C285 45 295 70 328 60 Z"/>
+    <path d="M298 35 C305 15 285 5 270 20 C255 35 270 55 298 35 Z"/>
+
+    <!-- Bottom Ribbon Tie -->
+    <path d="M190 325 C195 335 205 335 210 325 C205 320 195 320 190 325 Z" fill="#D97706"/>
+    <path d="M185 325 L160 345 L175 345 L195 330 Z" fill="#B45309"/>
+    <path d="M215 325 L240 345 L225 345 L205 330 Z" fill="#B45309"/>
+  </g>
+
+  <!-- Center Content: Lion Emblem in Gold -->
+  <g transform="translate(160, 45) scale(0.8)">
+    <!-- Ashoka Lion Outline in Gold -->
+    <!-- Head/Mane -->
+    <path d="M35 15 C20 15 10 35 15 50 C20 65 30 70 45 70 C60 70 70 65 75 50 C80 35 70 15 55 15 Z" fill="url(#goldGrad)"/>
+    <!-- Left & Right Lions -->
+    <path d="M15 35 C5 35 0 50 10 60 C20 65 25 55 20 45 Z" fill="url(#goldGrad)"/>
+    <path d="M75 35 C85 35 90 50 80 60 C70 65 65 55 70 45 Z" fill="url(#goldGrad)"/>
+    <!-- Abacus Base -->
+    <rect x="5" y="72" width="80" height="10" rx="2" fill="url(#goldGrad)"/>
+    <circle cx="45" cy="77" r="4" fill="#FFFFFF"/>
+    <!-- Bell Lotus Base -->
+    <path d="M15 84 C25 96 65 96 75 84 Z" fill="url(#goldGrad)"/>
+  </g>
+
+  <!-- Motto: "सत्यमेव जयते" -->
+  <text x="200" y="148" text-anchor="middle" font-family="'Noto Sans Devanagari', serif" font-size="11" font-weight="bold" fill="#78350F">सत्यमेव जयते</text>
+
+  <!-- Text: "Recognised by" -->
+  <text x="200" y="172" text-anchor="middle" font-family="'Cinzel', 'Georgia', serif" font-size="14" font-weight="500" fill="#334155" letter-spacing="1">Recognised by</text>
+
+  <!-- Text: "DPIIT" in bold maroon/gold -->
+  <text x="200" y="215" text-anchor="middle" font-family="'Cinzel', 'Times New Roman', serif" font-size="44" font-weight="900" fill="#881337" letter-spacing="3">DPIIT</text>
+
+  <!-- Subtitle: "Department for Promotion of Industry and Internal Trade" -->
+  <text x="200" y="235" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-size="10.5" font-weight="700" fill="#0F172A" letter-spacing="0.2">
+    Department for Promotion of
+  </text>
+  <text x="200" y="249" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-size="10.5" font-weight="700" fill="#0F172A" letter-spacing="0.2">
+    Industry and Internal Trade
+  </text>
+</svg>

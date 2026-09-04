@@ -16,10 +16,13 @@ import GrievanceSection from '@/components/public/GrievanceSection';
 import FaqSection from '@/components/public/FaqSection';
 import SitemapSection from '@/components/public/SitemapSection';
 import CompliancePages from '@/components/public/CompliancePages';
+import PlatformShowcase from '@/components/public/PlatformShowcase';
 import StartupDashboard from '@/components/dashboard/StartupDashboard';
 import GovernmentDashboard from '@/components/dashboard/GovernmentDashboard';
 import TestingLabDashboard from '@/components/dashboard/TestingLabDashboard';
 import AdminDashboard from '@/components/dashboard/AdminDashboard';
+import QuickSimulationModal from '@/components/simulation/QuickSimulationModal';
+import SimulationToast from '@/components/simulation/SimulationToast';
 import { Rocket, Building2, FlaskConical, Shield, ArrowLeft } from 'lucide-react';
 
 export default function HomePage() {
@@ -66,14 +69,8 @@ export default function HomePage() {
               onRegisterStartup={handleRegisterStartup}
             />
 
-            {/* 9-Step Innovation Procurement Workflow */}
-            <WorkflowSection />
-
-            {/* Public Challenge Explorer Directory */}
-            <ProblemBrowser onApplyForChallenge={handleApplyForChallenge} />
-
-            {/* Impact & Success Stories */}
-            <SuccessStories />
+            {/* Platform Promotional Showcase */}
+            <PlatformShowcase />
           </div>
         )}
 
@@ -187,6 +184,10 @@ export default function HomePage() {
 
       {/* 4. Official Government Footer */}
       <GovernmentFooter />
+
+      {/* Quick Simulation Modal & Notification Toasts */}
+      <QuickSimulationModal />
+      <SimulationToast />
     </div>
   );
 }

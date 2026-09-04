@@ -3,40 +3,114 @@
 import React from 'react';
 import { useApp } from '@/context/AppContext';
 import {
-  ArrowRight,
   Shield,
   Building2,
   Rocket,
-  TrendingUp,
   Award,
   IndianRupee,
-  FileCheck,
+  ArrowRight,
+  Sparkles,
 } from 'lucide-react';
 
 interface HeroSectionProps {
-  onExploreProblems: () => void;
-  onPostProblem: () => void;
-  onRegisterStartup: () => void;
+  onExploreProblems?: () => void;
+  onPostProblem?: () => void;
+  onRegisterStartup?: () => void;
 }
 
 export default function HeroSection({
   onExploreProblems,
   onPostProblem,
   onRegisterStartup,
-}: HeroSectionProps) {
-  const { challenges } = useApp();
+}: HeroSectionProps = {}) {
+  const { challenges, setIsSimulationModalOpen } = useApp();
 
   const totalFundAllocatedCr = 210; // ₹210 Cr+
   const totalScaledSolutions = 24;
 
   return (
-    <section className="relative bg-white border-b border-slate-200 pt-8 pb-12 md:pt-12 md:pb-16">
+    <section className="relative bg-white border-b border-slate-200 pt-6 pb-12 md:pt-10 md:pb-16">
       <div className="max-w-[1440px] mx-auto px-4">
-        {/* Top Government Initiative Badge */}
-        <div className="flex justify-center mb-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-sm bg-sangam-blue-50 border border-sangam-blue-200 text-sangam-blue-700 text-xs font-bold">
+        {/* Top Government Initiative & National Emblems Header */}
+        <div className="flex flex-col items-center mb-6">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-sm bg-sangam-blue-50 border border-sangam-blue-200 text-sangam-blue-800 text-xs font-bold mb-4">
             <Shield className="w-4 h-4 text-sangam-blue-600" />
-            <span>Government of India National Innovation Procurement Initiative • DPIIT</span>
+            <span>Government of India National Innovation Procurement Portal • DPIIT</span>
+          </div>
+
+          {/* Official National Initiative Badges Strip */}
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8 px-4 py-2.5 rounded-lg bg-slate-50/80 border border-slate-200/80 max-w-4xl w-full shadow-2xs">
+            {/* 1. National Emblem of India */}
+            <div className="flex items-center gap-2.5">
+              <img
+                src="/images/emblem-india.svg"
+                alt="State Emblem of India"
+                className="h-10 sm:h-12 w-auto object-contain drop-shadow-2xs"
+                referrerPolicy="no-referrer"
+              />
+              <div className="text-left leading-none">
+                <p className="text-[11px] font-extrabold text-slate-900">भारत सरकार</p>
+                <p className="text-[9px] font-semibold text-slate-600 mt-0.5">Government of India</p>
+              </div>
+            </div>
+
+            <div className="hidden sm:block h-7 w-px bg-slate-200" />
+
+            {/* 2. DPIIT Recognised */}
+            <div className="flex items-center gap-2">
+              <img
+                src="/images/dpiit-recognised.svg"
+                alt="Recognised by DPIIT"
+                className="h-10 sm:h-11 w-auto object-contain"
+                referrerPolicy="no-referrer"
+              />
+              <div className="text-left leading-tight hidden xs:block">
+                <p className="text-[10px] font-extrabold text-amber-900 uppercase tracking-wider">DPIIT Validated</p>
+                <p className="text-[9px] text-slate-500">Startup India Network</p>
+              </div>
+            </div>
+
+            <div className="hidden md:block h-7 w-px bg-slate-200" />
+
+            {/* 3. Digital India */}
+            <div className="flex items-center gap-2">
+              <img
+                src="/images/digital-india.svg"
+                alt="Digital India - Power To Empower"
+                className="h-9 sm:h-10 w-auto object-contain"
+                referrerPolicy="no-referrer"
+              />
+            </div>
+
+            <div className="hidden lg:block h-7 w-px bg-slate-200" />
+
+            {/* 4. Aatmanirbhar Bharat */}
+            <div className="hidden sm:flex items-center gap-2">
+              <img
+                src="/images/aatmanirbhar-bharat.svg"
+                alt="Aatmanirbhar Bharat Abhiyan"
+                className="h-9 sm:h-10 w-auto object-contain"
+                referrerPolicy="no-referrer"
+              />
+            </div>
+
+            <div className="hidden lg:block h-7 w-px bg-slate-200" />
+
+            {/* 5. G20 India */}
+            <div className="hidden md:flex items-center gap-2">
+              <img
+                src="/images/g20-india.png"
+                alt="G20 India 2023 - Vasudhaiva Kutumbakam"
+                className="h-9 sm:h-10 w-auto object-contain"
+                referrerPolicy="no-referrer"
+                onError={(e) => {
+                  const el = e.currentTarget;
+                  if (!el.src.includes('g20-india.svg')) {
+                    el.src = '/images/g20-india.svg';
+                  }
+                }}
+              />
+            </div>
           </div>
         </div>
 
@@ -51,30 +125,30 @@ export default function HeroSection({
             A structured, transparent, AI-powered bridge connecting <strong>Central & State Ministries</strong> with <strong>DPIIT-Recognized Startups</strong> to solve mission-critical operational challenges with verified field testing under GFR 2017.
           </p>
 
-          {/* Action CTAs */}
-          <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
+          {/* Hero Action Buttons */}
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             <button
               onClick={onExploreProblems}
-              className="w-full sm:w-auto px-6 py-3 rounded-sm bg-sangam-blue-600 hover:bg-sangam-blue-700 text-white font-bold text-xs sm:text-sm transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-sm bg-sangam-blue-600 hover:bg-sangam-blue-700 text-white font-bold text-sm shadow-xs transition-colors cursor-pointer"
             >
               <span>Explore Government Challenges</span>
               <ArrowRight className="w-4 h-4" />
             </button>
 
             <button
-              onClick={onRegisterStartup}
-              className="w-full sm:w-auto px-5 py-3 rounded-sm bg-sangam-saffron-500 hover:bg-sangam-saffron-600 text-slate-950 font-bold text-xs sm:text-sm transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
+              onClick={onPostProblem}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-sm bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm shadow-xs transition-colors cursor-pointer"
             >
-              <Rocket className="w-4 h-4" />
-              <span>Register Startup (DPIIT)</span>
+              <Building2 className="w-4 h-4 text-amber-400" />
+              <span>Post Ministry Challenge</span>
             </button>
 
             <button
-              onClick={onPostProblem}
-              className="w-full sm:w-auto px-5 py-3 rounded-sm bg-white hover:bg-slate-50 text-slate-900 border border-slate-300 font-bold text-xs sm:text-sm transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
+              onClick={() => setIsSimulationModalOpen(true)}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-sm bg-amber-50 hover:bg-amber-100 text-amber-950 border border-amber-400 font-bold text-sm shadow-xs transition-colors cursor-pointer"
             >
-              <Building2 className="w-4 h-4 text-sangam-blue-600" />
-              <span>Post Government Challenge</span>
+              <Sparkles className="w-4 h-4 text-amber-600 animate-pulse" />
+              <span>⚡ Quick Simulation / Demo Data</span>
             </button>
           </div>
         </div>

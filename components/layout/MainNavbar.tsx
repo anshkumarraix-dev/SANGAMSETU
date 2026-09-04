@@ -23,6 +23,7 @@ import {
   FileText,
   HelpCircle,
   Globe,
+  Sparkles,
 } from 'lucide-react';
 import { UserRole, ActiveView } from '@/lib/types';
 
@@ -32,7 +33,18 @@ interface MainNavbarProps {
 }
 
 export default function MainNavbar({ activeTab: propActiveTab, setActiveTab: propSetActiveTab }: MainNavbarProps = {}) {
-  const { role, setRole, currentUser, notifications, markNotificationRead, language, setLanguage, activeView, setActiveView } = useApp();
+  const {
+    role,
+    setRole,
+    currentUser,
+    notifications,
+    markNotificationRead,
+    language,
+    setLanguage,
+    activeView,
+    setActiveView,
+    setIsSimulationModalOpen,
+  } = useApp();
   const { user, profile } = useAuth();
   const activeTab = propActiveTab || activeView;
   const setActiveTab = propSetActiveTab || ((tab: string) => setActiveView(tab as ActiveView));
@@ -121,8 +133,21 @@ export default function MainNavbar({ activeTab: propActiveTab, setActiveTab: pro
       <nav className="bg-white border-b border-slate-200 sticky top-0 z-50">
       <div className="max-w-[1440px] mx-auto px-4">
         <div className="flex justify-between items-center py-2.5 sm:py-3 gap-4">
-          {/* Brand Logo */}
-          <div className="flex items-center gap-4">
+          {/* Brand Logo & National Emblem */}
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="flex items-center gap-2 pr-3 border-r border-slate-200 shrink-0">
+              <img
+                src="/images/emblem-india.svg"
+                alt="State Emblem of India"
+                className="h-10 sm:h-12 w-auto object-contain"
+                referrerPolicy="no-referrer"
+              />
+              <div className="hidden sm:block text-left leading-tight">
+                <p className="text-[10px] font-extrabold text-slate-900">भारत सरकार</p>
+                <p className="text-[9px] font-semibold text-slate-600">Govt. of India</p>
+              </div>
+            </div>
+
             <button
               onClick={() => handleNavClick('home')}
               className="text-left focus:outline-none cursor-pointer"
@@ -202,6 +227,39 @@ export default function MainNavbar({ activeTab: propActiveTab, setActiveTab: pro
 
           {/* Right: Role Switcher Dropdown, Language & Notifications */}
           <div className="flex items-center gap-2 sm:gap-2.5">
+            {/* National Initiative Logos in Navbar */}
+            <div className="hidden xl:flex items-center gap-3 pr-2.5 border-r border-slate-200">
+              <img
+                src="/images/g20-india.png"
+                alt="G20 India"
+                className="h-7 w-auto object-contain"
+                referrerPolicy="no-referrer"
+                onError={(e) => {
+                  const el = e.currentTarget;
+                  if (!el.src.includes('g20-india.svg')) {
+                    el.src = '/images/g20-india.svg';
+                  }
+                }}
+              />
+              <img
+                src="/images/digital-india.svg"
+                alt="Digital India"
+                className="h-7 w-auto object-contain"
+                referrerPolicy="no-referrer"
+              />
+            </div>
+
+            {/* Quick Simulation & Demo Trigger */}
+            <button
+              onClick={() => setIsSimulationModalOpen(true)}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-sm border border-amber-400 bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-bold transition-all shadow-2xs cursor-pointer"
+              title="Quick Simulation & Demo Data"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
+              <span className="hidden lg:inline">Quick Simulation</span>
+              <span className="lg:hidden">Simulation</span>
+            </button>
+
             {/* Quick Language Toggle */}
             <button
               onClick={() => setLanguage(language === 'en' ? 'hi' : 'en')}

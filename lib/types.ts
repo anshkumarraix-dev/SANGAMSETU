@@ -261,13 +261,15 @@ export interface Winner {
 
 export interface Milestone {
   id: string;
-  pilotId: string;
+  pilotId?: string;
   title: string;
   description: string;
   dueDate: string;
   status: MilestoneStatus;
   completedAt?: string;
   paymentAmount: number;
+  paymentPercentage?: number;
+  deliverablesUrl?: string;
   paymentStatus: PaymentStatus;
   paidAt?: string;
   utrNumber?: string;
@@ -285,10 +287,11 @@ export interface Pilot {
   startDate: string;
   endDate: string;
   status: PilotStatus;
-  kpis: { metric: string; target: string; achieved: string }[];
+  kpis?: { metric: string; target: string; achieved: string }[];
   progress: number; // 0-100
   currentPhase: string;
   totalBudget: number;
+  totalSanctionedAmount?: number;
   disbursedAmount: number;
   milestones: Milestone[];
 }
@@ -298,7 +301,16 @@ export interface NotificationItem {
   userId: string;
   title: string;
   message: string;
-  type: 'INFO' | 'SUCCESS' | 'WARNING' | 'ERROR' | 'DEADLINE_REMINDER' | 'PAYMENT_RECEIVED' | 'PROPOSAL_SHORTLISTED';
+  type:
+    | 'INFO'
+    | 'SUCCESS'
+    | 'WARNING'
+    | 'ERROR'
+    | 'DEADLINE_REMINDER'
+    | 'PAYMENT_RECEIVED'
+    | 'PROPOSAL_SHORTLISTED'
+    | 'LAB_REPORT'
+    | 'AWARDED';
   read: boolean;
   createdAt: string;
 }

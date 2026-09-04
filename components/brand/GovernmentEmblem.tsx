@@ -72,28 +72,55 @@ export function GovernmentEmblem({
 
 export function PartnerLogosBar({ className = '' }: { className?: string }) {
   return (
-    <div className={`flex items-center gap-4 select-none ${className}`}>
-      {/* DPIIT */}
-      <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white/10 rounded border border-white/20">
-        <span className="text-xs font-extrabold tracking-wider text-slate-100">DPIIT</span>
-        <span className="text-[10px] text-slate-300">Govt of India</span>
-      </div>
-
-      {/* Startup India */}
-      <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white/10 rounded border border-white/20">
-        <span className="text-amber-400 font-black text-xs">#startup</span>
-        <span className="text-white font-bold text-xs">india</span>
+    <div className={`flex flex-wrap items-center gap-3 select-none ${className}`}>
+      {/* DPIIT Recognised */}
+      <div className="flex items-center gap-2 px-3 py-1 bg-white/95 rounded-sm border border-white/30 shadow-2xs">
+        <img
+          src="/images/dpiit-recognised.svg"
+          alt="Recognised by DPIIT"
+          className="h-6 w-auto object-contain"
+          referrerPolicy="no-referrer"
+        />
+        <div className="text-left leading-none">
+          <p className="text-[10px] font-black text-slate-900">DPIIT</p>
+          <p className="text-[8px] font-semibold text-slate-600">Govt of India</p>
+        </div>
       </div>
 
       {/* Digital India */}
-      <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white/10 rounded border border-white/20">
-        <span className="text-sky-400 font-extrabold text-xs">Digital</span>
-        <span className="text-emerald-400 font-extrabold text-xs">India</span>
+      <div className="flex items-center px-3 py-1 bg-white/95 rounded-sm border border-white/30 shadow-2xs">
+        <img
+          src="/images/digital-india.svg"
+          alt="Digital India"
+          className="h-6 w-auto object-contain"
+          referrerPolicy="no-referrer"
+        />
       </div>
 
-      {/* Make in India */}
-      <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 bg-white/10 rounded border border-white/20">
-        <span className="text-xs font-bold text-orange-300">🇮🇳 Make in India</span>
+      {/* Aatmanirbhar Bharat */}
+      <div className="flex items-center px-3 py-1 bg-white/95 rounded-sm border border-white/30 shadow-2xs">
+        <img
+          src="/images/aatmanirbhar-bharat.svg"
+          alt="Aatmanirbhar Bharat"
+          className="h-6 w-auto object-contain"
+          referrerPolicy="no-referrer"
+        />
+      </div>
+
+      {/* G20 India */}
+      <div className="hidden sm:flex items-center px-3 py-1 bg-white/95 rounded-sm border border-white/30 shadow-2xs">
+        <img
+          src="/images/g20-india.png"
+          alt="G20 India 2023"
+          className="h-6 w-auto object-contain"
+          referrerPolicy="no-referrer"
+          onError={(e) => {
+            const el = e.currentTarget;
+            if (!el.src.includes('g20-india.svg')) {
+              el.src = '/images/g20-india.svg';
+            }
+          }}
+        />
       </div>
     </div>
   );
