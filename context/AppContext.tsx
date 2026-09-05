@@ -629,7 +629,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const timestamp = new Date().toISOString();
 
     if (step === 'SUBMIT_PROPOSAL') {
-      const targetChallenge = challenges.find(c => c.id === 'ch-jal-04') || challenges[0];
+      const targetChallenge = challenges.find(c => c.id === 'ch-jal-04') || challenges[0] || {
+        id: 'ch-default-1',
+        title: 'Real-Time Edge AI for Corridor Traffic & Infrastructure Monitoring',
+        ministryName: 'Ministry of Road Transport and Highways',
+      };
       const newPropId = `prop-sim-${Date.now()}`;
       const newProp: Proposal = {
         id: newPropId,
@@ -718,7 +722,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     if (step === 'ISSUE_LAB_CERT') {
       const certNumber = `STQC/DEL/2026/BENCH-${Math.floor(1000 + Math.random() * 9000)}`;
-      const targetProto = prototypes.find(p => p.status === 'UNDER_TESTING') || prototypes[0];
+      const targetProto = prototypes.find(p => p.status === 'UNDER_TESTING') || prototypes[0] || {
+        id: 'proto-default-1',
+        proposalId: 'prop-default-1',
+        challengeId: 'ch-default-1',
+        startupName: 'JalVigyan Technologies Pvt Ltd',
+        solutionTitle: 'GangaSentinel Pro Telemetry Buoy',
+      };
       const newReportId = `rep-stqc-sim-${Date.now()}`;
 
       const newReport: TestReport = {
@@ -787,7 +797,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
 
     if (step === 'SANCTION_PILOT') {
-      const eligibleProp = proposals.find(p => p.status === 'SHORTLISTED') || proposals[0];
+      const eligibleProp = proposals.find(p => p.status === 'SHORTLISTED') || proposals[0] || {
+        id: 'prop-default-1',
+        challengeId: 'ch-default-1',
+        challengeTitle: 'Corridor Mobility AI Challenge',
+        startupId: 'startup-default-1',
+        startupName: 'JalVigyan Technologies Pvt Ltd',
+        title: 'GangaSentinel Pro Telemetry System',
+        totalBudget: 4050000,
+      };
       const winId = `win-sim-${Date.now()}`;
       const contractNum = `GOVT/PILOT/2026/SANCTION-${Math.floor(100 + Math.random() * 900)}`;
 

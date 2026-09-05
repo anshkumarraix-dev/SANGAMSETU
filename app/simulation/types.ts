@@ -1,5 +1,18 @@
 export type SimulationStage = 0 | 1 | 2 | 3 | 4 | 5;
-export type SimTab = 'admin' | 'government' | 'startup' | 'testing_org';
+export type SimTab = 'public' | 'admin' | 'government' | 'startup' | 'testing_org';
+export type SimPersona = 'public' | 'startup' | 'department' | 'evaluator' | 'admin';
+
+export interface StartupNotification {
+  id: string;
+  startupId: string;
+  timestamp: string;
+  stage: number;
+  type: 'SHORTLIST' | 'LAB_TEST' | 'AWARD' | 'INFO';
+  title: string;
+  message: string;
+  badgeText: string;
+  badgeColor: 'emerald' | 'amber' | 'rose' | 'blue';
+}
 
 export interface ScoredParameter {
   name: string;

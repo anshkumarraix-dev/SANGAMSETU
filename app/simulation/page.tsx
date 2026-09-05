@@ -1,18 +1,21 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import MainNavbar from '@/components/layout/MainNavbar';
 import GovernmentFooter from '@/components/layout/GovernmentFooter';
 import SimulationToast from '@/components/simulation/SimulationToast';
 import ScoreRow from '@/components/simulation/ScoreRow';
+import PersonaSwitcher from '@/components/simulation/PersonaSwitcher';
 import {
   SimulationStage,
-  SimTab,
+  SimPersona,
   EvaluationStartup,
   ScoredParameter,
   PrototypeTestParameter,
   DepartmentReviewData,
+  StartupNotification,
 } from './types';
 import {
   SIMULATION_PROBLEM,
@@ -22,6 +25,7 @@ import {
   computePrototypeOverallResult,
   computeFinalSelectionStatus,
 } from './data';
+import { generateStartupNotifications } from './notifications';
 import {
   Building2,
   Rocket,
@@ -57,13 +61,28 @@ import {
   Lock,
   Search,
   ExternalLink,
+  Bell,
+  UserCheck,
+  CheckCheck,
+  BarChart3,
+  ShieldAlert,
 } from 'lucide-react';
 
-export default function SimulationPage() {
+function SimulationContent() {
+  const searchParams = useSearchParams();
+  const initialPersonaParam = searchParams.get('persona') as SimPersona | null;
+
+  const [currentPersona, setCurrentPersona] = useState<SimPersona>(() => {
+    if (initialPersonaParam && ['public', 'startup', 'department', 'evaluator', 'admin'].includes(initialPersonaParam)) {
+      return initialPersonaParam;
+    }
+    return 'department';
+  });
+
   const [stage, setStage] = useState<SimulationStage>(2);
-  const [activeTab, setActiveTab] = useState<SimTab>('government');
   const [startups, setStartups] = useState<EvaluationStartup[]>(INITIAL_EVALUATION_STARTUPS);
   const [selectedStartupId, setSelectedStartupId] = useState<string>('s1');
+  const [manualSelectedPilotId, setManualSelectedPilotId] = useState<string>('s1');
   const [filterCategory, setFilterCategory] = useState<'ALL' | 'G1' | 'G2'>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -72,6 +91,7 @@ export default function SimulationPage() {
   const [isDeptReviewModalOpen, setIsDeptReviewModalOpen] = useState(false);
   const [isLabTestModalOpen, setIsLabTestModalOpen] = useState(false);
   const [isAddStartupModalOpen, setIsAddStartupModalOpen] = useState(false);
+  const [isFloatingSwitcherOpen, setIsFloatingSwitcherOpen] = useState(false);
 
   // Department Review Form State
   const [deptDecision, setDeptDecision] = useState<DepartmentReviewData['decision']>('Approve for Prototype');
@@ -95,28 +115,60 @@ export default function SimulationPage() {
   // Toast
   const [toast, setToast] = useState<{ show: boolean; message: string; type: 'success' | 'info' | 'error' } | null>(null);
 
+  // Notifications feed for all startups
+  const notificationsByStartup = useMemo(() => {
+    return generateStartupNotifications(startups, stage);
+  }, [startups, stage]);
+
+  // HARD DATA-FILTERING RULE (Feature C):
+  // Filtered startups depending on active persona
+  const eligibleOnlyStartups = useMemo(() => {
+    return startups.filter(
+      s => s.eligibility.status === 'Eligible' && s.aiEvaluation.recommendation !== 'Not shortlisted'
+    );
+  }, [startups]);
+
+  // G1 Ranked Startups (Filtered for Department & Public: Only Eligible & Shortlisted)
+  const g1Shortlist = useMemo(() => {
+    return eligibleOnlyStartups
+      .filter(s => s.category === 'G1' || s.aiEvaluation.recommendation === 'G1 candidate')
+      .sort((a, b) => b.aiEvaluation.overallScore - a.aiEvaluation.overallScore)
+      .slice(0, 5);
+  }, [eligibleOnlyStartups]);
+
+  // G2 Ranked Startups (Filtered for Department & Public: Min 70/100, Eligible & Shortlisted)
+  const g2Shortlist = useMemo(() => {
+    return eligibleOnlyStartups
+      .filter(s => s.aiEvaluation.overallScore >= 70 && s.aiEvaluation.recommendation === 'G2 candidate')
+      .sort((a, b) => (b.aiEvaluation.g2ValueScore?.total || 0) - (a.aiEvaluation.g2ValueScore?.total || 0))
+      .slice(0, 5);
+  }, [eligibleOnlyStartups]);
+
+  // Evaluator View Blind Data Mapping (Hides startup names and DPIIT IDs, replaces with anonymous Prototype IDs)
+  const evaluatorBlindStartups = useMemo(() => {
+    return eligibleOnlyStartups.map((s, index) => {
+      const anonymousId = `Prototype ${s.category}-${String(index + 1).padStart(2, '0')}`;
+      return {
+        ...s,
+        blindName: anonymousId,
+        blindDpiit: 'DPIIT-CONFIDENTIAL-BLIND-MASKED',
+        blindEmail: 'evaluator-relay@nic.in',
+      };
+    });
+  }, [eligibleOnlyStartups]);
+
+  // Currently Selected Startup Record
   const selectedStartup = useMemo(() => {
     return startups.find(s => s.id === selectedStartupId) || startups[0];
   }, [startups, selectedStartupId]);
 
-  // G1 Ranked Startups (Ranked by Overall Weighted Score)
-  const g1Shortlist = useMemo(() => {
-    return [...startups]
-      .filter(s => s.eligibility.status === 'Eligible')
-      .sort((a, b) => b.aiEvaluation.overallScore - a.aiEvaluation.overallScore)
-      .slice(0, 5);
-  }, [startups]);
+  // Startup isolated notifications for Startup View
+  const currentStartupNotifications: StartupNotification[] = useMemo(() => {
+    return notificationsByStartup[selectedStartup.id] || [];
+  }, [notificationsByStartup, selectedStartup.id]);
 
-  // G2 Ranked Startups (Eligible only if Overall Score >= 70, ranked by G2 Value Score formula)
-  const g2Shortlist = useMemo(() => {
-    return [...startups]
-      .filter(s => s.eligibility.status === 'Eligible' && s.aiEvaluation.overallScore >= 70)
-      .sort((a, b) => (b.aiEvaluation.g2ValueScore?.total || 0) - (a.aiEvaluation.g2ValueScore?.total || 0))
-      .slice(0, 5);
-  }, [startups]);
-
-  // Filtered startups for browsing table
-  const filteredStartups = useMemo(() => {
+  // Filtered startups for Admin table
+  const filteredAdminStartups = useMemo(() => {
     return startups.filter(s => {
       const matchCat = filterCategory === 'ALL' || s.category === filterCategory;
       const matchQuery =
@@ -127,15 +179,76 @@ export default function SimulationPage() {
     });
   }, [startups, filterCategory, searchQuery]);
 
-  // Stage Stepper Steps
+  // 6-Stage Definitions
   const STAGES = [
-    { step: 0, label: 'Draft Problem', desc: 'MoRTH defines corridor challenge' },
-    { step: 1, label: 'Eligibility Gates', desc: '8 mandatory compliance checks' },
-    { step: 2, label: 'Explainable AI Scoring', desc: '8 weighted parameters & G1/G2' },
-    { step: 3, label: 'Department Review', desc: 'Officer evaluation & audit trail' },
-    { step: 4, label: 'Independent Lab Test', desc: '15 STQC parameters tested' },
-    { step: 5, label: 'Pilot Sanctioned', desc: 'Final checklist & work order' },
+    { step: 0, label: 'Draft Problem', desc: 'MoRTH corridor challenge posted' },
+    { step: 1, label: 'Eligibility Gates', desc: '8 compliance checks verified' },
+    { step: 2, label: 'Explainable AI', desc: '8 weighted parameters & G1/G2' },
+    { step: 3, label: 'Department Review', desc: 'Officer audit & override log' },
+    { step: 4, label: 'STQC Lab Testing', desc: '15 parameters benchmarked' },
+    { step: 5, label: 'Pilot Sanctioned', desc: 'Work order & deployment' },
   ];
+
+  // STAGE ADVANCE ACTIONS (Feature E)
+  const handleAdvanceToAIShortlisting = () => {
+    setStage(2);
+    setToast({
+      show: true,
+      message: 'Explainable AI shortlisting computed. Notifications dispatched to all 10 applicant startups.',
+      type: 'success',
+    });
+  };
+
+  const handleAdvanceToLabTesting = () => {
+    setStage(4);
+    setToast({
+      show: true,
+      message: 'Proposals dispatched to STQC Testing Laboratory for independent 15-parameter benchmarking.',
+      type: 'info',
+    });
+  };
+
+  const handleConfirmAndDeploy = (startupIdToSanction?: string) => {
+    const targetId = startupIdToSanction || manualSelectedPilotId || selectedStartup.id;
+    const target = startups.find(s => s.id === targetId);
+
+    if (!target) return;
+
+    if (!target.finalSelection?.isEligibleForPilot) {
+      setToast({
+        show: true,
+        message: `Cannot sanction pilot for ${target.name}: Mandatory pre-conditions are blocking selection.`,
+        type: 'error',
+      });
+      return;
+    }
+
+    const workOrderNumber = `MORTH/DPIIT/2026/WO-${Math.floor(100 + Math.random() * 900)}`;
+
+    setStartups(prev =>
+      prev.map(s => {
+        if (s.id === target.id) {
+          return {
+            ...s,
+            finalSelection: {
+              ...s.finalSelection,
+              isFinallySelected: true,
+              workOrderNumber,
+              sanctionAmount: s.cost * 100000,
+            },
+          };
+        }
+        return s;
+      })
+    );
+
+    setStage(5);
+    setToast({
+      show: true,
+      message: `Pilot work order ${workOrderNumber} confirmed & awarded to ${target.name} (₹${target.cost} Lakhs).`,
+      type: 'success',
+    });
+  };
 
   // Helper: Open Department Review Modal
   const handleOpenDeptReview = (startup: EvaluationStartup) => {
@@ -159,7 +272,6 @@ export default function SimulationPage() {
     const isAiPositive = aiRec === 'G1 candidate' || aiRec === 'G2 candidate';
     const isDeptPositive = deptDecision === 'Approve for Prototype';
 
-    // Override Check: If AI recommended G1/G2 but Dept rejected/reserved, or AI said Not shortlisted but Dept approved
     const isOverriding = (isAiPositive && !isDeptPositive) || (!isAiPositive && isDeptPositive);
 
     if (isOverriding && (!deptOverrideReason || deptOverrideReason.trim().length < 15)) {
@@ -256,47 +368,12 @@ export default function SimulationPage() {
     });
   };
 
-  // Helper: Final Pilot Sanction Action
-  const handleSanctionPilot = (startup: EvaluationStartup) => {
-    if (!startup.finalSelection?.isEligibleForPilot) {
-      setToast({
-        show: true,
-        message: `Cannot sanction pilot for ${startup.name}: Mandatory pre-conditions are blocking selection.`,
-        type: 'error',
-      });
-      return;
-    }
-
-    const workOrderNumber = `MORTH/DPIIT/2026/WO-${Math.floor(100 + Math.random() * 900)}`;
-    setStartups(prev =>
-      prev.map(s => {
-        if (s.id === startup.id) {
-          return {
-            ...s,
-            finalSelection: {
-              ...s.finalSelection,
-              isFinallySelected: true,
-              workOrderNumber,
-              sanctionAmount: s.cost * 100000,
-            },
-          };
-        }
-        return s;
-      })
-    );
-
-    setStage(5);
-    setToast({
-      show: true,
-      message: `Pilot work order ${workOrderNumber} sanctioned for ${startup.name} (₹${startup.cost} Lakhs).`,
-      type: 'success',
-    });
-  };
-
   // Helper: Reset All Data to Baseline
   const handleResetBaseline = () => {
     setStartups(INITIAL_EVALUATION_STARTUPS);
     setStage(2);
+    setSelectedStartupId('s1');
+    setManualSelectedPilotId('s1');
     setToast({
       show: true,
       message: 'Evaluation dataset restored to clean official baseline.',
@@ -491,14 +568,48 @@ export default function SimulationPage() {
         />
       )}
 
+      {/* PERSISTENT FLOATING PERSONA SWITCHER TRIGGER (Bottom-Right) */}
+      <div className="fixed bottom-5 right-5 z-40">
+        {isFloatingSwitcherOpen ? (
+          <div className="relative">
+            <button
+              onClick={() => setIsFloatingSwitcherOpen(false)}
+              className="absolute -top-3 -right-3 w-6 h-6 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs font-bold shadow-md z-50 hover:bg-slate-800 cursor-pointer"
+            >
+              ✕
+            </button>
+            <PersonaSwitcher
+              currentPersona={currentPersona}
+              onSelectPersona={(p) => {
+                setCurrentPersona(p);
+                setIsFloatingSwitcherOpen(false);
+              }}
+              departmentName={SIMULATION_PROBLEM.department}
+              isFloating={true}
+            />
+          </div>
+        ) : (
+          <button
+            onClick={() => setIsFloatingSwitcherOpen(true)}
+            className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-gradient-to-r from-slate-950 via-slate-900 to-blue-700 text-white font-bold text-xs shadow-xl border border-blue-400/30 hover:scale-105 transition-all cursor-pointer"
+          >
+            <RotateCcw className="w-3.5 h-3.5 text-amber-400" />
+            <span>Persona Switcher</span>
+            <span className="px-2 py-0.5 rounded-full text-[10px] bg-white/20 text-white">
+              {currentPersona.toUpperCase()}
+            </span>
+          </button>
+        )}
+      </div>
+
       <main id="main-content" className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-6 space-y-6">
-        {/* TOP BANNER & STAGE STEPPER */}
+        {/* TOP BANNER WITH INTEGRATED PERSONA SWITCHER */}
         <div className="bg-white rounded-md border border-slate-200 p-5 shadow-2xs space-y-4">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-4">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-200 pb-4">
             <div>
               <div className="flex items-center gap-2">
                 <span className="px-2 py-0.5 rounded-xs text-[10px] font-black uppercase tracking-wider bg-sangam-blue-600 text-white">
-                  Part 2: Evaluation Framework
+                  Part 3: Multi-Persona Role Simulator
                 </span>
                 <span className="text-xs text-slate-500 font-mono">GFR 2017 Rules 149 / 194 Compliant</span>
               </div>
@@ -506,138 +617,312 @@ export default function SimulationPage() {
                 <Scale className="w-6 h-6 text-sangam-blue-600 shrink-0" />
                 <span>Explainable Evaluation & Statutory Procurement Simulation</span>
               </h1>
-              <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-3xl">
-                Every score, rank, and verdict is bound to verifiable evidentiary justification. Trace proposals through <strong>Eligibility Gates</strong>, <strong>8-Factor AI Scoring (G1/G2)</strong>, <strong>Department Review with Mandatory Override Auditing</strong>, <strong>15-Parameter Lab Benchmarking</strong>, and <strong>Final Pilot Sanction</strong>.
+              <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-2xl">
+                Switch between <strong>Public Portal</strong>, <strong>Startup View</strong>, <strong>Department View (MoRTH)</strong>, <strong>Evaluator Blind Review (STQC)</strong>, and <strong>Platform SuperAdmin</strong> with role-enforced data boundaries.
               </p>
             </div>
 
-            <div className="flex items-center gap-2 shrink-0">
-              <button
-                onClick={() => setIsAddStartupModalOpen(true)}
-                className="px-3 py-1.5 rounded-sm bg-sangam-blue-600 hover:bg-sangam-blue-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-2xs cursor-pointer transition-colors"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Submit New Proposal</span>
-              </button>
-              <button
-                onClick={handleResetBaseline}
-                className="px-3 py-1.5 rounded-sm border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-xs flex items-center gap-1.5 cursor-pointer transition-colors"
-                title="Reset simulation to default 10 startups"
-              >
-                <RotateCcw className="w-3.5 h-3.5 text-slate-500" />
-                <span className="hidden sm:inline">Reset Baseline</span>
-              </button>
+            {/* Persona Switcher Component Header Integration */}
+            <div className="shrink-0 flex items-center gap-2">
+              <PersonaSwitcher
+                currentPersona={currentPersona}
+                onSelectPersona={setCurrentPersona}
+                departmentName={SIMULATION_PROBLEM.department}
+              />
             </div>
           </div>
 
-          {/* 6-Stage Progress Stepper */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
-            {STAGES.map(s => {
-              const isCurrent = stage === s.step;
-              const isCompleted = stage > s.step;
-              return (
+          {/* 6-Stage Progress Stepper & Stage Advance Actions */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                Procurement Stage Progression:
+              </span>
+              <div className="flex items-center gap-1.5 text-xs">
+                {stage === 1 && (
+                  <button
+                    onClick={handleAdvanceToAIShortlisting}
+                    className="px-2.5 py-1 rounded bg-sangam-blue-600 hover:bg-sangam-blue-700 text-white font-bold text-[11px] flex items-center gap-1 cursor-pointer"
+                  >
+                    <Sparkles className="w-3 h-3 text-amber-300" />
+                    <span>Run AI Shortlisting (Advance to Stage 2)</span>
+                  </button>
+                )}
+                {stage === 2 && (
+                  <button
+                    onClick={handleAdvanceToLabTesting}
+                    className="px-2.5 py-1 rounded bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[11px] flex items-center gap-1 cursor-pointer"
+                  >
+                    <FlaskConical className="w-3 h-3" />
+                    <span>Submit Test Reports to Admin (Advance to Stage 4)</span>
+                  </button>
+                )}
+                {stage === 4 && (
+                  <button
+                    onClick={() => handleConfirmAndDeploy()}
+                    className="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] flex items-center gap-1 cursor-pointer"
+                  >
+                    <CheckCheck className="w-3 h-3" />
+                    <span>Confirm & Begin Deployment (Advance to Stage 5)</span>
+                  </button>
+                )}
                 <button
-                  key={s.step}
-                  onClick={() => setStage(s.step as SimulationStage)}
-                  className={`text-left p-2.5 rounded-sm border transition-all cursor-pointer ${
-                    isCurrent
-                      ? 'bg-sangam-navy-900 text-white border-sangam-navy-900 shadow-xs'
-                      : isCompleted
-                      ? 'bg-emerald-50 text-slate-800 border-emerald-300 hover:bg-emerald-100/70'
-                      : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-white'
-                  }`}
+                  onClick={handleResetBaseline}
+                  className="px-2.5 py-1 rounded border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold text-[11px] flex items-center gap-1 cursor-pointer"
                 >
-                  <div className="flex items-center justify-between">
-                    <span className={`text-[10px] font-black uppercase ${isCurrent ? 'text-amber-400' : isCompleted ? 'text-emerald-700' : 'text-slate-500'}`}>
-                      Stage 0{s.step + 1}
-                    </span>
-                    {isCompleted ? (
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                    ) : isCurrent ? (
-                      <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                    ) : (
-                      <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                    )}
-                  </div>
-                  <div className="font-bold text-xs mt-0.5 truncate">{s.label}</div>
-                  <div className={`text-[10px] truncate ${isCurrent ? 'text-slate-300' : 'text-slate-500'}`}>
-                    {s.desc}
-                  </div>
+                  <RotateCcw className="w-3 h-3 text-slate-500" />
+                  <span>Reset Data</span>
                 </button>
-              );
-            })}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+              {STAGES.map(s => {
+                const isCurrent = stage === s.step;
+                const isCompleted = stage > s.step;
+                return (
+                  <button
+                    key={s.step}
+                    onClick={() => setStage(s.step as SimulationStage)}
+                    className={`text-left p-2.5 rounded-sm border transition-all cursor-pointer ${
+                      isCurrent
+                        ? 'bg-sangam-navy-900 text-white border-sangam-navy-900 shadow-xs'
+                        : isCompleted
+                        ? 'bg-emerald-50 text-slate-800 border-emerald-300 hover:bg-emerald-100/70'
+                        : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-white'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span
+                        className={`text-[10px] font-black uppercase ${
+                          isCurrent ? 'text-amber-400' : isCompleted ? 'text-emerald-700' : 'text-slate-500'
+                        }`}
+                      >
+                        Stage 0{s.step + 1}
+                      </span>
+                      {isCompleted ? (
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                      ) : isCurrent ? (
+                        <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                      ) : (
+                        <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      )}
+                    </div>
+                    <div className="font-bold text-xs mt-0.5 truncate">{s.label}</div>
+                    <div className={`text-[10px] truncate ${isCurrent ? 'text-slate-300' : 'text-slate-500'}`}>
+                      {s.desc}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
 
-        {/* ROLE-BASED TABS NAVIGATION */}
-        <div className="flex items-center justify-between border-b border-slate-300">
-          <div className="flex items-center gap-1 overflow-x-auto">
-            <button
-              onClick={() => setActiveTab('government')}
-              className={`px-4 py-2.5 font-bold text-xs sm:text-sm border-b-2 transition-colors flex items-center gap-2 cursor-pointer ${
-                activeTab === 'government'
-                  ? 'border-sangam-blue-600 text-sangam-blue-700 bg-white'
-                  : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
-              }`}
-            >
-              <Building2 className="w-4 h-4 text-sangam-blue-600" />
-              <span>Government / Department Review</span>
-              <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-sangam-blue-100 text-sangam-blue-800">
-                MoRTH
-              </span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('admin')}
-              className={`px-4 py-2.5 font-bold text-xs sm:text-sm border-b-2 transition-colors flex items-center gap-2 cursor-pointer ${
-                activeTab === 'admin'
-                  ? 'border-sangam-blue-600 text-sangam-blue-700 bg-white'
-                  : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
-              }`}
-            >
-              <Shield className="w-4 h-4 text-sangam-navy-900" />
-              <span>DPIIT National Admin Overview</span>
-              <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-200 text-slate-800">
-                {startups.length} Startups
-              </span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('testing_org')}
-              className={`px-4 py-2.5 font-bold text-xs sm:text-sm border-b-2 transition-colors flex items-center gap-2 cursor-pointer ${
-                activeTab === 'testing_org'
-                  ? 'border-sangam-blue-600 text-sangam-blue-700 bg-white'
-                  : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
-              }`}
-            >
-              <FlaskConical className="w-4 h-4 text-indigo-600" />
-              <span>STQC / C-DAC Testing Lab</span>
-              <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-indigo-100 text-indigo-800">
-                15 Parameters
-              </span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('startup')}
-              className={`px-4 py-2.5 font-bold text-xs sm:text-sm border-b-2 transition-colors flex items-center gap-2 cursor-pointer ${
-                activeTab === 'startup'
-                  ? 'border-sangam-blue-600 text-sangam-blue-700 bg-white'
-                  : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
-              }`}
-            >
-              <Rocket className="w-4 h-4 text-amber-600" />
-              <span>Startup Self-View</span>
-              <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-900">
-                {selectedStartup.name}
-              </span>
-            </button>
-          </div>
-        </div>
-
-        {/* TAB 1: GOVERNMENT / DEPARTMENT TAB */}
-        {activeTab === 'government' && (
+        {/* ========================================================= */}
+        {/* VIEW 1: PUBLIC PORTAL PERSONA (FEATURE C) */}
+        {/* ========================================================= */}
+        {currentPersona === 'public' && (
           <div className="space-y-6">
-            {/* Active Problem Statement Card */}
+            <div className="bg-white p-6 rounded-md border border-slate-200 shadow-2xs space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+                <div className="flex items-center gap-2">
+                  <span className="p-2 bg-blue-50 text-blue-600 rounded-sm">
+                    <Eye className="w-5 h-5" />
+                  </span>
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-blue-700 bg-blue-100 px-2 py-0.5 rounded-xs">
+                      Public Portal • Read-Only Transparency View
+                    </span>
+                    <h2 className="text-lg font-black text-sangam-navy-900 mt-1">
+                      {SIMULATION_PROBLEM.title}
+                    </h2>
+                  </div>
+                </div>
+                <span className="px-2.5 py-1 rounded text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                  {stage >= 5 ? 'Pilot Awarded' : 'Active Challenge Cycle'}
+                </span>
+              </div>
+
+              <p className="text-xs text-slate-700 leading-relaxed">{SIMULATION_PROBLEM.statement}</p>
+
+              {/* High-Level Public Aggregate Counts Only (No Startup Names, Scores, or Verdicts) */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+                <div className="p-3 bg-slate-50 rounded-sm border border-slate-200 text-center">
+                  <span className="text-[10px] text-slate-500 uppercase font-bold block">Proposals Received</span>
+                  <span className="text-base font-black text-slate-900">{startups.length} Submissions</span>
+                </div>
+                <div className="p-3 bg-slate-50 rounded-sm border border-slate-200 text-center">
+                  <span className="text-[10px] text-slate-500 uppercase font-bold block">Sanctioned Budget</span>
+                  <span className="text-base font-black text-emerald-700">
+                    ₹{SIMULATION_PROBLEM.budgetMin}L – ₹{SIMULATION_PROBLEM.budgetMax}L
+                  </span>
+                </div>
+                <div className="p-3 bg-slate-50 rounded-sm border border-slate-200 text-center">
+                  <span className="text-[10px] text-slate-500 uppercase font-bold block">Pilot Timeline</span>
+                  <span className="text-base font-black text-blue-700">{SIMULATION_PROBLEM.timelineMonths} Months</span>
+                </div>
+                <div className="p-3 bg-slate-50 rounded-sm border border-slate-200 text-center">
+                  <span className="text-[10px] text-slate-500 uppercase font-bold block">Host Department</span>
+                  <span className="text-base font-black text-sangam-navy-900">{SIMULATION_PROBLEM.department}</span>
+                </div>
+              </div>
+
+              <div className="p-3.5 bg-blue-50/70 border border-blue-200 rounded-sm text-xs text-blue-900 space-y-1">
+                <div className="font-bold flex items-center gap-1.5">
+                  <Info className="w-4 h-4 text-blue-600 shrink-0" />
+                  <span>Public Transparency & Statutory Procurement Compliance Notice</span>
+                </div>
+                <p className="text-[11px] text-blue-800 leading-relaxed">
+                  Under the GFR 2017 Innovation Procurement Guidelines, individual startup names, interim AI scorecards, and proprietary laboratory logs remain confidential during active evaluation to maintain competitive fairness and prevent market distortion. Final sanctioned contract awards are published to the public gazette upon completion.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================= */}
+        {/* VIEW 2: STARTUP VIEW PERSONA (SCOPED + NOTIFICATIONS - FEATURE C & E) */}
+        {/* ========================================================= */}
+        {currentPersona === 'startup' && (
+          <div className="space-y-6">
+            <div className="bg-white p-5 rounded-md border border-slate-200 shadow-2xs space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 bg-amber-50 px-2 py-0.5 rounded-xs">
+                    Startup Portal Self-Inspection (Scoped to Your Entity Only)
+                  </span>
+                  <h2 className="text-base sm:text-lg font-black text-sangam-navy-900 mt-1">
+                    {selectedStartup.name} • Evaluation Transparency Dossier
+                  </h2>
+                  <p className="text-xs text-slate-500 font-mono">DPIIT ID: {selectedStartup.dpiitNumber}</p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-slate-600">Simulate Startup:</span>
+                  <select
+                    value={selectedStartup.id}
+                    onChange={e => setSelectedStartupId(e.target.value)}
+                    className="text-xs font-semibold px-2 py-1 rounded border border-slate-300 bg-white cursor-pointer"
+                  >
+                    {startups.map(s => (
+                      <option key={s.id} value={s.id}>
+                        {s.name} ({s.category})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Startup In-App Notification Feed (Feature E) */}
+              <div className="p-4 bg-slate-50 rounded-sm border border-slate-200 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Bell className="w-4 h-4 text-amber-600" />
+                    <span className="text-xs font-black uppercase tracking-wider text-slate-800">
+                      In-App Official Notifications ({currentStartupNotifications.length})
+                    </span>
+                  </div>
+                  <span className="text-[10px] text-slate-500 font-mono">Isolated to {selectedStartup.name}</span>
+                </div>
+
+                <div className="space-y-2">
+                  {currentStartupNotifications.map(notif => (
+                    <div
+                      key={notif.id}
+                      className="p-3 bg-white rounded border border-slate-200 text-xs space-y-1 shadow-2xs"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-slate-900">{notif.title}</span>
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`px-1.5 py-0.2 rounded-xs text-[10px] font-bold ${
+                              notif.badgeColor === 'emerald'
+                                ? 'bg-emerald-100 text-emerald-800'
+                                : notif.badgeColor === 'amber'
+                                ? 'bg-amber-100 text-amber-800'
+                                : notif.badgeColor === 'rose'
+                                ? 'bg-rose-100 text-rose-800'
+                                : 'bg-blue-100 text-blue-800'
+                            }`}
+                          >
+                            {notif.badgeText}
+                          </span>
+                          <span className="text-[10px] text-slate-400 font-mono">{notif.timestamp}</span>
+                        </div>
+                      </div>
+                      <p className="text-[11px] text-slate-600 leading-relaxed">{notif.message}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Startup Own Evaluation Parameters */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between border-b border-slate-200 pb-1">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
+                    Your 8-Factor Explainable AI Scorecard (Overall Score: {selectedStartup.aiEvaluation.overallScore}/100)
+                  </h3>
+                  <span className="text-xs font-bold text-sangam-blue-600">
+                    Track: {selectedStartup.aiEvaluation.recommendation}
+                  </span>
+                </div>
+
+                <div className="space-y-2">
+                  {selectedStartup.aiEvaluation.parameters.map((param, idx) => (
+                    <ScoreRow
+                      key={idx}
+                      id={`startup-ai-param-${idx}`}
+                      label={param.name}
+                      value={param.score}
+                      weight={param.weight}
+                      justification={param.justification}
+                      evidence={param.evidence}
+                      confidence={param.confidence}
+                      category="AI Parameter"
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Startup Own STQC Lab Test Results (If stage >= 3) */}
+              {stage >= 3 && (
+                <div className="space-y-3 pt-3 border-t border-slate-200">
+                  <div className="flex items-center justify-between border-b border-slate-200 pb-1">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
+                      Your STQC Laboratory Benchmarking Report (Result: {selectedStartup.prototypeTesting.overallResult})
+                    </h3>
+                    <span className="text-xs text-slate-500 font-mono">
+                      Cert: {selectedStartup.prototypeTesting.testCertificateId}
+                    </span>
+                  </div>
+
+                  <div className="space-y-2">
+                    {selectedStartup.prototypeTesting.parameters.map((param, idx) => (
+                      <ScoreRow
+                        key={idx}
+                        id={`startup-proto-param-${idx}`}
+                        label={param.name}
+                        value={param.result}
+                        isMandatory={param.isMandatory}
+                        justification={param.justification}
+                        evidence={param.evidence ? [param.evidence] : []}
+                        category="STQC Lab Test"
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================= */}
+        {/* VIEW 3: DEPARTMENT VIEW PERSONA (RESTRICTED + MANUAL PICK - FEATURE C) */}
+        {/* ========================================================= */}
+        {currentPersona === 'department' && (
+          <div className="space-y-6">
+            {/* Active Challenge Card */}
             <div className="bg-white p-5 rounded-md border border-slate-200 shadow-2xs space-y-3">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
                 <div className="flex items-center gap-2">
@@ -646,7 +931,7 @@ export default function SimulationPage() {
                   </span>
                   <div>
                     <span className="text-[10px] font-bold uppercase tracking-wider text-sangam-blue-700">
-                      Active Challenge • {SIMULATION_PROBLEM.department}
+                      Ministry Evaluation Portal • {SIMULATION_PROBLEM.department}
                     </span>
                     <h2 className="text-base sm:text-lg font-black text-sangam-navy-900">
                       {SIMULATION_PROBLEM.title}
@@ -661,20 +946,9 @@ export default function SimulationPage() {
                 </div>
               </div>
               <p className="text-xs text-slate-700 leading-relaxed">{SIMULATION_PROBLEM.statement}</p>
-              <div className="flex flex-wrap items-center gap-4 text-xs font-semibold text-slate-600 pt-1">
-                <span className="flex items-center gap-1.5">
-                  <Target className="w-3.5 h-3.5 text-emerald-600" /> Outcome: {SIMULATION_PROBLEM.outcome}
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5 text-blue-600" /> Timeline: {SIMULATION_PROBLEM.timelineMonths} Months
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <Shield className="w-3.5 h-3.5 text-purple-600" /> {SIMULATION_PROBLEM.eligibility}
-                </span>
-              </div>
             </div>
 
-            {/* ANTI-BIAS RULE NOTICE (Placing once prominently near AI Scoring section) */}
+            {/* Anti-Bias Rule Banner */}
             <div className="bg-slate-900 text-white p-3.5 rounded-md flex items-start gap-3 shadow-xs">
               <Shield className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
               <div className="text-xs space-y-0.5">
@@ -682,14 +956,14 @@ export default function SimulationPage() {
                   Statutory AI Anti-Bias & Objective Scoring Mandate
                 </div>
                 <p className="text-slate-300 leading-snug">
-                  AI scoring excludes founder identity, gender, caste, religion, political affiliation, college prestige, social-media popularity, and unrelated brand recognition. Scores reflect problem fit, technical feasibility, impact potential, cost efficiency, and verified execution evidence only.
+                  AI scoring excludes founder identity, personal popularity, and unrelated brand recognition. Scores reflect problem fit, technical feasibility, impact potential, cost efficiency, and verified execution evidence only.
                 </p>
               </div>
             </div>
 
-            {/* G1 & G2 SHORTLIST TABLES WITH EXPLAINABLE FORMULAS */}
+            {/* G1 & G2 SHORTLIST TABLES (EXCLUDES ELIMINATED STARTUPS) */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* G1 SHORTLIST (Top 5 Overall Quality) */}
+              {/* G1 SHORTLIST */}
               <div className="bg-white p-5 rounded-md border border-slate-200 shadow-2xs space-y-4">
                 <div className="flex items-center justify-between border-b border-slate-200 pb-3">
                   <div>
@@ -700,7 +974,7 @@ export default function SimulationPage() {
                       Ranked strictly by 8-Factor Weighted AI Score
                     </h3>
                   </div>
-                  <span className="text-[11px] text-slate-500 italic">Lowest price not required</span>
+                  <span className="text-[11px] text-slate-500 italic">Eligible teams only</span>
                 </div>
 
                 <div className="space-y-3">
@@ -709,6 +983,7 @@ export default function SimulationPage() {
                       key={startup.id}
                       onClick={() => {
                         setSelectedStartupId(startup.id);
+                        setManualSelectedPilotId(startup.id);
                         setIsDetailModalOpen(true);
                       }}
                       className="p-3.5 rounded-sm border border-slate-200 bg-slate-50 hover:bg-white hover:border-sangam-blue-500 transition-all cursor-pointer space-y-2"
@@ -734,12 +1009,10 @@ export default function SimulationPage() {
                         </div>
                       </div>
 
-                      {/* Top Justification Snippet */}
                       <p className="text-[11px] text-slate-600 line-clamp-1 italic">
                         &quot;{startup.aiEvaluation.parameters[0].justification}&quot;
                       </p>
 
-                      {/* Status Badges & Action Buttons */}
                       <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-200">
                         <div className="flex items-center gap-1.5 text-[10px]">
                           <span className="font-bold text-slate-700">Lab Test:</span>
@@ -773,6 +1046,7 @@ export default function SimulationPage() {
                             onClick={(e) => {
                               e.stopPropagation();
                               setSelectedStartupId(startup.id);
+                              setManualSelectedPilotId(startup.id);
                               setIsDetailModalOpen(true);
                             }}
                             className="text-[11px] font-bold text-slate-600 hover:text-slate-900 flex items-center gap-1 cursor-pointer"
@@ -786,7 +1060,7 @@ export default function SimulationPage() {
                 </div>
               </div>
 
-              {/* G2 SHORTLIST (Top 5 Best Value) */}
+              {/* G2 SHORTLIST */}
               <div className="bg-white p-5 rounded-md border border-slate-200 shadow-2xs space-y-4">
                 <div className="flex items-center justify-between border-b border-slate-200 pb-3">
                   <div>
@@ -797,7 +1071,7 @@ export default function SimulationPage() {
                       Quality (60%) + Cost Eff. (25%) + Impact (15%)
                     </h3>
                   </div>
-                  <span className="text-[10px] text-slate-500 font-bold">Min 70/100 Quality Required</span>
+                  <span className="text-[10px] text-slate-500 font-bold">Min 70/100 Quality</span>
                 </div>
 
                 <div className="space-y-3">
@@ -806,6 +1080,7 @@ export default function SimulationPage() {
                       key={startup.id}
                       onClick={() => {
                         setSelectedStartupId(startup.id);
+                        setManualSelectedPilotId(startup.id);
                         setIsDetailModalOpen(true);
                       }}
                       className="p-3.5 rounded-sm border border-slate-200 bg-slate-50 hover:bg-white hover:border-blue-500 transition-all cursor-pointer space-y-2"
@@ -831,7 +1106,6 @@ export default function SimulationPage() {
                         </div>
                       </div>
 
-                      {/* Formula 3-Component Breakdown */}
                       {startup.aiEvaluation.g2ValueScore && (
                         <div className="grid grid-cols-3 gap-1 bg-white p-2 rounded-xs border border-slate-200 text-[10px] text-center">
                           <div>
@@ -855,7 +1129,6 @@ export default function SimulationPage() {
                         </div>
                       )}
 
-                      {/* Action Strip */}
                       <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-200">
                         <div className="flex items-center gap-1.5 text-[10px]">
                           <span className="font-bold text-slate-700">Lab Test:</span>
@@ -889,6 +1162,7 @@ export default function SimulationPage() {
                             onClick={(e) => {
                               e.stopPropagation();
                               setSelectedStartupId(startup.id);
+                              setManualSelectedPilotId(startup.id);
                               setIsDetailModalOpen(true);
                             }}
                             className="text-[11px] font-bold text-slate-600 hover:text-slate-900 flex items-center gap-1 cursor-pointer"
@@ -900,134 +1174,217 @@ export default function SimulationPage() {
                     </div>
                   ))}
                 </div>
-
-                <p className="text-[11px] text-slate-500 italic text-center pt-2 border-t border-slate-200">
-                  * Note: Cheapest is not automatically best — ranked by quality-to-cost ratio and measurable impact potential.
-                </p>
               </div>
             </div>
 
-            {/* FINAL PILOT SELECTION GATE (LAYER 5) */}
+            {/* MANUAL FINAL SELECTION & SANCTION GATE (FEATURE C EXTENSION) */}
             <div className="bg-white p-5 rounded-md border border-slate-200 shadow-2xs space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
                 <div>
                   <span className="text-[10px] font-bold uppercase tracking-wider text-purple-700 bg-purple-100 px-2 py-0.5 rounded-xs">
-                    Layer 5: Statutory Final Selection Gate
+                    Layer 5: Manual Pilot Award Selection (GFR 149 / 194)
                   </span>
                   <h3 className="text-base font-black text-sangam-navy-900 mt-1">
-                    Sanction Work Order & Issue Pilot Contract (GFR 149 / 194)
+                    Select ANY Eligible G1/G2 Shortlisted Team for Pilot Sanction
                   </h3>
                 </div>
                 <div className="text-xs text-slate-500">
-                  Select startup to review its 10-point statutory pre-condition checklist:
+                  Choose from shortlisted candidates who cleared the 10-point checklist:
                 </div>
               </div>
 
-              {/* Startup Selector for Final Gate */}
-              <div className="flex items-center gap-2 overflow-x-auto pb-2">
-                {startups.map(s => (
-                  <button
-                    key={s.id}
-                    onClick={() => setSelectedStartupId(s.id)}
-                    className={`px-3 py-1.5 rounded-sm text-xs font-bold whitespace-nowrap transition-colors cursor-pointer border ${
-                      selectedStartup.id === s.id
-                        ? 'bg-sangam-navy-900 text-white border-sangam-navy-900'
-                        : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
-                    }`}
-                  >
-                    {s.name} ({s.category})
-                  </button>
-                ))}
-              </div>
-
-              {/* Checklist & Gate Display for Selected Startup */}
-              <div className="bg-slate-50 p-4 rounded-sm border border-slate-200 space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
-                  <div>
-                    <h4 className="font-black text-sm text-slate-900">{selectedStartup.name}</h4>
-                    <p className="text-xs text-slate-600">{selectedStartup.solutionTitle}</p>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <div className="text-right">
-                      <span className="text-[10px] text-slate-500 uppercase font-bold block">Sanction Ceiling</span>
-                      <span className="text-base font-black text-emerald-700">₹{selectedStartup.cost} Lakhs</span>
-                    </div>
-
-                    {selectedStartup.finalSelection?.isFinallySelected ? (
-                      <span className="px-3 py-1 rounded-sm bg-emerald-600 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs">
-                        <CheckCircle2 className="w-4 h-4" /> Sanctioned ({selectedStartup.finalSelection.workOrderNumber})
-                      </span>
-                    ) : (
-                      <button
-                        onClick={() => handleSanctionPilot(selectedStartup)}
-                        disabled={!selectedStartup.finalSelection?.isEligibleForPilot}
-                        className={`px-4 py-2 rounded-sm font-bold text-xs flex items-center gap-1.5 shadow-xs transition-colors ${
-                          selectedStartup.finalSelection?.isEligibleForPilot
-                            ? 'bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer'
-                            : 'bg-slate-300 text-slate-500 cursor-not-allowed'
-                        }`}
-                      >
-                        <FileCheck2 className="w-4 h-4" />
-                        <span>Sanction Pilot Work Order</span>
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                {/* Blocking Items Notice if Blocked */}
-                {selectedStartup.finalSelection?.blockingItems &&
-                  selectedStartup.finalSelection.blockingItems.length > 0 && (
-                    <div className="p-3 bg-rose-50 border border-rose-300 rounded-sm space-y-1">
-                      <div className="flex items-center gap-1.5 text-xs font-bold text-rose-900">
-                        <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
-                        <span>Selection Blocked: {selectedStartup.finalSelection.blockingItems.length} Mandatory Items Unmet</span>
-                      </div>
-                      <ul className="text-[11px] text-rose-800 list-disc list-inside space-y-0.5">
-                        {selectedStartup.finalSelection.blockingItems.map((item, idx) => (
-                          <li key={idx}>{item}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                {/* 10-Point Checklist Items with Justifications */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  {selectedStartup.finalSelection?.checklist.map(item => (
+              {/* Radio Selector for Manual Pick across ALL Eligible Shortlisted Teams */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+                {eligibleOnlyStartups.map(s => {
+                  const isChosen = manualSelectedPilotId === s.id;
+                  const isEligible = s.finalSelection?.isEligibleForPilot;
+                  const isAwarded = s.finalSelection?.isFinallySelected;
+                  return (
                     <div
-                      key={item.key}
-                      className={`p-2.5 rounded-sm border text-xs flex items-start gap-2 ${
-                        item.isPassed
-                          ? 'bg-white border-slate-200'
-                          : 'bg-rose-50/50 border-rose-200'
+                      key={s.id}
+                      onClick={() => {
+                        setManualSelectedPilotId(s.id);
+                        setSelectedStartupId(s.id);
+                      }}
+                      className={`p-3 rounded border text-xs cursor-pointer transition-all space-y-1 ${
+                        isChosen
+                          ? 'border-sangam-blue-600 bg-blue-50/50 shadow-xs'
+                          : 'border-slate-200 bg-slate-50 hover:bg-white'
                       }`}
                     >
-                      {item.isPassed ? (
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                      ) : (
-                        <XCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
-                      )}
-                      <div className="flex-1">
-                        <div className="font-bold text-slate-900 flex items-center justify-between">
-                          <span>{item.label}</span>
-                          {item.isMandatory && (
-                            <span className="text-[9px] font-bold px-1 rounded bg-slate-100 text-slate-600">
-                              Mandatory
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-[11px] text-slate-600 mt-0.5 leading-snug">{item.justification}</p>
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-slate-900">{s.name}</span>
+                        <span className="text-[10px] font-black px-1.5 py-0.2 rounded bg-slate-200 text-slate-800">
+                          {s.category}
+                        </span>
+                      </div>
+                      <div className="text-[11px] text-slate-500 truncate">{s.solutionTitle}</div>
+                      <div className="flex items-center justify-between pt-1 text-[10px]">
+                        <span className="font-black text-emerald-700">₹{s.cost} Lakhs</span>
+                        {isAwarded ? (
+                          <span className="font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.2 rounded">
+                            Awarded ({s.finalSelection.workOrderNumber})
+                          </span>
+                        ) : isEligible ? (
+                          <span className="font-bold text-blue-700 bg-blue-100 px-1.5 py-0.2 rounded">
+                            Eligible for Sanction
+                          </span>
+                        ) : (
+                          <span className="font-bold text-rose-700 bg-rose-100 px-1.5 py-0.2 rounded">
+                            Pre-conditions Blocked
+                          </span>
+                        )}
                       </div>
                     </div>
-                  ))}
+                  );
+                })}
+              </div>
+
+              {/* Action Bar for Manual Award */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-200 bg-slate-50 p-4 rounded-sm">
+                <div>
+                  <div className="text-xs font-bold text-slate-900">
+                    Selected for Sanction: <span className="text-sangam-blue-700">{selectedStartup.name}</span>
+                  </div>
+                  <div className="text-[11px] text-slate-500">
+                    Cost: ₹{selectedStartup.cost} Lakhs • AI Score: {selectedStartup.aiEvaluation.overallScore}/100 • Lab Result: {selectedStartup.prototypeTesting.overallResult}
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  {selectedStartup.finalSelection?.isFinallySelected ? (
+                    <span className="px-4 py-2 rounded-sm bg-emerald-600 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs">
+                      <CheckCircle2 className="w-4 h-4" /> Sanctioned ({selectedStartup.finalSelection.workOrderNumber})
+                    </span>
+                  ) : (
+                    <button
+                      onClick={() => handleConfirmAndDeploy(selectedStartup.id)}
+                      disabled={!selectedStartup.finalSelection?.isEligibleForPilot}
+                      className={`px-5 py-2.5 rounded-sm font-bold text-xs flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer ${
+                        selectedStartup.finalSelection?.isEligibleForPilot
+                          ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                          : 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                      }`}
+                    >
+                      <FileCheck2 className="w-4 h-4" />
+                      <span>Confirm & Begin Deployment (Sanction Pilot)</span>
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
           </div>
         )}
 
-        {/* TAB 2: DPIIT ADMIN MASTER OVERVIEW */}
-        {activeTab === 'admin' && (
+        {/* ========================================================= */}
+        {/* VIEW 4: EVALUATOR VIEW PERSONA (BLIND REVIEW MODE - FEATURE C) */}
+        {/* ========================================================= */}
+        {currentPersona === 'evaluator' && (
+          <div className="space-y-6">
+            <div className="bg-white p-5 rounded-md border border-slate-200 shadow-2xs space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
+                <div className="flex items-center gap-2">
+                  <span className="p-2 bg-emerald-50 text-emerald-700 rounded-sm">
+                    <UserCheck className="w-5 h-5" />
+                  </span>
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-xs">
+                      STQC / C-DAC Testing Laboratory • Blind Review Mode Active
+                    </span>
+                    <h2 className="text-base sm:text-lg font-black text-sangam-navy-900">
+                      Standardisation Testing and Quality Certification (STQC)
+                    </h2>
+                  </div>
+                </div>
+                <div className="text-xs text-slate-600">
+                  Anonymous Blind Masking Active (Founder & Entity Identity Shielded)
+                </div>
+              </div>
+
+              {/* Blind Prototype Selector */}
+              <div className="flex items-center gap-2 overflow-x-auto pb-1">
+                {evaluatorBlindStartups.map(s => (
+                  <button
+                    key={s.id}
+                    onClick={() => setSelectedStartupId(s.id)}
+                    className={`px-3 py-1.5 rounded-sm text-xs font-bold whitespace-nowrap transition-colors cursor-pointer border ${
+                      selectedStartup.id === s.id
+                        ? 'bg-emerald-800 text-white border-emerald-800'
+                        : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                    }`}
+                  >
+                    {s.blindName} ({s.prototypeTesting.overallResult})
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Blind Review Evaluation Dossier */}
+            <div className="bg-white p-5 rounded-md border border-slate-200 shadow-2xs space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-base font-black text-slate-900">
+                      {evaluatorBlindStartups.find(b => b.id === selectedStartup.id)?.blindName || 'Prototype Blind ID'}
+                    </h3>
+                    <span className="text-xs text-slate-500 font-mono">
+                      Cert: {selectedStartup.prototypeTesting.testCertificateId}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-600 mt-0.5">
+                    Testing Lab: {selectedStartup.prototypeTesting.testedByLab} • Architecture: {selectedStartup.solutionTitle}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`px-3 py-1 rounded-sm text-xs font-black uppercase tracking-wider border ${
+                      selectedStartup.prototypeTesting.overallResult === 'Pass'
+                        ? 'bg-emerald-100 text-emerald-900 border-emerald-300'
+                        : selectedStartup.prototypeTesting.overallResult === 'Conditional Pass'
+                        ? 'bg-amber-100 text-amber-900 border-amber-300'
+                        : 'bg-rose-100 text-rose-900 border-rose-300'
+                    }`}
+                  >
+                    Overall Verdict: {selectedStartup.prototypeTesting.overallResult}
+                  </span>
+
+                  <button
+                    onClick={() => handleOpenLabTest(selectedStartup)}
+                    className="px-3 py-1 rounded-sm bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs flex items-center gap-1.5 shadow-2xs cursor-pointer"
+                  >
+                    <Edit3 className="w-3.5 h-3.5" />
+                    <span>Audit 15 Parameters</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* 15 Parameter Rows */}
+              <div className="space-y-2.5">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                  15 Independent Laboratory Benchmarking Parameters:
+                </h4>
+                {selectedStartup.prototypeTesting.parameters.map((param, idx) => (
+                  <ScoreRow
+                    key={idx}
+                    id={`evaluator-param-${idx}`}
+                    label={param.name}
+                    value={param.result}
+                    isMandatory={param.isMandatory}
+                    justification={param.justification}
+                    evidence={param.evidence ? [param.evidence] : []}
+                    category="STQC Lab Test"
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================= */}
+        {/* VIEW 5: PLATFORM ADMIN PERSONA (FULL VISIBILITY + FEATURE D) */}
+        {/* ========================================================= */}
+        {currentPersona === 'admin' && (
           <div className="space-y-6">
             {/* Filter and Search Bar */}
             <div className="bg-white p-4 rounded-md border border-slate-200 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-3">
@@ -1048,7 +1405,7 @@ export default function SimulationPage() {
                   onClick={() => setFilterCategory('ALL')}
                   className={`px-2.5 py-1 rounded-sm text-xs font-bold cursor-pointer transition-colors ${
                     filterCategory === 'ALL'
-                      ? 'bg-sangam-navy-900 text-white'
+                      ? 'bg-slate-950 text-white'
                       : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                   }`}
                 >
@@ -1077,12 +1434,12 @@ export default function SimulationPage() {
               </div>
             </div>
 
-            {/* Master Table */}
+            {/* Master Admin Table */}
             <div className="bg-white rounded-md border border-slate-200 shadow-2xs overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
-                    <tr className="bg-slate-900 text-white font-bold border-b border-slate-800">
+                    <tr className="bg-slate-950 text-white font-bold border-b border-slate-800">
                       <th className="p-3">Startup & Solution</th>
                       <th className="p-3">DPIIT Recognition</th>
                       <th className="p-3">Eligibility Gate</th>
@@ -1094,7 +1451,7 @@ export default function SimulationPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200">
-                    {filteredStartups.map(startup => (
+                    {filteredAdminStartups.map(startup => (
                       <tr key={startup.id} className="hover:bg-slate-50 transition-colors">
                         <td className="p-3">
                           <div className="font-bold text-slate-900">{startup.name}</div>
@@ -1172,7 +1529,7 @@ export default function SimulationPage() {
                               setSelectedStartupId(startup.id);
                               setIsDetailModalOpen(true);
                             }}
-                            className="px-2.5 py-1 rounded-sm bg-sangam-navy-900 text-white font-bold text-[11px] hover:bg-slate-800 cursor-pointer transition-colors"
+                            className="px-2.5 py-1 rounded-sm bg-slate-900 text-white font-bold text-[11px] hover:bg-slate-800 cursor-pointer transition-colors"
                           >
                             Inspect Audit
                           </button>
@@ -1183,206 +1540,198 @@ export default function SimulationPage() {
                 </table>
               </div>
             </div>
-          </div>
-        )}
 
-        {/* TAB 3: STQC / C-DAC TESTING LAB TAB */}
-        {activeTab === 'testing_org' && (
-          <div className="space-y-6">
-            <div className="bg-white p-5 rounded-md border border-slate-200 shadow-2xs space-y-3">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
+            {/* ========================================================= */}
+            {/* FEATURE D: AI FILTRATION TRANSPARENCY SECTION (NEW ADMIN EXTENSION) */}
+            {/* ========================================================= */}
+            <div className="bg-white p-6 rounded-md border border-slate-200 shadow-2xs space-y-6">
+              <div className="border-b border-slate-200 pb-4">
                 <div className="flex items-center gap-2">
-                  <span className="p-2 bg-indigo-50 text-indigo-600 rounded-sm">
-                    <FlaskConical className="w-5 h-5" />
+                  <span className="p-1.5 bg-purple-100 text-purple-800 rounded-sm">
+                    <ShieldAlert className="w-4 h-4" />
                   </span>
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-700">
-                      Independent Laboratory Benchmarking
+                    <span className="text-[10px] font-black uppercase tracking-wider text-purple-800 bg-purple-100 px-2 py-0.5 rounded-xs">
+                      Feature D • Admin Exclusive Audit Section
                     </span>
-                    <h2 className="text-base sm:text-lg font-black text-sangam-navy-900">
-                      Standardisation Testing and Quality Certification (STQC) / C-DAC
+                    <h2 className="text-base sm:text-lg font-black text-sangam-navy-900 mt-1">
+                      AI Filtration Transparency & Elimination Audit
                     </h2>
                   </div>
                 </div>
-                <div className="text-xs text-slate-600">
-                  Select startup prototype to conduct or modify testing parameters:
-                </div>
+                <p className="text-xs text-slate-600 mt-1">
+                  Full granular inspection across all <strong>{startups.length} submitted proposals</strong>. Audits every &quot;Not shortlisted&quot; and &quot;Fail&quot; entity, highlighting exact pull-down factors and the G1/G2 mathematical basis for selection.
+                </p>
               </div>
 
-              {/* Startup Selector for Lab */}
-              <div className="flex items-center gap-2 overflow-x-auto pb-1">
-                {startups.map(s => (
-                  <button
-                    key={s.id}
-                    onClick={() => setSelectedStartupId(s.id)}
-                    className={`px-3 py-1.5 rounded-sm text-xs font-bold whitespace-nowrap transition-colors cursor-pointer border ${
-                      selectedStartup.id === s.id
-                        ? 'bg-indigo-900 text-white border-indigo-900'
-                        : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
-                    }`}
-                  >
-                    {s.name} ({s.prototypeTesting.overallResult})
-                  </button>
-                ))}
-              </div>
-            </div>
+              {/* Full Inspection Across All Startups */}
+              <div className="space-y-6">
+                {startups.map((st, index) => {
+                  const isNotShortlisted = st.aiEvaluation.recommendation === 'Not shortlisted';
+                  const isShortlistedG1 = st.aiEvaluation.recommendation === 'G1 candidate';
+                  const isShortlistedG2 = st.aiEvaluation.recommendation === 'G2 candidate';
 
-            {/* Active Lab Benchmark Report */}
-            <div className="bg-white p-5 rounded-md border border-slate-200 shadow-2xs space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-base font-black text-slate-900">{selectedStartup.name}</h3>
-                    <span className="text-xs text-slate-500 font-mono">
-                      Cert: {selectedStartup.prototypeTesting.testCertificateId}
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-600 mt-0.5">
-                    Evaluated by: {selectedStartup.prototypeTesting.testedByLab}
-                  </p>
-                </div>
+                  // Identify lowest pull-down parameters
+                  const pullDownParams = [...st.aiEvaluation.parameters].sort((a, b) => a.score - b.score).slice(0, 2);
 
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`px-3 py-1 rounded-sm text-xs font-black uppercase tracking-wider border ${
-                      selectedStartup.prototypeTesting.overallResult === 'Pass'
-                        ? 'bg-emerald-100 text-emerald-900 border-emerald-300'
-                        : selectedStartup.prototypeTesting.overallResult === 'Conditional Pass'
-                        ? 'bg-amber-100 text-amber-900 border-amber-300'
-                        : 'bg-rose-100 text-rose-900 border-rose-300'
-                    }`}
-                  >
-                    Overall Verdict: {selectedStartup.prototypeTesting.overallResult}
-                  </span>
+                  return (
+                    <div
+                      key={st.id}
+                      className={`p-4 rounded-md border space-y-4 ${
+                        isNotShortlisted
+                          ? 'bg-rose-50/40 border-rose-200'
+                          : isShortlistedG1
+                          ? 'bg-emerald-50/30 border-emerald-200'
+                          : 'bg-blue-50/30 border-blue-200'
+                      }`}
+                    >
+                      {/* Header Strip */}
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="w-5 h-5 rounded-full bg-slate-900 text-white font-bold text-xs flex items-center justify-center">
+                              #{index + 1}
+                            </span>
+                            <h3 className="font-black text-sm text-slate-900">{st.name}</h3>
+                            <span className="text-xs text-slate-500 font-mono">({st.dpiitNumber})</span>
+                          </div>
+                          <p className="text-xs text-slate-600 mt-0.5">{st.solutionTitle}</p>
+                        </div>
 
-                  <button
-                    onClick={() => handleOpenLabTest(selectedStartup)}
-                    className="px-3 py-1 rounded-sm bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-2xs cursor-pointer"
-                  >
-                    <Edit3 className="w-3.5 h-3.5" />
-                    <span>Edit 15 Parameters</span>
-                  </button>
-                </div>
-              </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-black px-2 py-0.5 rounded bg-white border text-slate-800">
+                            Overall AI Score: {st.aiEvaluation.overallScore}/100
+                          </span>
+                          <span
+                            className={`px-2.5 py-0.5 rounded-sm text-xs font-black uppercase ${
+                              isNotShortlisted
+                                ? 'bg-rose-100 text-rose-900 border border-rose-300'
+                                : isShortlistedG1
+                                ? 'bg-emerald-100 text-emerald-900 border border-emerald-300'
+                                : 'bg-blue-100 text-blue-900 border border-blue-300'
+                            }`}
+                          >
+                            {st.aiEvaluation.recommendation}
+                          </span>
+                        </div>
+                      </div>
 
-              {/* Mandatory Failure Explanation Banner if Failed */}
-              {selectedStartup.prototypeTesting.failedMandatoryReason && (
-                <div className="p-3.5 bg-rose-50 border border-rose-300 rounded-sm flex items-start gap-2.5">
-                  <XCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
-                  <div className="text-xs text-rose-900 space-y-0.5">
-                    <strong className="font-bold block">MANDATORY BENCHMARK AUDIT FAILURE:</strong>
-                    <span>{selectedStartup.prototypeTesting.failedMandatoryReason}</span>
-                    <p className="text-[11px] text-rose-800 mt-1 italic">
-                      Rule: Under MoRTH & STQC guidelines, failure of any mandatory parameter (Functional correctness, Security, Compliance validation, Integration) automatically renders the overall prototype result as FAIL regardless of high scores elsewhere.
-                    </p>
-                  </div>
-                </div>
-              )}
+                      {/* Pull-Down Highlight for Eliminated Startups */}
+                      {isNotShortlisted && (
+                        <div className="p-3 bg-rose-100/70 border border-rose-300 rounded text-xs text-rose-900 space-y-1">
+                          <strong className="font-bold block flex items-center gap-1">
+                            <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
+                            Primary Factor(s) Pulling Score Below Shortlist Threshold:
+                          </strong>
+                          <ul className="list-disc list-inside space-y-0.5 text-[11px]">
+                            {pullDownParams.map((p, pidx) => (
+                              <li key={pidx}>
+                                <strong>{p.name} ({p.score}/100):</strong> {p.justification}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
 
-              {/* 15 Prototype Parameters Rendered via Reusable ScoreRow Component */}
-              <div className="space-y-2.5">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700">
-                  15 Independent Laboratory Test Parameters (with Audited Evidence):
-                </h4>
-                {selectedStartup.prototypeTesting.parameters.map((param, idx) => (
-                  <ScoreRow
-                    key={idx}
-                    id={`lab-param-${idx}`}
-                    label={param.name}
-                    value={param.result}
-                    isMandatory={param.isMandatory}
-                    justification={param.justification}
-                    evidence={param.evidence ? [param.evidence] : []}
-                    category="STQC Lab Test"
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
+                      {/* Selection Basis for Shortlisted Startups */}
+                      {!isNotShortlisted && (
+                        <div className="p-3 bg-white border border-slate-200 rounded text-xs space-y-1.5">
+                          <strong className="font-bold text-slate-900 block flex items-center gap-1">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                            Selection Basis ({st.category} Track):
+                          </strong>
+                          {isShortlistedG1 && (
+                            <p className="text-[11px] text-slate-700">
+                              Selected for G1 Quality Shortlist by achieving high 8-factor score ({st.aiEvaluation.overallScore}/100) with robust problem-solution fit and verified technical feasibility.
+                            </p>
+                          )}
+                          {isShortlistedG2 && st.aiEvaluation.g2ValueScore && (
+                            <div className="space-y-1 text-[11px] text-slate-700">
+                              <p>
+                                Selected for G2 Value Shortlist via 3-component formula: Total Score = <strong>{st.aiEvaluation.g2ValueScore.total}/100</strong>
+                              </p>
+                              <div className="grid grid-cols-3 gap-2 bg-slate-50 p-2 rounded text-center font-mono">
+                                <div>Quality (60%): {st.aiEvaluation.g2ValueScore.overallQualityComponent}</div>
+                                <div>Cost Eff (25%): {st.aiEvaluation.g2ValueScore.costEfficiencyComponent}</div>
+                                <div>Impact (15%): {st.aiEvaluation.g2ValueScore.impactPotentialComponent}</div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
 
-        {/* TAB 4: STARTUP SELF-VIEW TAB */}
-        {activeTab === 'startup' && (
-          <div className="space-y-6">
-            <div className="bg-white p-5 rounded-md border border-slate-200 shadow-2xs space-y-3">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
-                <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 bg-amber-50 px-2 py-0.5 rounded-xs">
-                    Startup Portal Self-Inspection
-                  </span>
-                  <h2 className="text-base sm:text-lg font-black text-sangam-navy-900 mt-1">
-                    {selectedStartup.name} • Evaluation Transparency Dossier
-                  </h2>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-slate-600">Switch Startup View:</span>
-                  <select
-                    value={selectedStartup.id}
-                    onChange={e => setSelectedStartupId(e.target.value)}
-                    className="text-xs font-semibold px-2 py-1 rounded border border-slate-300 bg-white cursor-pointer"
-                  >
-                    {startups.map(s => (
-                      <option key={s.id} value={s.id}>
-                        {s.name} ({s.category})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
+                      {/* 8 AI Parameters Rendered using ScoreRow Component */}
+                      <div className="space-y-2">
+                        <span className="text-[10px] font-bold uppercase text-slate-600 tracking-wider block">
+                          8-Factor Parameter Scores & Justifications:
+                        </span>
+                        {st.aiEvaluation.parameters.map((param, idx) => (
+                          <ScoreRow
+                            key={idx}
+                            id={`admin-param-${st.id}-${idx}`}
+                            label={param.name}
+                            value={param.score}
+                            weight={param.weight}
+                            justification={param.justification}
+                            evidence={param.evidence}
+                            confidence={param.confidence}
+                            category="AI Parameter"
+                          />
+                        ))}
+                      </div>
 
-              {/* Summary Cards */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-                <div className="p-3 bg-slate-50 rounded-sm border border-slate-200 text-center">
-                  <span className="text-[10px] text-slate-500 uppercase font-bold block">Eligibility Gate</span>
-                  <span className="text-sm font-black text-emerald-700">{selectedStartup.eligibility.status}</span>
-                </div>
-                <div className="p-3 bg-slate-50 rounded-sm border border-slate-200 text-center">
-                  <span className="text-[10px] text-slate-500 uppercase font-bold block">AI Quality Score</span>
-                  <span className="text-sm font-black text-sangam-blue-600">{selectedStartup.aiEvaluation.overallScore}/100</span>
-                </div>
-                <div className="p-3 bg-slate-50 rounded-sm border border-slate-200 text-center">
-                  <span className="text-[10px] text-slate-500 uppercase font-bold block">Lab Test Result</span>
-                  <span className="text-sm font-black text-indigo-700">{selectedStartup.prototypeTesting.overallResult}</span>
-                </div>
-                <div className="p-3 bg-slate-50 rounded-sm border border-slate-200 text-center">
-                  <span className="text-[10px] text-slate-500 uppercase font-bold block">Pilot Allocation</span>
-                  <span className="text-sm font-black text-purple-700">₹{selectedStartup.cost} Lakhs</span>
-                </div>
-              </div>
-            </div>
+                      {/* STQC Testing Pipeline Status */}
+                      <div className="p-3 bg-slate-50 rounded border border-slate-200 text-xs flex items-center justify-between">
+                        <div>
+                          <span className="text-slate-500 font-semibold block text-[10px] uppercase">STQC Testing Pipeline Status</span>
+                          <span className="font-bold text-slate-900">
+                            {st.prototypeTesting.overallResult === 'Pass'
+                              ? 'Testing Complete (Cleared 15 Parameters)'
+                              : st.prototypeTesting.overallResult === 'Conditional Pass'
+                              ? 'Conditional Pass (Optimization Notice)'
+                              : 'Testing Audit: FAIL (Mandatory Check Unmet)'}
+                          </span>
+                        </div>
+                        <span
+                          className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                            st.prototypeTesting.overallResult === 'Pass'
+                              ? 'bg-emerald-100 text-emerald-800'
+                              : st.prototypeTesting.overallResult === 'Conditional Pass'
+                              ? 'bg-amber-100 text-amber-800'
+                              : 'bg-rose-100 text-rose-800'
+                          }`}
+                        >
+                          {st.prototypeTesting.overallResult}
+                        </span>
+                      </div>
 
-            {/* 8 AI Scored Parameters for this Startup */}
-            <div className="bg-white p-5 rounded-md border border-slate-200 shadow-2xs space-y-4">
-              <div className="border-b border-slate-200 pb-2 flex items-center justify-between">
-                <h3 className="text-sm font-black text-slate-900">
-                  8-Factor Weighted AI Scoring Breakdown
-                </h3>
-                <span className="text-xs font-bold text-slate-600">
-                  Confidence: <span className="text-emerald-700">{selectedStartup.aiEvaluation.confidence}</span>
-                </span>
-              </div>
-
-              <div className="space-y-2.5">
-                {selectedStartup.aiEvaluation.parameters.map((param, idx) => (
-                  <ScoreRow
-                    key={idx}
-                    id={`startup-ai-param-${idx}`}
-                    label={param.name}
-                    value={param.score}
-                    weight={param.weight}
-                    justification={param.justification}
-                    evidence={param.evidence}
-                    confidence={param.confidence}
-                    category="AI Parameter"
-                  />
-                ))}
+                      {/* Final Department Award & Override Log (If Awarded) */}
+                      {st.finalSelection?.isFinallySelected && (
+                        <div className="p-3 bg-emerald-50 border border-emerald-300 rounded text-xs space-y-1 text-emerald-900">
+                          <div className="font-bold flex items-center gap-1.5">
+                            <Award className="w-4 h-4 text-emerald-700" />
+                            <span>Awarded Pilot Contract ({st.finalSelection.workOrderNumber})</span>
+                          </div>
+                          <p className="text-[11px] text-emerald-800">
+                            Sanction Amount: ₹{st.cost} Lakhs • Allocated by Ministry of Road Transport and Highways.
+                          </p>
+                          {st.departmentReview.overridesAI && (
+                            <div className="mt-1 p-2 bg-white rounded border border-emerald-200 text-[11px]">
+                              <strong>Audited Override Reason:</strong> {st.departmentReview.overrideReason}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
         )}
       </main>
 
-      {/* FULL EVALUATION DETAIL MODAL (INSPECT AUDIT) */}
+      {/* FULL EVALUATION DETAIL MODAL */}
       {isDetailModalOpen && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-100">
           <div className="bg-white rounded-md max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-slate-200 shadow-2xl p-6 space-y-6">
@@ -1501,7 +1850,7 @@ export default function SimulationPage() {
         </div>
       )}
 
-      {/* DEPARTMENT REVIEW MODAL (WITH ENFORCED OVERRIDE JUSTIFICATION) */}
+      {/* DEPARTMENT REVIEW MODAL */}
       {isDeptReviewModalOpen && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-100">
           <div className="bg-white rounded-md max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-slate-200 shadow-2xl p-6 space-y-5">
@@ -1515,7 +1864,6 @@ export default function SimulationPage() {
               <p className="text-xs text-slate-500">AI Recommendation: <strong>{selectedStartup.aiEvaluation.recommendation}</strong> (Score: {selectedStartup.aiEvaluation.overallScore}/100)</p>
             </div>
 
-            {/* Officer Info & Decision Dropdown */}
             <div className="space-y-3">
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
@@ -1545,7 +1893,6 @@ export default function SimulationPage() {
                 </select>
               </div>
 
-              {/* MANDATORY OVERRIDE REASON (Enforced when decision conflicts with AI) */}
               <div className="p-3.5 bg-amber-50 rounded border border-amber-300 space-y-2">
                 <div className="flex items-center gap-1.5 text-xs font-bold text-amber-900">
                   <Shield className="w-4 h-4 text-amber-600 shrink-0" />
@@ -1593,7 +1940,7 @@ export default function SimulationPage() {
         </div>
       )}
 
-      {/* LAB TESTING BENCHMARKING MODAL (15 PARAMETERS) */}
+      {/* LAB TESTING BENCHMARKING MODAL */}
       {isLabTestModalOpen && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-100">
           <div className="bg-white rounded-md max-w-3xl w-full max-h-[90vh] overflow-y-auto border border-slate-200 shadow-2xl p-6 space-y-5">
@@ -1815,5 +2162,13 @@ export default function SimulationPage() {
 
       <GovernmentFooter />
     </div>
+  );
+}
+
+export default function SimulationPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-500">Loading SangamSetu Simulation...</div>}>
+      <SimulationContent />
+    </Suspense>
   );
 }

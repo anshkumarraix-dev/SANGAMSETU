@@ -623,6 +623,28 @@ export default function RegisterPage() {
               Return to Homepage
             </Link>
           </div>
+
+          {/* Feature B: Demo User Option */}
+          <div className="mt-5 pt-4 border-t border-dashed border-slate-300 bg-slate-50 -mx-6 -mb-6 p-6 rounded-b-md space-y-3 text-center">
+            <div className="space-y-1">
+              <span className="text-[10px] font-black uppercase tracking-wider text-sangam-blue-700 bg-sangam-blue-100 px-2 py-0.5 rounded-xs">
+                Interactive Multi-Persona Demo
+              </span>
+              <h3 className="text-xs font-bold text-slate-800">
+                Exploring for a hackathon or demo? Continue as Demo User
+              </h3>
+              <p className="text-[11px] text-slate-500 max-w-sm mx-auto">
+                Skip registration to test all 5 roles (Public, Startup, Ministry, STQC Evaluator & SuperAdmin) with live AI scoring and stage pipeline.
+              </p>
+            </div>
+            <Link
+              href="/simulation?persona=public"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-sm bg-sangam-navy-900 hover:bg-slate-800 text-white font-black text-xs shadow-xs transition-colors cursor-pointer w-full sm:w-auto"
+            >
+              <Eye className="w-4 h-4 text-amber-400" />
+              <span>Launch Demo Mode (Persona Switcher)</span>
+            </Link>
+          </div>
         </div>
       </div>
     </div>
