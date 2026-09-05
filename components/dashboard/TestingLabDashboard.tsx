@@ -83,15 +83,15 @@ export default function TestingLabDashboard() {
   return (
     <div className="space-y-8">
       {/* Empanelled Lab Profile Header */}
-      <div className="bg-gradient-to-r from-indigo-950 via-slate-900 to-indigo-900 text-white rounded-2xl p-6 sm:p-8 shadow-md">
+      <div className="bg-slate-900 text-white rounded-md p-6 sm:p-8 border border-slate-800 shadow-xs">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className="px-3 py-1 rounded-full bg-cyan-400 text-slate-950 text-xs font-black tracking-wide flex items-center gap-1">
+              <span className="px-3 py-1 rounded-sm bg-cyan-400 text-slate-950 text-xs font-black tracking-wide flex items-center gap-1">
                 <FlaskConical className="w-3.5 h-3.5" />
                 EMPANELLED TESTING ORGANISATION
               </span>
-              <span className="px-2.5 py-0.5 rounded-full bg-white/20 text-slate-200 text-xs font-semibold">
+              <span className="px-2.5 py-0.5 rounded-sm bg-white/20 text-slate-200 text-xs font-semibold">
                 Ministry of Electronics & IT (MeitY)
               </span>
             </div>

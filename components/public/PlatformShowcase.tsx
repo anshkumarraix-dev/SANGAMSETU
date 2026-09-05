@@ -88,7 +88,7 @@ export default function PlatformShowcase() {
     {
       role: 'GOVERNMENT',
       title: 'For Ministries & Departments',
-      subtitle: 'Zero-Risk Pilot Procurement',
+      subtitle: 'Benefits for Ministries & Departments',
       icon: Building2,
       accent: 'border-sangam-blue-300 hover:border-sangam-blue-500',
       badgeColor: 'bg-sangam-blue-50 text-sangam-blue-700 border-sangam-blue-200',
@@ -106,7 +106,7 @@ export default function PlatformShowcase() {
     {
       role: 'STARTUP',
       title: 'For DPIIT-Recognized Startups',
-      subtitle: 'Direct Gateway to Public Contracts',
+      subtitle: 'Benefits for DPIIT-Recognised Startups',
       icon: Rocket,
       accent: 'border-sangam-saffron-300 hover:border-sangam-saffron-500',
       badgeColor: 'bg-amber-50 text-amber-800 border-amber-200',
@@ -124,7 +124,7 @@ export default function PlatformShowcase() {
     {
       role: 'TESTING_LAB',
       title: 'For Empanelled Testing Labs',
-      subtitle: 'Standardized Quality & Security Audit',
+      subtitle: 'Benefits for Empanelled Laboratories',
       icon: FlaskConical,
       accent: 'border-emerald-300 hover:border-emerald-500',
       badgeColor: 'bg-emerald-50 text-emerald-800 border-emerald-200',
@@ -145,7 +145,7 @@ export default function PlatformShowcase() {
     {
       icon: Sparkles,
       title: 'Explainable Dual-Category AI Ranking',
-      desc: 'Our Gemini-powered scoring algorithm tabulates 7 transparent dimensions, automatically categorizing submissions into G1 (Top Quality) and G2 (Top Value-for-Money) with audit-proof justifications.',
+      desc: 'Our Explainable Multi-Parameter AI Scoring Engine tabulates 7 transparent dimensions, automatically categorizing submissions into G1 (Top Quality) and G2 (Top Value-for-Money) with audit-proof justifications.',
     },
     {
       icon: FileCheck2,
@@ -175,7 +175,7 @@ export default function PlatformShowcase() {
               National Public Procurement Modernization
             </span>
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 tracking-tight leading-tight">
-              India’s Unified Highway for <span className="text-sangam-blue-600">Startup-Government</span> Innovation
+              Unified National Framework for <span className="text-sangam-blue-600">Startup-Government</span> Innovation Procurement
             </h2>
             <p className="mt-3 text-slate-600 text-sm sm:text-base md:text-lg leading-relaxed max-w-3xl mx-auto">
               SangamSetu eliminates traditional tender roadblocks by establishing a regulated sandbox where government ministries field-test cutting-edge startup solutions before committing large-scale capital.
@@ -391,7 +391,7 @@ export default function PlatformShowcase() {
                 <span className="text-xs font-black text-amber-400">PHASE 1</span>
                 <h4 className="font-bold text-sm text-white mt-1">Challenge & AI Match</h4>
                 <p className="text-xs text-slate-300 mt-1">
-                  Ministries publish problems; DPIIT startups submit proposals; Gemini AI ranks top G1 (Quality) & G2 (Cost) contenders.
+                  Ministries publish problems; DPIIT startups submit proposals; SangamSetu AI Engine ranks top G1 (Quality) & G2 (Cost) contenders.
                 </p>
               </div>
 

@@ -21,7 +21,6 @@ import StartupDashboard from '@/components/dashboard/StartupDashboard';
 import GovernmentDashboard from '@/components/dashboard/GovernmentDashboard';
 import TestingLabDashboard from '@/components/dashboard/TestingLabDashboard';
 import AdminDashboard from '@/components/dashboard/AdminDashboard';
-import QuickSimulationModal from '@/components/simulation/QuickSimulationModal';
 import SimulationToast from '@/components/simulation/SimulationToast';
 import { Rocket, Building2, FlaskConical, Shield, ArrowLeft } from 'lucide-react';
 
@@ -141,38 +140,81 @@ export default function HomePage() {
 
         {activeView === 'dashboard' && (
           <div className="max-w-[1440px] mx-auto px-4 py-8">
-            {/* Return to Public Portal Bar */}
-            <div className="flex items-center justify-between mb-6 pb-3 border-b border-slate-200">
-              <button
-                onClick={() => {
-                  setActiveView('home');
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-sangam-navy-900 hover:text-sangam-blue-600 transition-colors cursor-pointer"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                <span>Return to Public Portal</span>
-              </button>
+            {/* Top Bar: Return Link & Role Switcher Tabs */}
+            <div className="bg-white border border-slate-200 rounded-md p-4 mb-6 shadow-2xs">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => {
+                      setActiveView('home');
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-sangam-navy-900 hover:text-sangam-blue-600 transition-colors cursor-pointer py-1 px-2 rounded-sm hover:bg-slate-100"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    <span>Return to Public Portal</span>
+                  </button>
+                  <span className="text-slate-300 hidden sm:inline">|</span>
+                  <div className="text-xs font-semibold text-slate-500 hidden sm:block">
+                    Procurement Lifecycle Roles:
+                  </div>
+                </div>
 
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-slate-500 font-medium">Viewing Workspace as:</span>
-                <span className="px-3 py-1 rounded-sm text-xs font-bold bg-sangam-navy-900 text-white flex items-center gap-1.5">
-                  {role === 'STARTUP' && <Rocket className="w-3.5 h-3.5 text-amber-400" />}
-                  {role === 'GOVERNMENT' && <Building2 className="w-3.5 h-3.5 text-blue-300" />}
-                  {(role === 'TESTING_ORG' || role === 'TESTING_LAB') && <FlaskConical className="w-3.5 h-3.5 text-cyan-300" />}
-                  {role === 'ADMIN' && <Shield className="w-3.5 h-3.5 text-amber-400" />}
-                  <span>
-                    {role === 'STARTUP' && 'DPIIT Startup'}
-                    {role === 'GOVERNMENT' && 'Ministry Procurement Officer'}
-                    {(role === 'TESTING_ORG' || role === 'TESTING_LAB') && 'Empanelled STQC Lab'}
-                    {role === 'ADMIN' && 'DPIIT Oversight Admin'}
-                  </span>
-                </span>
+                {/* 4 Interactive Persona Tabs */}
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0">
+                  <button
+                    onClick={() => setRole('STARTUP')}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs font-bold transition-all cursor-pointer shrink-0 ${
+                      role === 'STARTUP' || role === 'PUBLIC'
+                        ? 'bg-sangam-navy-900 text-white shadow-2xs'
+                        : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                    }`}
+                  >
+                    <Rocket className="w-3.5 h-3.5 text-amber-400" />
+                    <span>1. DPIIT Startup</span>
+                  </button>
+
+                  <button
+                    onClick={() => setRole('GOVERNMENT')}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs font-bold transition-all cursor-pointer shrink-0 ${
+                      role === 'GOVERNMENT'
+                        ? 'bg-sangam-navy-900 text-white shadow-2xs'
+                        : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                    }`}
+                  >
+                    <Building2 className="w-3.5 h-3.5 text-blue-300" />
+                    <span>2. Ministry Officer</span>
+                  </button>
+
+                  <button
+                    onClick={() => setRole('TESTING_ORG')}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs font-bold transition-all cursor-pointer shrink-0 ${
+                      role === 'TESTING_ORG' || role === 'TESTING_LAB'
+                        ? 'bg-sangam-navy-900 text-white shadow-2xs'
+                        : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                    }`}
+                  >
+                    <FlaskConical className="w-3.5 h-3.5 text-cyan-300" />
+                    <span>3. Empanelled Lab</span>
+                  </button>
+
+                  <button
+                    onClick={() => setRole('ADMIN')}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs font-bold transition-all cursor-pointer shrink-0 ${
+                      role === 'ADMIN'
+                        ? 'bg-sangam-navy-900 text-white shadow-2xs'
+                        : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                    }`}
+                  >
+                    <Shield className="w-3.5 h-3.5 text-amber-400" />
+                    <span>4. DPIIT Mission Control</span>
+                  </button>
+                </div>
               </div>
             </div>
 
             {/* Role-Specific Dashboard Renderer */}
-            {role === 'STARTUP' && (
+            {(role === 'STARTUP' || role === 'PUBLIC') && (
               <StartupDashboard preselectedChallenge={preselectedChallengeForApply} />
             )}
             {role === 'GOVERNMENT' && <GovernmentDashboard />}
@@ -185,8 +227,7 @@ export default function HomePage() {
       {/* 4. Official Government Footer */}
       <GovernmentFooter />
 
-      {/* Quick Simulation Modal & Notification Toasts */}
-      <QuickSimulationModal />
+      {/* System Notification Toasts */}
       <SimulationToast />
     </div>
   );

@@ -150,16 +150,16 @@ export default function SuccessStories() {
           {filteredStories.map(story => (
             <div
               key={story.id}
-              className="bg-slate-50 rounded-md border border-slate-200 p-4 flex flex-col justify-between hover:border-emerald-400 transition-colors"
+              className="bg-slate-50 rounded-md border border-slate-200 p-4 flex flex-col justify-between hover:border-emerald-400 transition-colors overflow-hidden"
             >
               <div className="space-y-3">
                 {/* Header */}
                 <div className="flex items-center justify-between gap-2 border-b border-slate-200 pb-2.5">
-                  <span className="text-[10px] font-bold text-sangam-blue-600 uppercase flex items-center gap-1">
-                    <Building2 className="w-3 h-3" />
-                    {story.ministry}
+                  <span className="text-[10px] font-bold text-sangam-blue-600 uppercase flex items-center gap-1 min-w-0 flex-1">
+                    <Building2 className="w-3 h-3 shrink-0" />
+                    <span className="truncate">{story.ministry}</span>
                   </span>
-                  <span className="px-2 py-0.5 rounded-sm bg-emerald-100 text-emerald-800 text-[10px] font-bold">
+                  <span className="px-2 py-0.5 rounded-sm bg-emerald-100 text-emerald-800 text-[10px] font-bold shrink-0 overflow-hidden whitespace-nowrap">
                     DPIIT Verified
                   </span>
                 </div>

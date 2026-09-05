@@ -62,7 +62,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sangam-blue-50 to-white flex items-center justify-center py-12 px-4">
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center py-12 px-4">
       <div className="max-w-md w-full">
         {/* Logo & Branding */}
         <div className="text-center mb-8">
@@ -245,10 +245,23 @@ export default function LoginPage() {
 
         {/* Security Badges */}
         <div className="mt-8 text-center text-xs text-slate-500">
-          <p className="flex items-center justify-center gap-2 mb-2">
-            🔒 Government-Verified IDs Only | 🛡️ SSL Encrypted | ✅ 2FA Mandatory
-          </p>
-          <p>For support, call 1800-123-4567 or email support@sangamsetu.gov.in</p>
+          <div className="flex flex-wrap items-center justify-center gap-3 mb-2 font-medium">
+            <span className="flex items-center gap-1">
+              <Lock className="w-3.5 h-3.5 text-slate-600" />
+              <span>Government-Verified IDs Only</span>
+            </span>
+            <span>•</span>
+            <span className="flex items-center gap-1">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+              <span>SSL 256-bit Encrypted</span>
+            </span>
+            <span>•</span>
+            <span className="flex items-center gap-1">
+              <CheckCircle className="w-3.5 h-3.5 text-sangam-blue-600" />
+              <span>2FA Mandatory</span>
+            </span>
+          </div>
+          <p>For official support, call 1800-115-565 or email support@sangamsetu.gov.in</p>
         </div>
       </div>
     </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useApp } from '@/context/AppContext';
 import {
   FileText,
   Search,
@@ -24,24 +25,28 @@ import {
   Calculator,
   Download,
   Check,
+  Building2,
+  Rocket,
+  Shield,
 } from 'lucide-react';
 
 export default function WorkflowSection() {
+  const { setActiveView } = useApp();
   const [selectedStep, setSelectedStep] = useState(3); // Default highlighting AI Scoring
   const [corridorMode, setCorridorMode] = useState<'standard' | 'fastTrack'>('standard');
-  const [isSimulating, setIsSimulating] = useState(false);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(false);
   const [activeTab, setActiveTab] = useState<'overview' | 'statutory' | 'artifacts' | 'scoringEngine'>('overview');
 
-  // Interactive step auto-simulator timer
+  // Interactive step auto-walkthrough timer
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    if (isSimulating) {
+    if (isAutoPlaying) {
       interval = setInterval(() => {
         setSelectedStep(prev => (prev === 9 ? 1 : prev + 1));
       }, 3000);
     }
     return () => clearInterval(interval);
-  }, [isSimulating]);
+  }, [isAutoPlaying]);
 
   const steps = [
     {
@@ -140,7 +145,7 @@ export default function WorkflowSection() {
       timelineFastTrack: '7 - 10 Days Express Lab Audit',
       statutoryRule: 'STQC MeitY Laboratory Accreditation Standard ISO/IEC 17025',
       deliverables: ['STQC Official Test Certificate', 'Vulnerability & CERT-In Assessment', 'PASS / CONDITIONAL Verdict'],
-      sampleArtifact: 'STQC-MeitY-Certificate-Mock.pdf',
+      sampleArtifact: 'STQC-MeitY-Standard-Certificate.pdf',
     },
     {
       step: 8,
@@ -218,24 +223,24 @@ export default function WorkflowSection() {
               </button>
             </div>
 
-            {/* Interactive Simulation Toggle */}
+            {/* Interactive Automated Walkthrough Toggle */}
             <button
-              onClick={() => setIsSimulating(!isSimulating)}
+              onClick={() => setIsAutoPlaying(!isAutoPlaying)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-sm border text-xs font-bold transition-colors cursor-pointer ${
-                isSimulating
+                isAutoPlaying
                   ? 'bg-amber-50 text-amber-800 border-amber-300'
                   : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
               }`}
             >
-              {isSimulating ? (
+              {isAutoPlaying ? (
                 <>
                   <Pause className="w-3.5 h-3.5 text-amber-600" />
-                  <span>Pause Simulation</span>
+                  <span>Pause Walkthrough</span>
                 </>
               ) : (
                 <>
                   <Play className="w-3.5 h-3.5 text-sangam-blue-600" />
-                  <span>Simulate Pathway</span>
+                  <span>Step-by-Step Walkthrough</span>
                 </>
               )}
             </button>
@@ -251,7 +256,7 @@ export default function WorkflowSection() {
                 key={s.step}
                 onClick={() => {
                   setSelectedStep(s.step);
-                  setIsSimulating(false);
+                  setIsAutoPlaying(false);
                 }}
                 className={`flex flex-col items-center text-center p-2 rounded-sm border transition-all cursor-pointer ${
                   isSelected
@@ -501,6 +506,87 @@ export default function WorkflowSection() {
               </div>
             </div>
           )}
+        </div>
+
+        {/* 9-Step Process Summary & Action Gateway */}
+        <div className="mt-8 pt-6 border-t border-slate-200">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div className="bg-white p-4 rounded-sm border border-slate-200 shadow-2xs flex flex-col justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-1.5 text-sangam-blue-700">
+                  <Search className="w-4 h-4" />
+                  <h4 className="text-xs font-bold uppercase tracking-wider">Step 1 & 2: Articulation</h4>
+                </div>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Browse open challenges released by Central Ministries without prior turnover barriers under GFR 161(iv).
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  setActiveView('challenges');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="mt-3 w-full py-2 px-3 rounded-sm bg-sangam-blue-600 hover:bg-sangam-blue-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
+              >
+                <span>Browse Active Challenges</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            <div className="bg-white p-4 rounded-sm border border-slate-200 shadow-2xs flex flex-col justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-1.5 text-sangam-navy-900">
+                  <Cpu className="w-4 h-4 text-sangam-blue-600" />
+                  <h4 className="text-xs font-bold uppercase tracking-wider">Steps 3-7: AI & Lab Testing</h4>
+                </div>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Experience multi-parameter AI scoring, G1/G2 shortlisting, and STQC hardware/software validation.
+                </p>
+              </div>
+              <button
+                onClick={() => setActiveView('guidelines')}
+                className="mt-3 w-full py-2 px-3 rounded-sm bg-sangam-navy-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
+              >
+                <FileText className="w-3.5 h-3.5 text-amber-400" />
+                <span>Review GFR 2017 Guidelines</span>
+              </button>
+            </div>
+
+            <div className="bg-white p-4 rounded-sm border border-slate-200 shadow-2xs flex flex-col justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-1.5 text-emerald-700">
+                  <TrendingUp className="w-4 h-4" />
+                  <h4 className="text-xs font-bold uppercase tracking-wider">Steps 8 & 9: Pilots & GeM</h4>
+                </div>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Review milestone-based DBT fund disbursals and commercialization via GeM Rule 149(ii) direct onboarding.
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  setActiveView('dashboard');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="mt-3 w-full py-2 px-3 rounded-sm bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
+              >
+                <span>Enter Role Dashboard</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Statutory Authority Footnote Strip */}
+          <div className="p-3 bg-slate-50 rounded-sm border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-600">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-sangam-green-600 shrink-0" />
+              <span>
+                <strong>Statutory Framework:</strong> General Financial Rules (GFR) 2017 Rules 149, 161(iv), and 173(i) notified by Ministry of Finance, Govt of India.
+              </span>
+            </div>
+            <div className="text-[10px] font-mono text-slate-500 shrink-0">
+              Corridor Standard: 90 Days • Fast-Track: 45 Days
+            </div>
+          </div>
         </div>
       </div>
     </section>

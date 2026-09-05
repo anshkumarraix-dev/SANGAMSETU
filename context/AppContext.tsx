@@ -620,7 +620,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setIsSimulationLoaded(true);
     setSimulationToast({
       show: true,
-      message: '⚡ Complete National Simulation Loaded! 8 Challenges, 6 Startups, 5 Proposals, 3 Live Pilots, 3 STQC Lab Certificates.',
+      message: 'Evaluation Dataset Loaded: 8 Challenges, 6 Startups, 5 Proposals, 3 Live Pilots, 3 STQC Lab Certificates.',
       type: 'success',
     });
   };
@@ -710,7 +710,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
       setSimulationToast({
         show: true,
-        message: '🚀 Simulated Startup Proposal: JalVigyan Tech submitted GangaSentinel (AI Score: 93.8/100, G1 Category)!',
+        message: 'DPIIT Proposal Registered: JalVigyan Tech submitted GangaSentinel (AI Score: 93.8/100, G1 Category).',
         type: 'success',
       });
       return { success: true, message: 'Proposal submitted successfully with instant AI evaluation score.' };
@@ -780,7 +780,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
       setSimulationToast({
         show: true,
-        message: `🔬 STQC Lab Certificate Issued: ${certNumber} (Overall Score: 94/100, Verdict: PASS)!`,
+        message: `STQC Lab Certificate Issued: ${certNumber} (Overall Score: 94/100, Verdict: PASS).`,
         type: 'success',
       });
       return { success: true, message: `Lab Certificate ${certNumber} issued successfully.` };
@@ -906,7 +906,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
       setSimulationToast({
         show: true,
-        message: `🏛️ Pilot Sanctioned: Contract ${contractNum} (₹${(eligibleProp.totalBudget / 100000).toFixed(1)} Lakhs) with 40% advance released!`,
+        message: `Pilot Sanctioned: Contract ${contractNum} (₹${(eligibleProp.totalBudget / 100000).toFixed(1)} Lakhs) with 40% advance released.`,
         type: 'success',
       });
       return { success: true, message: `Pilot Sanctioned under Contract ${contractNum}.` };
@@ -984,7 +984,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
         setSimulationToast({
           show: true,
-          message: `💳 Milestone Payment Released: ₹${(paidAmount / 100000).toFixed(2)} Lakhs credited to ${paidPilotName} (UTR: ${utr})!`,
+          message: `Milestone Payment Released: ₹${(paidAmount / 100000).toFixed(2)} Lakhs credited to ${paidPilotName} (UTR: ${utr}).`,
           type: 'success',
         });
         return { success: true, message: `Disbursed ₹${(paidAmount / 100000).toFixed(2)} Lakhs (UTR: ${utr}).` };
@@ -1014,7 +1014,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setIsSimulationLoaded(false);
     setSimulationToast({
       show: true,
-      message: 'All simulation data reset to clean default baseline.',
+      message: 'Portal dataset restored to clean official baseline.',
       type: 'info',
     });
   };

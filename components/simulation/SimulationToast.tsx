@@ -42,7 +42,7 @@ export default function SimulationToast() {
         </div>
         <div className="flex-1 pr-2">
           <p className="text-xs font-semibold uppercase tracking-wider text-amber-400 mb-0.5">
-            SangamSetu Simulation Engine
+            SangamSetu System Notification
           </p>
           <p className="text-xs text-slate-200 leading-relaxed">{simulationToast.message}</p>
         </div>

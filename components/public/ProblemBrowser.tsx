@@ -107,15 +107,15 @@ export default function ProblemBrowser({ onApplyForChallenge }: ProblemBrowserPr
   const getStatusBadge = (status: Challenge['status']) => {
     switch (status) {
       case 'APPLICATION_OPEN':
-        return <span className="px-2 py-0.5 rounded-sm bg-emerald-50 text-emerald-800 text-[10px] font-bold border border-emerald-300">● Open for Proposals</span>;
+        return <span className="px-2 py-0.5 rounded-sm bg-emerald-50 text-emerald-800 text-[10px] font-bold border border-emerald-300 inline-block whitespace-nowrap truncate max-w-[130px] sm:max-w-none">● Open for Proposals</span>;
       case 'PILOT_IN_PROGRESS':
-        return <span className="px-2 py-0.5 rounded-sm bg-blue-50 text-blue-800 text-[10px] font-bold border border-blue-300">● Live Pilot</span>;
+        return <span className="px-2 py-0.5 rounded-sm bg-blue-50 text-blue-800 text-[10px] font-bold border border-blue-300 inline-block whitespace-nowrap truncate max-w-[130px] sm:max-w-none">● Live Pilot</span>;
       case 'TESTING_IN_PROGRESS':
-        return <span className="px-2 py-0.5 rounded-sm bg-purple-50 text-purple-800 text-[10px] font-bold border border-purple-300">● STQC Lab Testing</span>;
+        return <span className="px-2 py-0.5 rounded-sm bg-purple-50 text-purple-800 text-[10px] font-bold border border-purple-300 inline-block whitespace-nowrap truncate max-w-[130px] sm:max-w-none">● STQC Testing</span>;
       case 'SHORTLISTED':
-        return <span className="px-2 py-0.5 rounded-sm bg-amber-50 text-amber-800 text-[10px] font-bold border border-amber-300">● G1/G2 Shortlisted</span>;
+        return <span className="px-2 py-0.5 rounded-sm bg-amber-50 text-amber-800 text-[10px] font-bold border border-amber-300 inline-block whitespace-nowrap truncate max-w-[130px] sm:max-w-none">● G1/G2 Shortlist</span>;
       default:
-        return <span className="px-2 py-0.5 rounded-sm bg-slate-100 text-slate-700 text-[10px] font-bold border border-slate-300">● {status}</span>;
+        return <span className="px-2 py-0.5 rounded-sm bg-slate-100 text-slate-700 text-[10px] font-bold border border-slate-300 inline-block whitespace-nowrap truncate max-w-[130px] sm:max-w-none">● {status}</span>;
     }
   };
 
@@ -338,20 +338,20 @@ export default function ProblemBrowser({ onApplyForChallenge }: ProblemBrowserPr
                     setActiveModalChallenge(challenge);
                     setModalTab('overview');
                   }}
-                  className="bg-white rounded-md border border-slate-200 p-4 flex flex-col justify-between hover:border-sangam-blue-500 transition-colors cursor-pointer group"
+                  className="bg-white rounded-md border border-slate-200 p-4 flex flex-col justify-between hover:border-sangam-blue-500 transition-colors cursor-pointer group overflow-hidden"
                 >
                   <div>
                     {/* Ministry & Status Header */}
                     <div className="flex items-start justify-between gap-2 mb-2">
-                      <div className="text-[10px] font-bold text-sangam-blue-600 uppercase tracking-wider flex items-center gap-1">
+                      <div className="text-[10px] font-bold text-sangam-blue-600 uppercase tracking-wider flex items-center gap-1 min-w-0 flex-1">
                         <Building2 className="w-3 h-3 shrink-0" />
-                        <span className="line-clamp-1">{challenge.ministryName}</span>
+                        <span className="truncate">{challenge.ministryName}</span>
                       </div>
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1 shrink-0 overflow-hidden">
                         {getStatusBadge(challenge.status)}
                         <button
                           onClick={e => toggleBookmark(challenge.id, e)}
-                          className="p-1 text-slate-400 hover:text-amber-500 transition-colors cursor-pointer"
+                          className="p-1 text-slate-400 hover:text-amber-500 transition-colors cursor-pointer shrink-0"
                           title={isBookmarked ? 'Remove bookmark' : 'Bookmark challenge'}
                         >
                           {isBookmarked ? (
@@ -575,7 +575,7 @@ export default function ProblemBrowser({ onApplyForChallenge }: ProblemBrowserPr
                       </div>
                       <div className="p-2.5 bg-slate-50 rounded-sm border border-slate-200">
                         <span className="font-bold text-slate-900 block">• Stress & Peak Latency</span>
-                        <span className="text-slate-600 text-[11px]">Load simulations simulating national deployment conditions.</span>
+                        <span className="text-slate-600 text-[11px]">Stress load testing under peak national operational conditions.</span>
                       </div>
                       <div className="p-2.5 bg-slate-50 rounded-sm border border-slate-200">
                         <span className="font-bold text-slate-900 block">• Interoperability & API</span>

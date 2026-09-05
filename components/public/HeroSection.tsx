@@ -23,7 +23,7 @@ export default function HeroSection({
   onPostProblem,
   onRegisterStartup,
 }: HeroSectionProps = {}) {
-  const { challenges, setIsSimulationModalOpen } = useApp();
+  const { challenges } = useApp();
 
   const totalFundAllocatedCr = 210; // ₹210 Cr+
   const totalScaledSolutions = 24;
@@ -144,11 +144,11 @@ export default function HeroSection({
             </button>
 
             <button
-              onClick={() => setIsSimulationModalOpen(true)}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-sm bg-amber-50 hover:bg-amber-100 text-amber-950 border border-amber-400 font-bold text-sm shadow-xs transition-colors cursor-pointer"
+              onClick={onRegisterStartup}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-sm bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 font-bold text-sm shadow-xs transition-colors cursor-pointer"
             >
-              <Sparkles className="w-4 h-4 text-amber-600 animate-pulse" />
-              <span>⚡ Quick Simulation / Demo Data</span>
+              <Rocket className="w-4 h-4 text-emerald-600" />
+              <span>Register DPIIT Startup</span>
             </button>
           </div>
         </div>
