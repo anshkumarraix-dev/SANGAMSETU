@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { useApp } from '@/context/AppContext';
 import {
   Shield,
@@ -127,29 +128,32 @@ export default function HeroSection({
 
           {/* Hero Action Buttons */}
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-            <button
+            <Link
+              href="/challenges"
               onClick={onExploreProblems}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-sm bg-sangam-blue-600 hover:bg-sangam-blue-700 text-white font-bold text-sm shadow-xs transition-colors cursor-pointer"
             >
               <span>Explore Government Challenges</span>
               <ArrowRight className="w-4 h-4" />
-            </button>
+            </Link>
 
-            <button
+            <Link
+              href="/dashboard"
               onClick={onPostProblem}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-sm bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm shadow-xs transition-colors cursor-pointer"
             >
               <Building2 className="w-4 h-4 text-amber-400" />
               <span>Post Ministry Challenge</span>
-            </button>
+            </Link>
 
-            <button
+            <Link
+              href="/register"
               onClick={onRegisterStartup}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-sm bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 font-bold text-sm shadow-xs transition-colors cursor-pointer"
             >
               <Rocket className="w-4 h-4 text-emerald-600" />
               <span>Register DPIIT Startup</span>
-            </button>
+            </Link>
           </div>
         </div>
 

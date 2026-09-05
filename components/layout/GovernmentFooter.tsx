@@ -4,17 +4,9 @@ import React from 'react';
 import SangamSetuLogo from '@/components/brand/SangamSetuLogo';
 import { GovernmentEmblem, PartnerLogosBar } from '@/components/brand/GovernmentEmblem';
 import { Mail, Phone, MapPin, ExternalLink, ShieldCheck, FileText, Scale, HelpCircle } from 'lucide-react';
-import { useApp } from '@/context/AppContext';
-import { ActiveView } from '@/lib/types';
+import Link from 'next/link';
 
 export default function GovernmentFooter() {
-  const { setActiveView } = useApp();
-
-  const handleNav = (view: ActiveView) => {
-    setActiveView(view);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
   return (
     <footer className="bg-sangam-navy-900 text-white border-t-4 border-sangam-saffron-500 select-none">
       <div className="max-w-[1440px] mx-auto px-4 py-12">
@@ -39,100 +31,100 @@ export default function GovernmentFooter() {
             </div>
           </div>
 
-          {/* Column 2: Platform Pathways */}
+          {/* Column 2: Platform Pathways — Real <a> / <Link> anchors */}
           <div>
             <h4 className="text-sm font-bold text-amber-400 uppercase tracking-wider mb-4 border-b border-white/10 pb-2">
               Platform Pathways
             </h4>
             <ul className="space-y-2.5 text-xs text-slate-300">
               <li>
-                <button
-                  onClick={() => handleNav('challenges')}
-                  className="hover:text-amber-300 transition-colors flex items-center gap-1.5 cursor-pointer text-left"
+                <Link
+                  href="/challenges"
+                  className="hover:text-amber-300 transition-colors flex items-center gap-1.5"
                 >
                   <span>Browse Active Challenges</span>
-                </button>
+                </Link>
               </li>
               <li>
-                <button
-                  onClick={() => handleNav('workflow')}
-                  className="hover:text-amber-300 transition-colors flex items-center gap-1.5 cursor-pointer text-left"
+                <Link
+                  href="/9-step-workflow"
+                  className="hover:text-amber-300 transition-colors flex items-center gap-1.5"
                 >
                   <span>9-Step Procurement Workflow</span>
-                </button>
+                </Link>
               </li>
               <li>
-                <button
-                  onClick={() => handleNav('success-stories')}
-                  className="hover:text-amber-300 transition-colors flex items-center gap-1.5 cursor-pointer text-left"
+                <Link
+                  href="/pilot-outcomes"
+                  className="hover:text-amber-300 transition-colors flex items-center gap-1.5"
                 >
                   <span>Pilot Success Stories & GeM Integration</span>
-                </button>
+                </Link>
               </li>
               <li>
-                <button
-                  onClick={() => handleNav('guidelines')}
-                  className="hover:text-amber-300 transition-colors flex items-center gap-1.5 cursor-pointer text-left"
+                <Link
+                  href="/guidelines"
+                  className="hover:text-amber-300 transition-colors flex items-center gap-1.5"
                 >
                   <span>Standard Procurement Templates</span>
-                </button>
+                </Link>
               </li>
               <li>
-                <button
-                  onClick={() => handleNav('circulars')}
-                  className="hover:text-amber-300 transition-colors flex items-center gap-1.5 cursor-pointer text-left"
+                <Link
+                  href="/circulars"
+                  className="hover:text-amber-300 transition-colors flex items-center gap-1.5"
                 >
                   <span>Official Circulars & Gazette Orders</span>
-                </button>
+                </Link>
               </li>
             </ul>
           </div>
 
-          {/* Column 3: Governance, RTI & Compliance */}
+          {/* Column 3: Governance, RTI & Compliance — Real <a> / <Link> anchors */}
           <div>
             <h4 className="text-sm font-bold text-amber-400 uppercase tracking-wider mb-4 border-b border-white/10 pb-2">
               Governance & RTI
             </h4>
             <ul className="space-y-2.5 text-xs text-slate-300">
               <li>
-                <button
-                  onClick={() => handleNav('rti')}
-                  className="hover:text-amber-300 transition-colors flex items-center gap-1.5 cursor-pointer text-left"
+                <Link
+                  href="/governance/rti"
+                  className="hover:text-amber-300 transition-colors flex items-center gap-1.5"
                 >
                   <span>Right to Information (RTI Act 2005)</span>
-                </button>
+                </Link>
               </li>
               <li>
-                <button
-                  onClick={() => handleNav('grievance')}
-                  className="hover:text-amber-300 transition-colors flex items-center gap-1.5 cursor-pointer text-left"
+                <Link
+                  href="/governance/cpgrams"
+                  className="hover:text-amber-300 transition-colors flex items-center gap-1.5"
                 >
                   <span>Public Grievances (CPGRAMS)</span>
-                </button>
+                </Link>
               </li>
               <li>
-                <button
-                  onClick={() => handleNav('guidelines')}
-                  className="hover:text-amber-300 transition-colors flex items-center gap-1.5 cursor-pointer text-left"
+                <Link
+                  href="/governance/startup-exemptions"
+                  className="hover:text-amber-300 transition-colors flex items-center gap-1.5"
                 >
                   <span>GFR 2017 Startup Exemption Norms</span>
-                </button>
+                </Link>
               </li>
               <li>
-                <button
-                  onClick={() => handleNav('faq')}
-                  className="hover:text-amber-300 transition-colors flex items-center gap-1.5 cursor-pointer text-left"
+                <Link
+                  href="/faq"
+                  className="hover:text-amber-300 transition-colors flex items-center gap-1.5"
                 >
                   <span>Frequently Asked Questions (FAQ)</span>
-                </button>
+                </Link>
               </li>
               <li>
-                <button
-                  onClick={() => handleNav('sitemap')}
-                  className="hover:text-amber-300 transition-colors flex items-center gap-1.5 cursor-pointer text-left"
+                <Link
+                  href="/sitemap"
+                  className="hover:text-amber-300 transition-colors flex items-center gap-1.5"
                 >
                   <span>Complete Portal Sitemap</span>
-                </button>
+                </Link>
               </li>
             </ul>
           </div>
@@ -182,36 +174,36 @@ export default function GovernmentFooter() {
           </div>
         </div>
 
-        {/* Bottom Legal & Copyright Bar */}
+        {/* Bottom Legal & Copyright Bar — Real <a> / <Link> anchors */}
         <div className="border-t border-white/10 pt-6 flex flex-col md:flex-row items-center justify-between gap-4 text-[11px] text-slate-400">
           <div className="flex flex-wrap gap-3 text-slate-300">
-            <button onClick={() => handleNav('privacy')} className="hover:text-white cursor-pointer">
+            <Link href="/legal/privacy-policy" className="hover:text-white transition-colors">
               Privacy Policy
-            </button>
+            </Link>
             <span>•</span>
-            <button onClick={() => handleNav('terms')} className="hover:text-white cursor-pointer">
+            <Link href="/legal/terms" className="hover:text-white transition-colors">
               Terms of Service
-            </button>
+            </Link>
             <span>•</span>
-            <button onClick={() => handleNav('copyright')} className="hover:text-white cursor-pointer">
+            <Link href="/legal/copyright" className="hover:text-white transition-colors">
               Copyright Policy
-            </button>
+            </Link>
             <span>•</span>
-            <button onClick={() => handleNav('hyperlink')} className="hover:text-white cursor-pointer">
+            <Link href="/legal/hyperlinking" className="hover:text-white transition-colors">
               Hyperlinking Policy
-            </button>
+            </Link>
             <span>•</span>
-            <button onClick={() => handleNav('disclaimer')} className="hover:text-white cursor-pointer">
+            <Link href="/legal/disclaimer" className="hover:text-white transition-colors">
               Disclaimer
-            </button>
+            </Link>
             <span>•</span>
-            <button onClick={() => handleNav('accessibility')} className="hover:text-white cursor-pointer">
+            <Link href="/legal/accessibility" className="hover:text-white transition-colors">
               Accessibility Statement (GIGW 3.0)
-            </button>
+            </Link>
             <span>•</span>
-            <button onClick={() => handleNav('sitemap')} className="hover:text-white cursor-pointer">
+            <Link href="/sitemap" className="hover:text-white transition-colors">
               Sitemap
-            </button>
+            </Link>
           </div>
 
           <div className="text-center md:text-right">
