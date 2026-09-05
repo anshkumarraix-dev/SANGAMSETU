@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useApp } from '@/context/AppContext';
-import { Challenge, Proposal, Prototype } from '@/lib/types';
+import { Challenge, Proposal, Prototype, StartupProfile } from '@/lib/types';
 import {
   Rocket,
   FileText,
@@ -45,7 +45,30 @@ export default function StartupDashboard({ preselectedChallenge }: StartupDashbo
     requestMilestonePayment,
   } = useApp();
 
-  const currentStartup = startups.find(s => s.userId === currentUser.id) || startups[0];
+  const defaultStartup: StartupProfile = {
+    id: 'startup-default',
+    userId: currentUser.id,
+    name: currentUser.organization || 'My Registered Startup',
+    dpiitNumber: 'DIPP-PENDING',
+    dpiitVerified: true,
+    panNumber: 'AABCS1234F',
+    gstNumber: '07AABCS1234F1Z5',
+    udyamNumber: 'UDYAM-DL-01-0012345',
+    website: 'https://startupindia.gov.in',
+    description: 'DPIIT Registered Startup Profile - No active dummy profile loaded.',
+    foundingYear: new Date().getFullYear(),
+    teamSize: 5,
+    sectors: ['DeepTech', 'Innovation'],
+    technologies: ['AI', 'IoT'],
+    city: 'New Delhi',
+    state: 'Delhi',
+    pincode: '110001',
+    bankAccountNumber: '912010048912341',
+    ifscCode: 'SBIN0001234',
+    accountHolderName: currentUser.name,
+  };
+
+  const currentStartup = startups.find(s => s.userId === currentUser.id) || startups[0] || defaultStartup;
 
   const [activeTab, setActiveTab] = useState<'proposals' | 'apply' | 'prototypes' | 'milestones'>(
     preselectedChallenge ? 'apply' : 'proposals'

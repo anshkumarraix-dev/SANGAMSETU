@@ -240,28 +240,40 @@ export default function GovernmentDashboard() {
       </div>
 
       {/* ACTIVE CHALLENGE SELECTOR STRIP (FOR CONTEXT) */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-2xs">
-        <div className="flex items-center gap-2 w-full sm:w-auto">
-          <span className="text-xs font-bold uppercase text-slate-500 shrink-0">Select Challenge:</span>
-          <select
-            value={selectedChallengeId}
-            onChange={e => setSelectedChallengeId(e.target.value)}
-            className="w-full sm:w-auto px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold text-sangam-navy-900 bg-slate-50 outline-none"
-          >
-            {challenges.map(c => (
-              <option key={c.id} value={c.id}>
-                {c.title} ({c.totalApplications} Applications)
-              </option>
-            ))}
-          </select>
-        </div>
+      {challenges.length > 0 ? (
+        <div className="bg-white p-4 rounded-xl border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-2xs">
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <span className="text-xs font-bold uppercase text-slate-500 shrink-0">Select Challenge:</span>
+            <select
+              value={selectedChallengeId}
+              onChange={e => setSelectedChallengeId(e.target.value)}
+              className="w-full sm:w-auto px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold text-sangam-navy-900 bg-slate-50 outline-none"
+            >
+              {challenges.map(c => (
+                <option key={c.id} value={c.id}>
+                  {c.title} ({c.totalApplications} Applications)
+                </option>
+              ))}
+            </select>
+          </div>
 
-        <div className="flex items-center gap-3 text-xs font-bold text-slate-700">
-          <span>Status: <strong className="text-sangam-blue-600">{activeChallenge?.status}</strong></span>
-          <span>•</span>
-          <span>Budget: <strong className="text-emerald-700">₹{(activeChallenge?.budgetMax / 100000).toFixed(0)}L</strong></span>
+          <div className="flex items-center gap-3 text-xs font-bold text-slate-700">
+            <span>Status: <strong className="text-sangam-blue-600">{activeChallenge?.status || 'OPEN'}</strong></span>
+            <span>•</span>
+            <span>Budget: <strong className="text-emerald-700">₹{activeChallenge?.budgetMax ? (activeChallenge.budgetMax / 100000).toFixed(0) : '0'}L</strong></span>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="bg-white p-4 rounded-md border border-slate-200 text-xs text-slate-600 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <span>No active challenges published yet. Click &quot;Post New Challenge&quot; to publish your first problem statement.</span>
+          <button
+            onClick={() => setActiveTab('post')}
+            className="px-3 py-1.5 rounded-sm bg-sangam-blue-600 hover:bg-sangam-blue-700 text-white font-bold cursor-pointer"
+          >
+            Post New Challenge
+          </button>
+        </div>
+      )}
 
       {/* TAB 1: AI SHORTLIST CENTER (G1 & G2) */}
       {activeTab === 'ai-shortlist' && (
@@ -608,7 +620,14 @@ export default function GovernmentDashboard() {
               </p>
             </div>
 
-            {testReports.map(rep => (
+            {testReports.length === 0 ? (
+              <div className="text-center py-12 bg-slate-50 rounded-xl border border-slate-200">
+                <FlaskConical className="w-10 h-10 text-slate-400 mx-auto mb-2" />
+                <h4 className="text-sm font-bold text-slate-800">No lab test reports received yet</h4>
+                <p className="text-xs text-slate-500 mt-1">Empanelled testing laboratories (STQC/C-DAC) will submit independent validation reports here.</p>
+              </div>
+            ) : (
+              testReports.map(rep => (
               <div key={rep.id} className="p-6 rounded-2xl border border-slate-200 bg-slate-50 space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
                   <div>
@@ -665,7 +684,8 @@ export default function GovernmentDashboard() {
                   <p className="text-emerald-900 font-semibold"><strong>Lab Recommendation:</strong> {rep.recommendations}</p>
                 </div>
               </div>
-            ))}
+            ))
+            )}
           </div>
         </div>
       )}
@@ -673,7 +693,16 @@ export default function GovernmentDashboard() {
       {/* TAB 4: PILOT MANAGEMENT & PAYMENT APPROVAL */}
       {activeTab === 'pilots' && (
         <div className="space-y-6">
-          {pilots.map(pilot => (
+          {pilots.length === 0 ? (
+            <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center max-w-lg mx-auto">
+              <TrendingUp className="w-10 h-10 text-slate-400 mx-auto mb-3" />
+              <h3 className="text-base font-bold text-slate-800">No active pilots sanctioned</h3>
+              <p className="text-xs text-slate-500 mt-1">
+                When top-ranked G1/G2 startups complete STQC testing and receive pilot work orders under GFR 149/194, their contracts and milestone payment approval queues will appear here.
+              </p>
+            </div>
+          ) : (
+            pilots.map(pilot => (
             <div key={pilot.id} className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
                 <div>
@@ -750,7 +779,8 @@ export default function GovernmentDashboard() {
                 ))}
               </div>
             </div>
-          ))}
+          )))
+        }
         </div>
       )}
 

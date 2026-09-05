@@ -144,7 +144,16 @@ export default function TestingLabDashboard() {
       {/* TAB 1: PROTOTYPE TESTING QUEUE */}
       {activeTab === 'queue' && (
         <div className="space-y-6">
-          <div className="grid grid-cols-1 gap-6">
+          {prototypes.length === 0 ? (
+            <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center max-w-lg mx-auto">
+              <FlaskConical className="w-10 h-10 text-slate-400 mx-auto mb-3" />
+              <h3 className="text-base font-bold text-slate-800">Testing Queue is Empty</h3>
+              <p className="text-xs text-slate-500 mt-1">
+                Shortlisted startup prototypes submitted for STQC / C-DAC independent laboratory evaluation will appear here for verification.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-6">
             {prototypes.map(proto => (
               <div
                 key={proto.id}
@@ -211,13 +220,23 @@ export default function TestingLabDashboard() {
               </div>
             ))}
           </div>
+          )}
         </div>
       )}
 
       {/* TAB 2: ISSUED CERTIFICATES */}
       {activeTab === 'reports' && (
         <div className="space-y-6">
-          {testReports.map(rep => (
+          {testReports.length === 0 ? (
+            <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center max-w-lg mx-auto">
+              <FileCheck className="w-10 h-10 text-slate-400 mx-auto mb-3" />
+              <h3 className="text-base font-bold text-slate-800">No Certificates Issued Yet</h3>
+              <p className="text-xs text-slate-500 mt-1">
+                Official test certificates issued after laboratory stress testing and CERT-In audits will be archived here.
+              </p>
+            </div>
+          ) : (
+            testReports.map(rep => (
             <div key={rep.id} className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-5">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
                 <div>
@@ -267,7 +286,8 @@ export default function TestingLabDashboard() {
                 <p className="text-emerald-900 font-bold"><strong>Formal Lab Recommendation:</strong> {rep.recommendations}</p>
               </div>
             </div>
-          ))}
+          )))
+        }
         </div>
       )}
 

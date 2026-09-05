@@ -170,7 +170,7 @@ export default function HeroSection({
               </span>
             </div>
             <div className="text-2xl font-black text-slate-900">
-              {challenges.length + 145}+
+              {challenges.length}
             </div>
             <div className="text-xs font-bold text-slate-800 mt-0.5">
               Government Challenges

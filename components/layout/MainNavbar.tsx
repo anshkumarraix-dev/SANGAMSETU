@@ -24,6 +24,7 @@ import {
   HelpCircle,
   Globe,
   Sparkles,
+  Scale,
 } from 'lucide-react';
 import { UserRole, ActiveView } from '@/lib/types';
 
@@ -169,10 +170,10 @@ export default function MainNavbar({ activeTab: propActiveTab }: MainNavbarProps
                 <div className="flex flex-col">
                   <div className="flex items-baseline gap-1.5">
                     <span className="text-base sm:text-xl font-black tracking-tight text-sangam-navy-900 font-serif">
-                      संगम<span className="text-sangam-saffron-500">सेतु</span>
+                      SANGAM<span className="text-sangam-saffron-500">SETU</span>
                     </span>
                     <span className="text-xs sm:text-sm font-bold text-sangam-blue-700 tracking-wide">
-                      SangamSetu
+                      Portal
                     </span>
                   </div>
                   <span className="text-[9px] sm:text-[10px] text-slate-700 font-semibold tracking-tight">
@@ -256,7 +257,20 @@ export default function MainNavbar({ activeTab: propActiveTab }: MainNavbarProps
                 {language === 'en' ? 'Circulars' : 'परिपत्र'}
               </Link>
 
-              {/* 7. Portal Dashboard */}
+              {/* 7. Evaluation Simulation */}
+              <Link
+                href="/simulation"
+                className={`px-2.5 py-1.5 rounded-sm transition-colors flex items-center gap-1.5 ${
+                  activeTab === 'simulation'
+                    ? 'bg-sangam-blue-50 text-sangam-blue-600 border border-sangam-blue-200'
+                    : 'text-slate-700 hover:text-sangam-blue-600 hover:bg-slate-50'
+                }`}
+              >
+                <Scale className="w-3.5 h-3.5 text-sangam-blue-600" />
+                <span>{language === 'en' ? 'Evaluation Simulation' : 'मूल्यांकन सिमुलेशन'}</span>
+              </Link>
+
+              {/* 8. Portal Dashboard */}
               <Link
                 href="/dashboard"
                 className={`px-2.5 py-1.5 rounded-sm transition-colors ${
@@ -268,7 +282,7 @@ export default function MainNavbar({ activeTab: propActiveTab }: MainNavbarProps
                 {language === 'en' ? 'Portal Dashboard' : 'पोर्टल डैशबोर्ड'}
               </Link>
 
-              {/* 8. DPIIT Mission Control */}
+              {/* 9. DPIIT Mission Control */}
               <Link
                 href="/dashboard"
                 onClick={handleMissionControlClick}
@@ -455,6 +469,13 @@ export default function MainNavbar({ activeTab: propActiveTab }: MainNavbarProps
                 className={`block w-full text-left px-3 py-2 rounded-sm ${activeTab === 'circulars' ? 'bg-sangam-blue-50 text-sangam-blue-600 font-black' : 'text-slate-700 hover:bg-slate-100'}`}
               >
                 {language === 'en' ? 'Circulars' : 'परिपत्र'}
+              </Link>
+              <Link
+                href="/simulation"
+                onClick={() => setMobileMenuOpen(false)}
+                className={`block w-full text-left px-3 py-2 rounded-sm ${activeTab === 'simulation' ? 'bg-sangam-blue-50 text-sangam-blue-600 font-black' : 'text-slate-700 hover:bg-slate-100'}`}
+              >
+                {language === 'en' ? 'Evaluation Simulation' : 'मूल्यांकन सिमुलेशन'}
               </Link>
               <Link
                 href="/dashboard"
