@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans, Noto_Sans_Devanagari } from 'next/font/google';
 import './globals.css';
 import { AppProvider } from '@/context/AppContext';
 import { AuthProvider } from '@/context/AuthContext';
+import { InnovationExchangeProvider } from '@/context/InnovationExchangeContext';
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -37,7 +38,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen bg-slate-50 text-slate-900 font-sans antialiased" suppressHydrationWarning>
         <AuthProvider>
           <AppProvider>
-            {children}
+            <InnovationExchangeProvider>
+              {children}
+            </InnovationExchangeProvider>
           </AppProvider>
         </AuthProvider>
       </body>

@@ -3,7 +3,7 @@
 import React from 'react';
 
 interface SangamSetuLogoProps {
-  variant?: 'full' | 'icon' | 'white' | 'compact';
+  variant?: 'full' | 'icon' | 'white' | 'compact' | 'horizontal';
   className?: string;
   size?: 'sm' | 'md' | 'lg' | 'xl';
 }
@@ -17,201 +17,234 @@ export default function SangamSetuLogo({
 
   const scaleMap = {
     sm: 'h-9',
-    md: 'h-12',
-    lg: 'h-16',
-    xl: 'h-24',
+    md: 'h-12 sm:h-14',
+    lg: 'h-16 sm:h-20',
+    xl: 'h-24 sm:h-28',
   };
 
   return (
     <div className={`inline-flex items-center gap-3 select-none ${className}`}>
-      {/* SVG Icon Emblem */}
+      {/* Official SangamSetu Vector Emblem */}
       <svg
-        viewBox="0 0 420 220"
+        viewBox="0 0 500 320"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className={`${scaleMap[size]} w-auto aspect-[420/220] transition-transform duration-200`}
-        aria-label="SangamSetu Official Emblem"
+        className={`${scaleMap[size]} w-auto aspect-[500/320] transition-transform duration-200`}
+        aria-label="SangamSetu - Where Innovation Meets Governance"
       >
         <defs>
-          <linearGradient id="blueBridgeGrad" x1="0%" y1="100%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#001F3D" />
-            <stop offset="60%" stopColor="#003D7A" />
-            <stop offset="100%" stopColor="#0066CC" />
+          <linearGradient id="navyBridgeGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor={isWhite ? '#FFFFFF' : '#0B2545'} />
+            <stop offset="100%" stopColor={isWhite ? '#E2E8F0' : '#004B87'} />
           </linearGradient>
           <linearGradient id="saffronBridgeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#FF9933" />
-            <stop offset="60%" stopColor="#FFAA44" />
-            <stop offset="100%" stopColor="#E68A00" />
+            <stop offset="0%" stopColor={isWhite ? '#FFD699' : '#FF7700'} />
+            <stop offset="100%" stopColor={isWhite ? '#FFAA33' : '#E65100'} />
           </linearGradient>
-          <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="3" result="blur" />
-            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+          <filter id="subtleGlow" x="-10%" y="-10%" width="120%" height="120%">
+            <feDropShadow dx="0" dy="1" stdDeviation="1.5" floodOpacity="0.15" />
           </filter>
         </defs>
 
-        {/* Central Vertical Spire */}
+        {/* 1. Central Monumental Spire (Left Navy / Right Saffron) */}
+        {/* Left Spire Half */}
         <path
-          d="M208 8 L212 8 L216 112 L204 112 Z"
-          fill={isWhite ? '#FFFFFF' : '#003D7A'}
+          d="M250 12 L244 80 L242 165 C242 165 246 170 250 170 Z"
+          fill={isWhite ? '#FFFFFF' : '#0B2545'}
         />
+        {/* Right Spire Half */}
         <path
-          d="M212 8 L214 8 L216 112 L212 112 Z"
-          fill={isWhite ? '#FFD480' : '#FF9933'}
+          d="M250 12 L256 80 L258 165 C258 165 254 170 250 170 Z"
+          fill={isWhite ? '#FFD480' : '#FF7700'}
         />
 
-        {/* Central Connecting Pivot Circle */}
-        <circle cx="210" cy="115" r="10" fill="#FFFFFF" stroke={isWhite ? '#FFFFFF' : '#003D7A'} strokeWidth="4" />
+        {/* Central Pivot Hub Ring */}
+        <circle
+          cx="250"
+          cy="165"
+          r="10"
+          fill={isWhite ? '#0B2545' : '#FFFFFF'}
+          stroke={isWhite ? '#FFFFFF' : '#0B2545'}
+          strokeWidth="4"
+        />
+        <circle
+          cx="250"
+          cy="165"
+          r="4"
+          fill={isWhite ? '#FFD480' : '#FF7700'}
+        />
 
-        {/* Left Side: Government Classical Dome & Pillars */}
-        <g transform="translate(115, 60)">
-          {/* Flag */}
-          <path d="M45 4 L45 0 L55 2 L45 5 Z" fill={isWhite ? '#FFD480' : '#FF9933'} />
-          <line x1="45" y1="0" x2="45" y2="10" stroke={isWhite ? '#FFFFFF' : '#002852'} strokeWidth="2" />
-          {/* Dome */}
+        {/* 2. Left Symbol: Classical Government Dome & Pillars (Navy) */}
+        <g transform="translate(145, 80)">
+          {/* Flagpole & Flag */}
+          <line x1="45" y1="2" x2="45" y2="24" stroke={isWhite ? '#FFFFFF' : '#0B2545'} strokeWidth="2.5" strokeLinecap="round" />
+          <path d="M45 4 L60 8 L45 13 Z" fill={isWhite ? '#FFFFFF' : '#0B2545'} />
+          {/* Dome Cupola */}
           <path
-            d="M30 25 C30 13 60 13 60 25 Z"
-            fill={isWhite ? '#FFFFFF' : '#002852'}
+            d="M24 40 C24 24 66 24 66 40 Z"
+            fill={isWhite ? '#FFFFFF' : '#0B2545'}
           />
-          {/* Base cornice */}
-          <rect x="25" y="25" width="40" height="5" rx="1" fill={isWhite ? '#FFFFFF' : '#002852'} />
+          {/* Cornice */}
+          <rect x="20" y="40" width="50" height="5" rx="1.5" fill={isWhite ? '#FFFFFF' : '#0B2545'} />
           {/* Pillars */}
-          <rect x="28" y="32" width="5" height="18" fill={isWhite ? '#FFFFFF' : '#002852'} />
-          <rect x="37" y="32" width="5" height="18" fill={isWhite ? '#FFFFFF' : '#002852'} />
-          <rect x="47" y="32" width="5" height="18" fill={isWhite ? '#FFFFFF' : '#002852'} />
-          <rect x="56" y="32" width="5" height="18" fill={isWhite ? '#FFFFFF' : '#002852'} />
-          {/* Plinth */}
-          <rect x="24" y="50" width="42" height="6" rx="1" fill={isWhite ? '#FFFFFF' : '#002852'} />
+          <rect x="23" y="48" width="5" height="24" rx="1" fill={isWhite ? '#FFFFFF' : '#0B2545'} />
+          <rect x="34" y="48" width="5" height="24" rx="1" fill={isWhite ? '#FFFFFF' : '#0B2545'} />
+          <rect x="45" y="48" width="5" height="24" rx="1" fill={isWhite ? '#FFFFFF' : '#0B2545'} />
+          <rect x="56" y="48" width="5" height="24" rx="1" fill={isWhite ? '#FFFFFF' : '#0B2545'} />
+          <rect x="67" y="48" width="5" height="24" rx="1" fill={isWhite ? '#FFFFFF' : '#0B2545'} />
+          {/* Base Plinth */}
+          <rect x="18" y="72" width="54" height="6" rx="1.5" fill={isWhite ? '#FFFFFF' : '#0B2545'} />
         </g>
 
-        {/* Right Side: Innovation Lightbulb & Rays */}
-        <g transform="translate(255, 60)">
-          {/* Rays */}
-          <line x1="45" y1="0" x2="45" y2="8" stroke={isWhite ? '#FFAA44' : '#FF9933'} strokeWidth="3" strokeLinecap="round" />
-          <line x1="18" y1="12" x2="24" y2="18" stroke={isWhite ? '#FFAA44' : '#FF9933'} strokeWidth="3" strokeLinecap="round" />
-          <line x1="72" y1="12" x2="66" y2="18" stroke={isWhite ? '#FFAA44' : '#FF9933'} strokeWidth="3" strokeLinecap="round" />
-          <line x1="8" y1="35" x2="16" y2="35" stroke={isWhite ? '#FFAA44' : '#FF9933'} strokeWidth="3" strokeLinecap="round" />
-          <line x1="82" y1="35" x2="74" y2="35" stroke={isWhite ? '#FFAA44' : '#FF9933'} strokeWidth="3" strokeLinecap="round" />
+        {/* 3. Right Symbol: Radiant Innovation Light Bulb (Saffron) */}
+        <g transform="translate(305, 95)">
+          {/* Radiating Aura Rays */}
+          <line x1="45" y1="2" x2="45" y2="12" stroke={isWhite ? '#FFD480' : '#FF7700'} strokeWidth="3" strokeLinecap="round" />
+          <line x1="16" y1="14" x2="24" y2="21" stroke={isWhite ? '#FFD480' : '#FF7700'} strokeWidth="3" strokeLinecap="round" />
+          <line x1="74" y1="14" x2="66" y2="21" stroke={isWhite ? '#FFD480' : '#FF7700'} strokeWidth="3" strokeLinecap="round" />
+          <line x1="5" y1="42" x2="15" y2="42" stroke={isWhite ? '#FFD480' : '#FF7700'} strokeWidth="3" strokeLinecap="round" />
+          <line x1="85" y1="42" x2="75" y2="42" stroke={isWhite ? '#FFD480' : '#FF7700'} strokeWidth="3" strokeLinecap="round" />
           {/* Bulb Outline */}
           <path
-            d="M32 32 C32 24 38 18 45 18 C52 18 58 24 58 32 C58 37 54 41 52 45 L38 45 C36 41 32 37 32 32 Z"
+            d="M30 42 C30 33 37 26 45 26 C53 26 60 33 60 42 C60 48 56 52 54 56 L36 56 C34 52 30 48 30 42 Z"
             fill="none"
-            stroke={isWhite ? '#FFAA44' : '#FF9933'}
+            stroke={isWhite ? '#FFD480' : '#FF7700'}
             strokeWidth="3.5"
+            strokeLinejoin="round"
           />
-          {/* Filament */}
+          {/* Glowing Filament */}
           <path
-            d="M41 45 L41 33 C41 30 49 30 49 33 L49 45"
+            d="M40 56 L40 42 C40 38 43 36 45 36 C47 36 50 38 50 42 L50 56"
             fill="none"
-            stroke={isWhite ? '#FFAA44' : '#FF9933'}
-            strokeWidth="2"
+            stroke={isWhite ? '#FFD480' : '#FF7700'}
+            strokeWidth="2.5"
+            strokeLinecap="round"
           />
-          {/* Bulb Base */}
-          <rect x="40" y="47" width="10" height="3" rx="1" fill={isWhite ? '#FFAA44' : '#FF9933'} />
-          <rect x="42" y="51" width="6" height="3" rx="1" fill={isWhite ? '#FFAA44' : '#FF9933'} />
+          {/* Screw Base */}
+          <rect x="38" y="58" width="14" height="3.5" rx="1" fill={isWhite ? '#FFD480' : '#FF7700'} />
+          <rect x="40" y="63" width="10" height="3" rx="1" fill={isWhite ? '#FFD480' : '#FF7700'} />
+          <rect x="42" y="67" width="6" height="2" rx="0.5" fill={isWhite ? '#FFD480' : '#FF7700'} />
         </g>
 
-        {/* Left Sweeping Bridge (Navy to Blue) */}
+        {/* 4. Left Sweeping Bridge (Deep Navy) */}
+        {/* Bridge Upper Arc */}
         <path
-          d="M80 185 C140 180 190 140 210 115 C200 135 150 165 80 170 Z"
-          fill="url(#blueBridgeGrad)"
+          d="M80 235 C145 230 215 195 246 168 C225 195 160 220 80 225 Z"
+          fill="url(#navyBridgeGrad)"
         />
+        {/* Main Arch Cable */}
         <path
-          d="M95 185 C145 155 185 130 210 115"
-          stroke={isWhite ? '#FFFFFF' : '#003D7A'}
-          strokeWidth="7"
+          d="M95 236 C155 195 210 172 245 168"
+          stroke={isWhite ? '#FFFFFF' : '#0B2545'}
+          strokeWidth="8"
           strokeLinecap="round"
         />
+        {/* Left Bridge Vertical Suspension Struts */}
+        <line x1="130" y1="234" x2="130" y2="204" stroke={isWhite ? '#FFFFFF' : '#0B2545'} strokeWidth="5" strokeLinecap="round" />
+        <line x1="155" y1="228" x2="155" y2="190" stroke={isWhite ? '#FFFFFF' : '#0B2545'} strokeWidth="5" strokeLinecap="round" />
+        <line x1="180" y1="218" x2="180" y2="180" stroke={isWhite ? '#FFFFFF' : '#0B2545'} strokeWidth="5" strokeLinecap="round" />
+        <line x1="208" y1="205" x2="208" y2="173" stroke={isWhite ? '#FFFFFF' : '#0B2545'} strokeWidth="5" strokeLinecap="round" />
 
-        {/* Left Bridge Vertical Suspension Cable Struts */}
-        <line x1="125" y1="183" x2="125" y2="160" stroke={isWhite ? '#FFFFFF' : '#003D7A'} strokeWidth="4.5" />
-        <line x1="145" y1="178" x2="145" y2="148" stroke={isWhite ? '#FFFFFF' : '#003D7A'} strokeWidth="4.5" />
-        <line x1="165" y1="170" x2="165" y2="137" stroke={isWhite ? '#FFFFFF' : '#003D7A'} strokeWidth="4.5" />
-        <line x1="185" y1="160" x2="185" y2="126" stroke={isWhite ? '#FFFFFF' : '#003D7A'} strokeWidth="4.5" />
-
-        {/* Right Sweeping Bridge (Saffron to Gold) */}
+        {/* 5. Right Sweeping Bridge (Vibrant Saffron) */}
+        {/* Bridge Upper Arc */}
         <path
-          d="M340 185 C280 180 230 140 210 115 C220 135 270 165 340 170 Z"
+          d="M420 235 C355 230 285 195 254 168 C275 195 340 220 420 225 Z"
           fill="url(#saffronBridgeGrad)"
         />
+        {/* Main Arch Cable */}
         <path
-          d="M325 185 C275 155 235 130 210 115"
-          stroke={isWhite ? '#FFD480' : '#FF9933'}
-          strokeWidth="7"
+          d="M405 236 C345 195 290 172 255 168"
+          stroke={isWhite ? '#FFD480' : '#FF7700'}
+          strokeWidth="8"
           strokeLinecap="round"
         />
+        {/* Right Bridge Vertical Suspension Struts */}
+        <line x1="370" y1="234" x2="370" y2="204" stroke={isWhite ? '#FFD480' : '#FF7700'} strokeWidth="5" strokeLinecap="round" />
+        <line x1="345" y1="228" x2="345" y2="190" stroke={isWhite ? '#FFD480' : '#FF7700'} strokeWidth="5" strokeLinecap="round" />
+        <line x1="320" y1="218" x2="320" y2="180" stroke={isWhite ? '#FFD480' : '#FF7700'} strokeWidth="5" strokeLinecap="round" />
+        <line x1="292" y1="205" x2="292" y2="173" stroke={isWhite ? '#FFD480' : '#FF7700'} strokeWidth="5" strokeLinecap="round" />
 
-        {/* Right Bridge Vertical Suspension Cable Struts */}
-        <line x1="295" y1="183" x2="295" y2="160" stroke={isWhite ? '#FFD480' : '#FF9933'} strokeWidth="4.5" />
-        <line x1="275" y1="178" x2="275" y2="148" stroke={isWhite ? '#FFD480' : '#FF9933'} strokeWidth="4.5" />
-        <line x1="255" y1="170" x2="255" y2="137" stroke={isWhite ? '#FFD480' : '#FF9933'} strokeWidth="4.5" />
-        <line x1="235" y1="160" x2="235" y2="126" stroke={isWhite ? '#FFD480' : '#FF9933'} strokeWidth="4.5" />
-
-        {/* Lower Main Arch Span */}
+        {/* 6. Lower Continuous Roadway Span */}
         <path
-          d="M90 185 C140 145 280 145 330 185"
-          stroke={isWhite ? '#FFFFFF' : '#003D7A'}
+          d="M90 236 C170 198 330 198 410 236"
+          stroke={isWhite ? '#FFFFFF' : '#0B2545'}
           strokeWidth="5"
           strokeLinecap="round"
           fill="none"
         />
 
-        {/* Ashoka Chakra & Decorative Separator Line */}
-        <line x1="60" y1="200" x2="190" y2="200" stroke={isWhite ? '#FFFFFF' : '#003D7A'} strokeWidth="2.5" />
-        <line x1="230" y1="200" x2="360" y2="200" stroke={isWhite ? '#FFD480' : '#FF9933'} strokeWidth="2.5" />
+        {/* 7. SANGAMSETU Primary Brand Text */}
+        <text
+          x="80"
+          y="278"
+          fontFamily="system-ui, -apple-system, sans-serif"
+          fontSize="36"
+          fontWeight="900"
+          letterSpacing="0.06em"
+          fill={isWhite ? '#FFFFFF' : '#0B2545'}
+        >
+          SANGAM
+        </text>
+        <text
+          x="272"
+          y="278"
+          fontFamily="system-ui, -apple-system, sans-serif"
+          fontSize="36"
+          fontWeight="900"
+          letterSpacing="0.06em"
+          fill={isWhite ? '#FFD480' : '#FF7700'}
+        >
+          SETU
+        </text>
 
-        {/* Ashoka Chakra Wheel */}
-        <g transform="translate(210, 200)">
-          <circle cx="0" cy="0" r="12" fill="#FFFFFF" stroke="#003D7A" strokeWidth="2" />
-          <circle cx="0" cy="0" r="3" fill="#003D7A" />
-          {/* 24 Spokes (simplified radial ticks using deterministic SVG rotation) */}
+        {/* 8. Separator Bar with Ashoka Chakra Wheel */}
+        {/* Left Navy Line */}
+        <line x1="80" y1="296" x2="232" y2="296" stroke={isWhite ? '#FFFFFF' : '#0B2545'} strokeWidth="2.5" strokeLinecap="round" />
+        {/* Right Saffron Line */}
+        <line x1="268" y1="296" x2="420" y2="296" stroke={isWhite ? '#FFD480' : '#FF7700'} strokeWidth="2.5" strokeLinecap="round" />
+
+        {/* Center Ashoka Chakra */}
+        <g transform="translate(250, 296)">
+          <circle cx="0" cy="0" r="10" fill={isWhite ? '#0B2545' : '#FFFFFF'} stroke={isWhite ? '#FFFFFF' : '#0B2545'} strokeWidth="2" />
+          <circle cx="0" cy="0" r="2.5" fill={isWhite ? '#FFFFFF' : '#0B2545'} />
           {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((deg) => (
             <line
               key={deg}
               x1="0"
               y1="0"
               x2="0"
-              y2="-10"
+              y2="-8"
               transform={`rotate(${deg})`}
-              stroke="#003D7A"
+              stroke={isWhite ? '#FFFFFF' : '#0B2545'}
               strokeWidth="1.2"
             />
           ))}
         </g>
+
+        {/* 9. Official Tagline: WHERE INNOVATION MEETS GOVERNANCE */}
+        <text
+          x="250"
+          y="314"
+          textAnchor="middle"
+          fontFamily="system-ui, -apple-system, sans-serif"
+          fontSize="10.5"
+          fontWeight="700"
+          letterSpacing="0.28em"
+          fill={isWhite ? '#E2E8F0' : '#1E293B'}
+        >
+          WHERE INNOVATION MEETS GOVERNANCE
+        </text>
       </svg>
 
-      {/* Brand Typography */}
-      {variant !== 'icon' && (
-        <div className="flex flex-col justify-center">
-          <div className="flex items-baseline tracking-tight font-extrabold leading-none">
-            <span
-              className={`text-xl sm:text-2xl md:text-3xl font-black ${
-                isWhite ? 'text-white' : 'text-sangam-navy-900'
-              }`}
-            >
-              SANGAM
-            </span>
-            <span
-              className={`text-xl sm:text-2xl md:text-3xl font-black ${
-                isWhite ? 'text-sangam-saffron-400' : 'text-sangam-saffron-500'
-              }`}
-            >
-              SETU
-            </span>
-          </div>
-          <div
-            className={`text-[9px] sm:text-[10px] md:text-[11px] font-bold tracking-widest uppercase mt-0.5 ${
-              isWhite ? 'text-slate-300' : 'text-slate-600'
-            }`}
-          >
-            WHERE INNOVATION MEETS GOVERNANCE
-          </div>
-          {size !== 'sm' && variant !== 'compact' && (
-            <div className="flex items-center gap-1 text-[9px] text-sangam-blue-600 font-semibold mt-0.5">
-              <span>Government of India Initiative</span>
-              <span>•</span>
-              <span className="text-slate-500">DPIIT</span>
-            </div>
-          )}
+      {/* Optional Side Label for compact header layouts if variant === 'horizontal' */}
+      {variant === 'horizontal' && (
+        <div className="hidden sm:flex flex-col justify-center border-l border-slate-200 pl-3">
+          <span className="text-[11px] font-black uppercase text-sangam-navy-900 tracking-wider">
+            Ministry of Commerce & Industry
+          </span>
+          <span className="text-[10px] text-slate-500 font-medium">
+            DPIIT Innovation Procurement Bridge
+          </span>
         </div>
       )}
     </div>

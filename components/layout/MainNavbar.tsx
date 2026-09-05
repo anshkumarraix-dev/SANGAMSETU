@@ -158,15 +158,10 @@ export default function MainNavbar({ activeTab: propActiveTab }: MainNavbarProps
       <nav className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-xs select-none">
         <div className="max-w-[1440px] mx-auto px-4 py-2 sm:py-2.5">
           <div className="flex items-center justify-between gap-2 lg:gap-6">
-            {/* Left: Official Brand Identity & Emblems */}
+            {/* Left: Official Brand Identity */}
             <div className="flex items-center gap-3 sm:gap-4 shrink-0">
               <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group">
-                <img
-                  src="/images/emblem-india.svg"
-                  alt="State Emblem of India"
-                  className="h-10 sm:h-12 w-auto object-contain transition-transform group-hover:scale-105"
-                  referrerPolicy="no-referrer"
-                />
+                <SangamSetuLogo variant="icon" size="sm" />
                 <div className="flex flex-col">
                   <div className="flex items-baseline gap-1.5">
                     <span className="text-base sm:text-xl font-black tracking-tight text-sangam-navy-900 font-serif">
@@ -297,30 +292,8 @@ export default function MainNavbar({ activeTab: propActiveTab }: MainNavbarProps
               </Link>
             </div>
 
-            {/* Right: Logos, Language, Auth & Notifications */}
+            {/* Right: Language, Auth & Notifications */}
             <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
-              {/* National Initiative Logos */}
-              <div className="hidden 2xl:flex items-center gap-2.5 pr-2.5 border-r border-slate-200">
-                <img
-                  src="/images/g20-india.png"
-                  alt="G20 India"
-                  className="h-6 w-auto object-contain"
-                  referrerPolicy="no-referrer"
-                  onError={(e) => {
-                    const el = e.currentTarget;
-                    if (!el.src.includes('g20-india.svg')) {
-                      el.src = '/images/g20-india.svg';
-                    }
-                  }}
-                />
-                <img
-                  src="/images/digital-india.svg"
-                  alt="Digital India"
-                  className="h-6 w-auto object-contain"
-                  referrerPolicy="no-referrer"
-                />
-              </div>
-
               {/* Quick Language Toggle */}
               <button
                 onClick={() => setLanguage(language === 'en' ? 'hi' : 'en')}

@@ -32,86 +32,11 @@ export default function HeroSection({
   return (
     <section className="relative bg-white border-b border-slate-200 pt-6 pb-12 md:pt-10 md:pb-16">
       <div className="max-w-[1440px] mx-auto px-4">
-        {/* Top Government Initiative & National Emblems Header */}
-        <div className="flex flex-col items-center mb-6">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-sm bg-sangam-blue-50 border border-sangam-blue-200 text-sangam-blue-800 text-xs font-bold mb-4">
+        {/* Top Government Initiative Pill */}
+        <div className="flex justify-center mb-6">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sangam-blue-50 border border-sangam-blue-200 text-sangam-blue-800 text-xs font-bold shadow-2xs">
             <Shield className="w-4 h-4 text-sangam-blue-600" />
-            <span>Government of India National Innovation Procurement Portal • DPIIT</span>
-          </div>
-
-          {/* Official National Initiative Badges Strip */}
-          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8 px-4 py-2.5 rounded-lg bg-slate-50/80 border border-slate-200/80 max-w-4xl w-full shadow-2xs">
-            {/* 1. National Emblem of India */}
-            <div className="flex items-center gap-2.5">
-              <img
-                src="/images/emblem-india.svg"
-                alt="State Emblem of India"
-                className="h-10 sm:h-12 w-auto object-contain drop-shadow-2xs"
-                referrerPolicy="no-referrer"
-              />
-              <div className="text-left leading-none">
-                <p className="text-[11px] font-extrabold text-slate-900">भारत सरकार</p>
-                <p className="text-[9px] font-semibold text-slate-600 mt-0.5">Government of India</p>
-              </div>
-            </div>
-
-            <div className="hidden sm:block h-7 w-px bg-slate-200" />
-
-            {/* 2. DPIIT Recognised */}
-            <div className="flex items-center gap-2">
-              <img
-                src="/images/dpiit-recognised.svg"
-                alt="Recognised by DPIIT"
-                className="h-10 sm:h-11 w-auto object-contain"
-                referrerPolicy="no-referrer"
-              />
-              <div className="text-left leading-tight hidden xs:block">
-                <p className="text-[10px] font-extrabold text-amber-900 uppercase tracking-wider">DPIIT Validated</p>
-                <p className="text-[9px] text-slate-500">Startup India Network</p>
-              </div>
-            </div>
-
-            <div className="hidden md:block h-7 w-px bg-slate-200" />
-
-            {/* 3. Digital India */}
-            <div className="flex items-center gap-2">
-              <img
-                src="/images/digital-india.svg"
-                alt="Digital India - Power To Empower"
-                className="h-9 sm:h-10 w-auto object-contain"
-                referrerPolicy="no-referrer"
-              />
-            </div>
-
-            <div className="hidden lg:block h-7 w-px bg-slate-200" />
-
-            {/* 4. Aatmanirbhar Bharat */}
-            <div className="hidden sm:flex items-center gap-2">
-              <img
-                src="/images/aatmanirbhar-bharat.svg"
-                alt="Aatmanirbhar Bharat Abhiyan"
-                className="h-9 sm:h-10 w-auto object-contain"
-                referrerPolicy="no-referrer"
-              />
-            </div>
-
-            <div className="hidden lg:block h-7 w-px bg-slate-200" />
-
-            {/* 5. G20 India */}
-            <div className="hidden md:flex items-center gap-2">
-              <img
-                src="/images/g20-india.png"
-                alt="G20 India 2023 - Vasudhaiva Kutumbakam"
-                className="h-9 sm:h-10 w-auto object-contain"
-                referrerPolicy="no-referrer"
-                onError={(e) => {
-                  const el = e.currentTarget;
-                  if (!el.src.includes('g20-india.svg')) {
-                    el.src = '/images/g20-india.svg';
-                  }
-                }}
-              />
-            </div>
+            <span>Government of India • DPIIT Startup Innovation Procurement Portal</span>
           </div>
         </div>
 
