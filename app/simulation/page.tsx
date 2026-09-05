@@ -181,33 +181,163 @@ function SimulationContent() {
 
   // 6-Stage Definitions
   const STAGES = [
-    { step: 0, label: 'Draft Problem', desc: 'MoRTH corridor challenge posted' },
-    { step: 1, label: 'Eligibility Gates', desc: '8 compliance checks verified' },
-    { step: 2, label: 'Explainable AI', desc: '8 weighted parameters & G1/G2' },
-    { step: 3, label: 'Department Review', desc: 'Officer audit & override log' },
-    { step: 4, label: 'STQC Lab Testing', desc: '15 parameters benchmarked' },
-    { step: 5, label: 'Pilot Sanctioned', desc: 'Work order & deployment' },
+    { step: 0, label: '01. Problem Draft', desc: 'MoRTH corridor challenge in formulation' },
+    { step: 1, label: '02. Live Intake', desc: 'Proposals submitted against live problem' },
+    { step: 2, label: '03. AI Shortlisting', desc: '8-factor scoring into G1/G2 shortlists' },
+    { step: 3, label: '04. Blind Lab Testing', desc: 'STQC 15-parameter independent audit' },
+    { step: 4, label: '05. Ministry Review', desc: 'Final shortlist & verdicts sent to Govt' },
+    { step: 5, label: '06. Pilot Deployed', desc: 'Work order awarded & deployment active' },
   ];
 
-  // STAGE ADVANCE ACTIONS (Feature E)
-  const handleAdvanceToAIShortlisting = () => {
-    setStage(2);
-    setToast({
-      show: true,
-      message: 'Explainable AI shortlisting computed. Notifications dispatched to all 10 applicant startups.',
-      type: 'success',
-    });
-  };
+  // 9-Step Demo Walkthrough Steps Definition
+  const DEMO_STEPS = [
+    {
+      step: 1,
+      persona: 'department' as SimPersona,
+      stage: 0 as SimulationStage,
+      personaLabel: 'Government View',
+      title: 'Launch Problem Statement',
+      actionLabel: 'Click "Submit Problem" to post live',
+      desc: 'MoRTH drafts and publishes the national urban corridor challenge live on the platform.',
+    },
+    {
+      step: 2,
+      persona: 'startup' as SimPersona,
+      stage: 1 as SimulationStage,
+      personaLabel: 'Startup View',
+      title: 'Propose a Solution',
+      actionLabel: 'Submit technical proposal',
+      desc: 'Startup reviews live problem statement and submits its dynamic traffic optimization proposal.',
+    },
+    {
+      step: 3,
+      persona: 'admin' as SimPersona,
+      stage: 1 as SimulationStage,
+      personaLabel: 'Platform Admin',
+      title: 'View Proposed Solutions',
+      actionLabel: 'Inspect 10+ intake proposals',
+      desc: 'Platform SuperAdmin monitors all incoming startup submissions, DPIIT IDs, and solution summaries.',
+    },
+    {
+      step: 4,
+      persona: 'admin' as SimPersona,
+      stage: 1 as SimulationStage,
+      personaLabel: 'Platform Admin',
+      title: 'Run AI Shortlisting',
+      actionLabel: 'Click "Run AI Shortlisting"',
+      desc: 'Automated 8-factor explainable AI evaluates all proposals into G1 Quality and G2 Value shortlists.',
+    },
+    {
+      step: 5,
+      persona: 'admin' as SimPersona,
+      stage: 2 as SimulationStage,
+      personaLabel: 'Platform Admin',
+      title: 'Send to Evaluator',
+      actionLabel: 'Click "Send to Evaluator"',
+      desc: 'Shortlisted prototypes are routed to the independent testing laboratory for technical benchmarking.',
+    },
+    {
+      step: 6,
+      persona: 'evaluator' as SimPersona,
+      stage: 3 as SimulationStage,
+      personaLabel: 'Evaluator View',
+      title: 'Blind Prototype Review',
+      actionLabel: 'Audit 15 STQC lab parameters',
+      desc: 'Independent testing lab evaluates anonymous prototypes (Prototype G1-01, etc.) under Blind Review Mode.',
+    },
+    {
+      step: 7,
+      persona: 'evaluator' as SimPersona,
+      stage: 3 as SimulationStage,
+      personaLabel: 'Evaluator View',
+      title: 'Submit Test Reports',
+      actionLabel: 'Click "Submit Test Reports to Admin"',
+      desc: 'Lab completes benchmark certifications and submits verified results to Platform Admin.',
+    },
+    {
+      step: 8,
+      persona: 'admin' as SimPersona,
+      stage: 3 as SimulationStage,
+      personaLabel: 'Platform Admin',
+      title: 'Send Final Selection to Govt',
+      actionLabel: 'Click "Send Final Selection to Govt"',
+      desc: 'Admin forwards the consolidated shortlist with STQC test verdicts to the Ministry (MoRTH).',
+    },
+    {
+      step: 9,
+      persona: 'department' as SimPersona,
+      stage: 4 as SimulationStage,
+      personaLabel: 'Government View',
+      title: 'Confirm & Begin Deployment',
+      actionLabel: 'Select team & Click "Confirm & Deploy"',
+      desc: 'Government reviews shortlist with test verdicts, selects one team, and issues official pilot work order.',
+    },
+  ];
 
-  const handleAdvanceToLabTesting = () => {
-    setStage(4);
+  // Helper: Jump to specific walkthrough demo step
+  const handleJumpToDemoStep = (stepNum: number) => {
+    const target = DEMO_STEPS.find(s => s.step === stepNum);
+    if (!target) return;
+    setCurrentPersona(target.persona);
+    setStage(target.stage);
     setToast({
       show: true,
-      message: 'Proposals dispatched to STQC Testing Laboratory for independent 15-parameter benchmarking.',
+      message: `Navigated to Demo Step ${target.step}: ${target.title} (${target.personaLabel}).`,
       type: 'info',
     });
   };
 
+  // STEP 1 ACTION: Launch problem statement live (Stage 0 -> 1)
+  const handleLaunchProblem = () => {
+    setStage(1);
+    setToast({
+      show: true,
+      message: 'Problem Statement successfully published live! Now accessible across Public Portal and Startup View.',
+      type: 'success',
+    });
+  };
+
+  // STEP 4 ACTION: Run AI Shortlisting (Stage 1 -> 2)
+  const handleAdvanceToAIShortlisting = () => {
+    setStage(2);
+    setToast({
+      show: true,
+      message: 'Explainable AI shortlisting computed. Submissions classified into G1 (Quality) and G2 (Value) shortlists. Notifications dispatched.',
+      type: 'success',
+    });
+  };
+
+  // STEP 5 ACTION: Send shortlisted teams to evaluator (Stage 2 -> 3)
+  const handleSendToEvaluator = () => {
+    setStage(3);
+    setToast({
+      show: true,
+      message: 'Shortlisted prototypes routed to STQC Testing Laboratory under Blind Review Mode.',
+      type: 'info',
+    });
+  };
+
+  // STEP 7 ACTION: Evaluator submits test reports back to Admin (Stage 3 -> 4)
+  const handleSubmitTestReportsToAdmin = () => {
+    setStage(4);
+    setToast({
+      show: true,
+      message: 'STQC Lab Test Reports & Certificates successfully submitted to Platform Admin.',
+      type: 'success',
+    });
+  };
+
+  // STEP 8 ACTION: Admin sends final selection to Government (Stage 4)
+  const handleSendSelectionToGovt = () => {
+    setStage(4);
+    setToast({
+      show: true,
+      message: 'Final Shortlist & STQC Benchmarks dispatched to Ministry of Road Transport and Highways (MoRTH).',
+      type: 'success',
+    });
+  };
+
+  // STEP 9 ACTION: Government confirms and begins deployment (Stage 4 -> 5)
   const handleConfirmAndDeploy = (startupIdToSanction?: string) => {
     const targetId = startupIdToSanction || manualSelectedPilotId || selectedStartup.id;
     const target = startups.find(s => s.id === targetId);
@@ -245,7 +375,7 @@ function SimulationContent() {
     setStage(5);
     setToast({
       show: true,
-      message: `Pilot work order ${workOrderNumber} confirmed & awarded to ${target.name} (₹${target.cost} Lakhs).`,
+      message: `Pilot work order ${workOrderNumber} confirmed & awarded to ${target.name} (₹${target.cost} Lakhs). Deployment active.`,
       type: 'success',
     });
   };
@@ -632,39 +762,139 @@ function SimulationContent() {
             </div>
           </div>
 
+          {/* 9-STEP DEMO WALKTHROUGH INTERACTIVE GUIDE */}
+          <div className="bg-gradient-to-r from-slate-900 via-slate-950 to-sangam-navy-900 rounded-md p-4 text-white shadow-xs space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-2.5">
+              <div className="flex items-center gap-2">
+                <span className="p-1 rounded bg-amber-400/20 text-amber-400">
+                  <Sparkles className="w-4 h-4" />
+                </span>
+                <div>
+                  <span className="text-[10px] font-black uppercase tracking-wider text-amber-400">
+                    SangamSetu Walkthrough Flow
+                  </span>
+                  <h2 className="text-xs sm:text-sm font-bold text-white">
+                    Step-by-Step 9-Stage Demo Simulation Journey
+                  </h2>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 text-[11px] text-slate-300">
+                <span>Active Persona: <strong className="text-white uppercase">{currentPersona}</strong></span>
+                <span>•</span>
+                <span>Stage: <strong className="text-amber-300">0{stage + 1}/06</strong></span>
+              </div>
+            </div>
+
+            {/* 9 Step Pills / Quick Nav */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-9 gap-1.5">
+              {DEMO_STEPS.map(s => {
+                const isCurrentStep =
+                  currentPersona === s.persona &&
+                  ((s.step === 1 && stage === 0) ||
+                   (s.step === 2 && stage === 1 && currentPersona === 'startup') ||
+                   (s.step === 3 && stage === 1 && currentPersona === 'admin') ||
+                   (s.step === 4 && stage === 1 && currentPersona === 'admin') ||
+                   (s.step === 5 && stage === 2 && currentPersona === 'admin') ||
+                   (s.step === 6 && stage === 3 && currentPersona === 'evaluator') ||
+                   (s.step === 7 && stage === 3 && currentPersona === 'evaluator') ||
+                   (s.step === 8 && stage === 4 && currentPersona === 'admin') ||
+                   (s.step === 9 && (stage === 4 || stage === 5) && currentPersona === 'department'));
+
+                return (
+                  <button
+                    key={s.step}
+                    type="button"
+                    onClick={() => handleJumpToDemoStep(s.step)}
+                    className={`text-left p-2 rounded border transition-all cursor-pointer select-none ${
+                      isCurrentStep
+                        ? 'bg-amber-400 text-slate-950 border-amber-300 font-bold shadow-sm scale-102'
+                        : 'bg-white/5 hover:bg-white/10 text-white/90 border-white/10'
+                    }`}
+                    title={s.desc}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span
+                        className={`text-[9px] font-black uppercase ${
+                          isCurrentStep ? 'text-slate-950' : 'text-amber-400/90'
+                        }`}
+                      >
+                        Step 0{s.step}
+                      </span>
+                      <span className={`text-[8px] font-mono px-1 rounded ${
+                        isCurrentStep ? 'bg-slate-950 text-white' : 'bg-white/10 text-white/70'
+                      }`}>
+                        {s.personaLabel.split(' ')[0]}
+                      </span>
+                    </div>
+                    <div className="font-bold text-[10px] mt-0.5 leading-tight truncate">
+                      {s.title}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           {/* 6-Stage Progress Stepper & Stage Advance Actions */}
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
                 Procurement Stage Progression:
               </span>
-              <div className="flex items-center gap-1.5 text-xs">
+              <div className="flex flex-wrap items-center gap-1.5 text-xs">
+                {stage === 0 && (
+                  <button
+                    onClick={handleLaunchProblem}
+                    className="px-2.5 py-1 rounded bg-sangam-blue-600 hover:bg-sangam-blue-700 text-white font-bold text-[11px] flex items-center gap-1 cursor-pointer shadow-xs"
+                  >
+                    <Send className="w-3 h-3 text-amber-300" />
+                    <span>Submit Problem (Launch Live 0→1)</span>
+                  </button>
+                )}
                 {stage === 1 && (
                   <button
                     onClick={handleAdvanceToAIShortlisting}
-                    className="px-2.5 py-1 rounded bg-sangam-blue-600 hover:bg-sangam-blue-700 text-white font-bold text-[11px] flex items-center gap-1 cursor-pointer"
+                    className="px-2.5 py-1 rounded bg-sangam-blue-600 hover:bg-sangam-blue-700 text-white font-bold text-[11px] flex items-center gap-1 cursor-pointer shadow-xs"
                   >
                     <Sparkles className="w-3 h-3 text-amber-300" />
-                    <span>Run AI Shortlisting (Advance to Stage 2)</span>
+                    <span>Run AI Shortlisting (Advance 1→2)</span>
                   </button>
                 )}
                 {stage === 2 && (
                   <button
-                    onClick={handleAdvanceToLabTesting}
-                    className="px-2.5 py-1 rounded bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[11px] flex items-center gap-1 cursor-pointer"
+                    onClick={handleSendToEvaluator}
+                    className="px-2.5 py-1 rounded bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[11px] flex items-center gap-1 cursor-pointer shadow-xs"
                   >
                     <FlaskConical className="w-3 h-3" />
-                    <span>Submit Test Reports to Admin (Advance to Stage 4)</span>
+                    <span>Send to Evaluator (Advance 2→3)</span>
+                  </button>
+                )}
+                {stage === 3 && (
+                  <button
+                    onClick={handleSubmitTestReportsToAdmin}
+                    className="px-2.5 py-1 rounded bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-[11px] flex items-center gap-1 cursor-pointer shadow-xs"
+                  >
+                    <CheckCheck className="w-3 h-3 text-amber-300" />
+                    <span>Submit Test Reports to Admin (Advance 3→4)</span>
                   </button>
                 )}
                 {stage === 4 && (
-                  <button
-                    onClick={() => handleConfirmAndDeploy()}
-                    className="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] flex items-center gap-1 cursor-pointer"
-                  >
-                    <CheckCheck className="w-3 h-3" />
-                    <span>Confirm & Begin Deployment (Advance to Stage 5)</span>
-                  </button>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={handleSendSelectionToGovt}
+                      className="px-2 py-1 rounded bg-blue-700 hover:bg-blue-800 text-white font-bold text-[11px] flex items-center gap-1 cursor-pointer shadow-xs"
+                    >
+                      <Building2 className="w-3 h-3" />
+                      <span>Send Selection to Govt</span>
+                    </button>
+                    <button
+                      onClick={() => handleConfirmAndDeploy()}
+                      className="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] flex items-center gap-1 cursor-pointer shadow-xs"
+                    >
+                      <FileCheck2 className="w-3 h-3 text-amber-300" />
+                      <span>Confirm & Begin Deployment (4→5)</span>
+                    </button>
+                  </div>
                 )}
                 <button
                   onClick={handleResetBaseline}
@@ -786,6 +1016,44 @@ function SimulationContent() {
         {/* ========================================================= */}
         {currentPersona === 'startup' && (
           <div className="space-y-6">
+            {/* Step 2 Propose Solution / Live Challenge Card */}
+            <div className="bg-white p-5 rounded-md border border-slate-200 shadow-2xs space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
+                <div className="flex items-center gap-2">
+                  <span className="p-2 bg-amber-50 text-amber-600 rounded-sm">
+                    <Rocket className="w-5 h-5" />
+                  </span>
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-100 px-2 py-0.5 rounded-xs">
+                      {stage === 0 ? 'Problem In Draft Formulation' : 'Live Challenge • Proposals Open'}
+                    </span>
+                    <h2 className="text-base sm:text-lg font-black text-sangam-navy-900 mt-0.5">
+                      {SIMULATION_PROBLEM.title}
+                    </h2>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  {stage >= 1 ? (
+                    <button
+                      onClick={() => setIsAddStartupModalOpen(true)}
+                      className="px-3.5 py-1.5 rounded bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs cursor-pointer"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Propose a Solution (Submit Technical Proposal)</span>
+                    </button>
+                  ) : (
+                    <span className="text-xs font-semibold text-slate-500 bg-slate-100 px-2.5 py-1 rounded">
+                      Awaiting Government Launch
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <p className="text-xs text-slate-700 leading-relaxed">{SIMULATION_PROBLEM.statement}</p>
+            </div>
+
+            {/* Scoped Startup Transparency Dossier */}
             <div className="bg-white p-5 rounded-md border border-slate-200 shadow-2xs space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
                 <div>
@@ -799,7 +1067,7 @@ function SimulationContent() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-slate-600">Simulate Startup:</span>
+                  <span className="text-xs font-bold text-slate-600">Switch Startup View:</span>
                   <select
                     value={selectedStartup.id}
                     onChange={e => setSelectedStartupId(e.target.value)}
@@ -922,31 +1190,81 @@ function SimulationContent() {
         {/* ========================================================= */}
         {currentPersona === 'department' && (
           <div className="space-y-6">
-            {/* Active Challenge Card */}
-            <div className="bg-white p-5 rounded-md border border-slate-200 shadow-2xs space-y-3">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
-                <div className="flex items-center gap-2">
-                  <span className="p-1.5 bg-sangam-blue-50 text-sangam-blue-600 rounded-sm">
-                    <Building2 className="w-4 h-4" />
-                  </span>
-                  <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-sangam-blue-700">
-                      Ministry Evaluation Portal • {SIMULATION_PROBLEM.department}
+            {/* Step 1 Draft Formulation Card (if stage === 0) */}
+            {stage === 0 ? (
+              <div className="bg-white p-6 rounded-md border-2 border-sangam-blue-600 shadow-sm space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
+                  <div className="flex items-center gap-2">
+                    <span className="p-2 bg-sangam-blue-50 text-sangam-blue-600 rounded-sm">
+                      <Building2 className="w-5 h-5" />
                     </span>
-                    <h2 className="text-base sm:text-lg font-black text-sangam-navy-900">
-                      {SIMULATION_PROBLEM.title}
-                    </h2>
+                    <div>
+                      <span className="text-[10px] font-black uppercase tracking-wider text-amber-700 bg-amber-100 px-2 py-0.5 rounded-xs">
+                        Step 1: Department Problem Formulation (Draft)
+                      </span>
+                      <h2 className="text-lg font-black text-sangam-navy-900 mt-1">
+                        {SIMULATION_PROBLEM.title}
+                      </h2>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={handleLaunchProblem}
+                    className="px-4 py-2 rounded bg-sangam-blue-600 hover:bg-sangam-blue-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm cursor-pointer"
+                  >
+                    <Send className="w-4 h-4 text-amber-300" />
+                    <span>Submit Problem (Post Challenge Live)</span>
+                  </button>
+                </div>
+
+                <p className="text-xs text-slate-700 leading-relaxed">{SIMULATION_PROBLEM.statement}</p>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 p-3.5 rounded border border-slate-200 text-xs">
+                  <div>
+                    <span className="text-[10px] text-slate-500 uppercase font-bold block">Ministry</span>
+                    <span className="font-bold text-slate-900">{SIMULATION_PROBLEM.department}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-500 uppercase font-bold block">Pilot Timeline</span>
+                    <span className="font-bold text-slate-900">{SIMULATION_PROBLEM.timelineMonths} Months</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-500 uppercase font-bold block">Budget Range</span>
+                    <span className="font-bold text-emerald-700">₹{SIMULATION_PROBLEM.budgetMin}L – ₹{SIMULATION_PROBLEM.budgetMax}L</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-500 uppercase font-bold block">Status</span>
+                    <span className="font-bold text-amber-700">Ready to Publish</span>
                   </div>
                 </div>
-                <div className="text-right">
-                  <span className="text-[11px] text-slate-500 block">Sanctioned Budget Range</span>
-                  <span className="text-sm font-black text-slate-900">
-                    ₹{SIMULATION_PROBLEM.budgetMin}L – ₹{SIMULATION_PROBLEM.budgetMax}L
-                  </span>
-                </div>
               </div>
-              <p className="text-xs text-slate-700 leading-relaxed">{SIMULATION_PROBLEM.statement}</p>
-            </div>
+            ) : (
+              /* Active Challenge Card (Stage >= 1) */
+              <div className="bg-white p-5 rounded-md border border-slate-200 shadow-2xs space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="p-1.5 bg-sangam-blue-50 text-sangam-blue-600 rounded-sm">
+                      <Building2 className="w-4 h-4" />
+                    </span>
+                    <div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-sangam-blue-700">
+                        Ministry Evaluation Portal • {SIMULATION_PROBLEM.department}
+                      </span>
+                      <h2 className="text-base sm:text-lg font-black text-sangam-navy-900">
+                        {SIMULATION_PROBLEM.title}
+                      </h2>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-[11px] text-slate-500 block">Sanctioned Budget Range</span>
+                    <span className="text-sm font-black text-slate-900">
+                      ₹{SIMULATION_PROBLEM.budgetMin}L – ₹{SIMULATION_PROBLEM.budgetMax}L
+                    </span>
+                  </div>
+                </div>
+                <p className="text-xs text-slate-700 leading-relaxed">{SIMULATION_PROBLEM.statement}</p>
+              </div>
+            )}
 
             {/* Anti-Bias Rule Banner */}
             <div className="bg-slate-900 text-white p-3.5 rounded-md flex items-start gap-3 shadow-xs">
@@ -1281,103 +1599,134 @@ function SimulationContent() {
         {/* ========================================================= */}
         {currentPersona === 'evaluator' && (
           <div className="space-y-6">
-            <div className="bg-white p-5 rounded-md border border-slate-200 shadow-2xs space-y-3">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
-                <div className="flex items-center gap-2">
-                  <span className="p-2 bg-emerald-50 text-emerald-700 rounded-sm">
-                    <UserCheck className="w-5 h-5" />
-                  </span>
-                  <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-xs">
-                      STQC / C-DAC Testing Laboratory • Blind Review Mode Active
-                    </span>
-                    <h2 className="text-base sm:text-lg font-black text-sangam-navy-900">
-                      Standardisation Testing and Quality Certification (STQC)
-                    </h2>
+            {stage < 3 ? (
+              <div className="bg-white p-6 rounded-md border border-slate-200 text-center space-y-3 shadow-2xs">
+                <FlaskConical className="w-10 h-10 text-slate-400 mx-auto" />
+                <h3 className="text-base font-black text-slate-900">
+                  Awaiting Shortlisted Prototypes from Platform Admin
+                </h3>
+                <p className="text-xs text-slate-600 max-w-md mx-auto">
+                  Prototypes are currently in Stage 01/02 (Proposal Submission & AI Shortlisting). Once Platform Admin dispatches the shortlisted candidates to STQC Lab in Stage 03, anonymous blind prototype testing will activate here.
+                </p>
+                <button
+                  onClick={() => handleJumpToDemoStep(5)}
+                  className="px-4 py-2 rounded bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs inline-flex items-center gap-1.5 cursor-pointer"
+                >
+                  <span>Go to Admin: Send to Evaluator (Step 5)</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ) : (
+              <>
+                {/* Step 6 & 7 Evaluator Testing Banner */}
+                <div className="bg-white p-5 rounded-md border border-slate-200 shadow-2xs space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="p-2 bg-emerald-50 text-emerald-700 rounded-sm">
+                        <UserCheck className="w-5 h-5" />
+                      </span>
+                      <div>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-xs">
+                          Step 6 & 7: STQC / C-DAC Testing Laboratory • Blind Review Mode Active
+                        </span>
+                        <h2 className="text-base sm:text-lg font-black text-sangam-navy-900">
+                          Standardisation Testing and Quality Certification (STQC)
+                        </h2>
+                      </div>
+                    </div>
+                    
+                    <button
+                      onClick={handleSubmitTestReportsToAdmin}
+                      className="px-4 py-2 rounded bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs cursor-pointer"
+                    >
+                      <CheckCheck className="w-4 h-4 text-amber-300" />
+                      <span>Submit Test Reports to Admin (Advance 3→4)</span>
+                    </button>
+                  </div>
+
+                  <div className="text-xs text-slate-600">
+                    Anonymous Blind Masking Active: Founder & Entity Identity are cryptographically shielded to guarantee objective technical validation.
+                  </div>
+
+                  {/* Blind Prototype Selector */}
+                  <div className="flex items-center gap-2 overflow-x-auto pb-1 pt-1">
+                    {evaluatorBlindStartups.map(s => (
+                      <button
+                        key={s.id}
+                        onClick={() => setSelectedStartupId(s.id)}
+                        className={`px-3 py-1.5 rounded-sm text-xs font-bold whitespace-nowrap transition-colors cursor-pointer border ${
+                          selectedStartup.id === s.id
+                            ? 'bg-emerald-800 text-white border-emerald-800'
+                            : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                        }`}
+                      >
+                        {s.blindName} ({s.prototypeTesting.overallResult})
+                      </button>
+                    ))}
                   </div>
                 </div>
-                <div className="text-xs text-slate-600">
-                  Anonymous Blind Masking Active (Founder & Entity Identity Shielded)
-                </div>
-              </div>
 
-              {/* Blind Prototype Selector */}
-              <div className="flex items-center gap-2 overflow-x-auto pb-1">
-                {evaluatorBlindStartups.map(s => (
-                  <button
-                    key={s.id}
-                    onClick={() => setSelectedStartupId(s.id)}
-                    className={`px-3 py-1.5 rounded-sm text-xs font-bold whitespace-nowrap transition-colors cursor-pointer border ${
-                      selectedStartup.id === s.id
-                        ? 'bg-emerald-800 text-white border-emerald-800'
-                        : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
-                    }`}
-                  >
-                    {s.blindName} ({s.prototypeTesting.overallResult})
-                  </button>
-                ))}
-              </div>
-            </div>
+                {/* Blind Review Evaluation Dossier */}
+                <div className="bg-white p-5 rounded-md border border-slate-200 shadow-2xs space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-base font-black text-slate-900">
+                          {evaluatorBlindStartups.find(b => b.id === selectedStartup.id)?.blindName || 'Prototype Blind ID'}
+                        </h3>
+                        <span className="text-xs text-slate-500 font-mono">
+                          Cert: {selectedStartup.prototypeTesting.testCertificateId}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-600 mt-0.5">
+                        Testing Lab: {selectedStartup.prototypeTesting.testedByLab} • Architecture: {selectedStartup.solutionTitle}
+                      </p>
+                    </div>
 
-            {/* Blind Review Evaluation Dossier */}
-            <div className="bg-white p-5 rounded-md border border-slate-200 shadow-2xs space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-base font-black text-slate-900">
-                      {evaluatorBlindStartups.find(b => b.id === selectedStartup.id)?.blindName || 'Prototype Blind ID'}
-                    </h3>
-                    <span className="text-xs text-slate-500 font-mono">
-                      Cert: {selectedStartup.prototypeTesting.testCertificateId}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`px-3 py-1 rounded-sm text-xs font-black uppercase tracking-wider border ${
+                          selectedStartup.prototypeTesting.overallResult === 'Pass'
+                            ? 'bg-emerald-100 text-emerald-900 border-emerald-300'
+                            : selectedStartup.prototypeTesting.overallResult === 'Conditional Pass'
+                            ? 'bg-amber-100 text-amber-900 border-amber-300'
+                            : 'bg-rose-100 text-rose-900 border-rose-300'
+                        }`}
+                      >
+                        Overall Verdict: {selectedStartup.prototypeTesting.overallResult}
+                      </span>
+
+                      <button
+                        onClick={() => handleOpenLabTest(selectedStartup)}
+                        className="px-3 py-1 rounded-sm bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs flex items-center gap-1.5 shadow-2xs cursor-pointer"
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                        <span>Audit 15 Parameters</span>
+                      </button>
+                    </div>
                   </div>
-                  <p className="text-xs text-slate-600 mt-0.5">
-                    Testing Lab: {selectedStartup.prototypeTesting.testedByLab} • Architecture: {selectedStartup.solutionTitle}
-                  </p>
+
+                  {/* 15 Parameter Rows */}
+                  <div className="space-y-2.5">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                      15 Independent Laboratory Benchmarking Parameters:
+                    </h4>
+                    {selectedStartup.prototypeTesting.parameters.map((param, idx) => (
+                      <ScoreRow
+                        key={idx}
+                        id={`evaluator-param-${idx}`}
+                        label={param.name}
+                        value={param.result}
+                        isMandatory={param.isMandatory}
+                        justification={param.justification}
+                        evidence={param.evidence ? [param.evidence] : []}
+                        category="STQC Lab Test"
+                      />
+                    ))}
+                  </div>
                 </div>
-
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`px-3 py-1 rounded-sm text-xs font-black uppercase tracking-wider border ${
-                      selectedStartup.prototypeTesting.overallResult === 'Pass'
-                        ? 'bg-emerald-100 text-emerald-900 border-emerald-300'
-                        : selectedStartup.prototypeTesting.overallResult === 'Conditional Pass'
-                        ? 'bg-amber-100 text-amber-900 border-amber-300'
-                        : 'bg-rose-100 text-rose-900 border-rose-300'
-                    }`}
-                  >
-                    Overall Verdict: {selectedStartup.prototypeTesting.overallResult}
-                  </span>
-
-                  <button
-                    onClick={() => handleOpenLabTest(selectedStartup)}
-                    className="px-3 py-1 rounded-sm bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs flex items-center gap-1.5 shadow-2xs cursor-pointer"
-                  >
-                    <Edit3 className="w-3.5 h-3.5" />
-                    <span>Audit 15 Parameters</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* 15 Parameter Rows */}
-              <div className="space-y-2.5">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700">
-                  15 Independent Laboratory Benchmarking Parameters:
-                </h4>
-                {selectedStartup.prototypeTesting.parameters.map((param, idx) => (
-                  <ScoreRow
-                    key={idx}
-                    id={`evaluator-param-${idx}`}
-                    label={param.name}
-                    value={param.result}
-                    isMandatory={param.isMandatory}
-                    justification={param.justification}
-                    evidence={param.evidence ? [param.evidence] : []}
-                    category="STQC Lab Test"
-                  />
-                ))}
-              </div>
-            </div>
+              </>
+            )}
           </div>
         )}
 
@@ -1386,6 +1735,69 @@ function SimulationContent() {
         {/* ========================================================= */}
         {currentPersona === 'admin' && (
           <div className="space-y-6">
+            {/* Step 3/4/5/8 Admin Walkthrough Workflow Stage Bar */}
+            <div className="bg-slate-900 text-white p-4 rounded-md flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-3">
+                <span className="p-2 rounded bg-amber-400/20 text-amber-400">
+                  <Shield className="w-5 h-5" />
+                </span>
+                <div>
+                  <div className="text-[10px] font-black uppercase tracking-wider text-amber-400">
+                    Platform SuperAdmin Controls • Active Stage: 0{stage + 1}
+                  </div>
+                  <h3 className="text-sm font-black text-white">
+                    {stage === 1
+                      ? 'Step 3 & 4: Submissions Intake & AI Shortlisting'
+                      : stage === 2
+                      ? 'Step 5: AI Shortlist Generated • Ready to Dispatch to Evaluator'
+                      : stage === 3
+                      ? 'Step 6: Evaluator Blind Lab Benchmarking Active'
+                      : stage === 4
+                      ? 'Step 8: Lab Testing Complete • Send Final Selection to Govt'
+                      : 'Stage 5: Final Sanction & Pilot Deployment'}
+                  </h3>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {stage === 1 && (
+                  <button
+                    onClick={handleAdvanceToAIShortlisting}
+                    className="px-3.5 py-1.5 rounded bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs flex items-center gap-1.5 cursor-pointer shadow-xs"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>Run AI Shortlisting (Stage 1→2)</span>
+                  </button>
+                )}
+                {stage === 2 && (
+                  <button
+                    onClick={handleSendToEvaluator}
+                    className="px-3.5 py-1.5 rounded bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs"
+                  >
+                    <FlaskConical className="w-3.5 h-3.5" />
+                    <span>Send Shortlisted Teams to Evaluator (Stage 2→3)</span>
+                  </button>
+                )}
+                {stage === 3 && (
+                  <button
+                    onClick={handleSubmitTestReportsToAdmin}
+                    className="px-3.5 py-1.5 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs"
+                  >
+                    <CheckCheck className="w-3.5 h-3.5" />
+                    <span>Fast-Forward Lab Reports (Stage 3→4)</span>
+                  </button>
+                )}
+                {stage === 4 && (
+                  <button
+                    onClick={handleSendSelectionToGovt}
+                    className="px-3.5 py-1.5 rounded bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs"
+                  >
+                    <Building2 className="w-3.5 h-3.5" />
+                    <span>Send Final Selection to Govt (Step 8)</span>
+                  </button>
+                )}
+              </div>
+            </div>
             {/* Filter and Search Bar */}
             <div className="bg-white p-4 rounded-md border border-slate-200 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-3">
               <div className="relative w-full sm:w-80">
