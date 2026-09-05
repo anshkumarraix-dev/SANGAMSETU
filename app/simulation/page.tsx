@@ -24,6 +24,7 @@ import {
   computeG2ValueScore,
   computePrototypeOverallResult,
   computeFinalSelectionStatus,
+  generateDefaultDeploymentData,
 } from './data';
 import { generateStartupNotifications } from './notifications';
 import {
@@ -66,6 +67,21 @@ import {
   CheckCheck,
   BarChart3,
   ShieldAlert,
+  CreditCard,
+  Receipt,
+  Activity,
+  Download,
+  UploadCloud,
+  Server,
+  Radio,
+  FileSpreadsheet,
+  Wallet,
+  Banknote,
+  CheckSquare,
+  MapPin,
+  Sliders,
+  Cpu,
+  ArrowUpRight,
 } from 'lucide-react';
 
 function SimulationContent() {
@@ -179,17 +195,30 @@ function SimulationContent() {
     });
   }, [startups, filterCategory, searchQuery]);
 
-  // 6-Stage Definitions
+  // Inspection log state for Government Stage 7 Live Corridor Monitoring
+  const [inspectionNote, setInspectionNote] = useState('');
+  const [inspectionLogs, setInspectionLogs] = useState<Array<{ id: string; date: string; officer: string; note: string; corridor: string }>>([
+    {
+      id: 'insp-1',
+      date: '05 Sep 2026, 11:30 AM IST',
+      officer: 'Shri R. K. Sharma (Superintending Engineer, MoRTH)',
+      note: 'Physical telemetry verification completed for 24 camera nodes on NH-48 Dhaula Kuan corridor. Sub-50ms inference verified.',
+      corridor: 'NH-48 Corridor & Ring Road Junctions',
+    },
+  ]);
+
+  // 7-Stage Definitions
   const STAGES = [
     { step: 0, label: '01. Problem Draft', desc: 'MoRTH corridor challenge in formulation' },
     { step: 1, label: '02. Live Intake', desc: 'Proposals submitted against live problem' },
     { step: 2, label: '03. AI Shortlisting', desc: '8-factor scoring into G1/G2 shortlists' },
     { step: 3, label: '04. Blind Lab Testing', desc: 'STQC 15-parameter independent audit' },
     { step: 4, label: '05. Ministry Review', desc: 'Final shortlist & verdicts sent to Govt' },
-    { step: 5, label: '06. Pilot Deployed', desc: 'Work order awarded & deployment active' },
+    { step: 5, label: '06. Pilot Sanction', desc: 'Selection confirmation & Work Order award' },
+    { step: 6, label: '07. Live Deployment & Payments', desc: 'Corridor tracking & Milestone payments' },
   ];
 
-  // 9-Step Demo Walkthrough Steps Definition
+  // 10-Step Demo Walkthrough Steps Definition
   const DEMO_STEPS = [
     {
       step: 1,
@@ -257,7 +286,7 @@ function SimulationContent() {
     {
       step: 8,
       persona: 'admin' as SimPersona,
-      stage: 3 as SimulationStage,
+      stage: 4 as SimulationStage,
       personaLabel: 'Platform Admin',
       title: 'Send Final Selection to Govt',
       actionLabel: 'Click "Send Final Selection to Govt"',
@@ -266,11 +295,20 @@ function SimulationContent() {
     {
       step: 9,
       persona: 'department' as SimPersona,
-      stage: 4 as SimulationStage,
+      stage: 5 as SimulationStage,
       personaLabel: 'Government View',
-      title: 'Confirm & Begin Deployment',
-      actionLabel: 'Select team & Click "Confirm & Deploy"',
-      desc: 'Government reviews shortlist with test verdicts, selects one team, and issues official pilot work order.',
+      title: 'Sanction Pilot & Issue Work Order',
+      actionLabel: 'Click "Confirm & Begin Deployment"',
+      desc: 'Government sanctions the pilot under GFR 149/194 and initializes PFMS milestone escrow account.',
+    },
+    {
+      step: 10,
+      persona: 'department' as SimPersona,
+      stage: 6 as SimulationStage,
+      personaLabel: 'Govt & Startup Views',
+      title: 'Live Deployment & Milestone Payments',
+      actionLabel: 'Inspect corridor telemetry & release milestone payments',
+      desc: 'MoRTH monitors real-time corridor metrics and approves Milestone 2 PFMS payment release to the startup.',
     },
   ];
 
@@ -329,15 +367,15 @@ function SimulationContent() {
 
   // STEP 8 ACTION: Admin sends final selection to Government (Stage 4)
   const handleSendSelectionToGovt = () => {
-    setStage(4);
+    setStage(5);
     setToast({
       show: true,
-      message: 'Final Shortlist & STQC Benchmarks dispatched to Ministry of Road Transport and Highways (MoRTH).',
+      message: 'Final Shortlist & STQC Benchmarks dispatched to Ministry of Road Transport and Highways (MoRTH). Stage 06 is now active.',
       type: 'success',
     });
   };
 
-  // STEP 9 ACTION: Government confirms and begins deployment (Stage 4 -> 5)
+  // STEP 9 ACTION: Government sanctions pilot and initializes deployment & milestones (Stage 5 -> 6 / Stage 07)
   const handleConfirmAndDeploy = (startupIdToSanction?: string) => {
     const targetId = startupIdToSanction || manualSelectedPilotId || selectedStartup.id;
     const target = startups.find(s => s.id === targetId);
@@ -353,7 +391,8 @@ function SimulationContent() {
       return;
     }
 
-    const workOrderNumber = `MORTH/DPIIT/2026/WO-${Math.floor(100 + Math.random() * 900)}`;
+    const workOrderNumber = `MORTH/DPIIT/2026/WO-${(target.id.charCodeAt(0) * 17 + target.cost * 13) % 900 + 100}`;
+    const deployment = generateDefaultDeploymentData(target.cost, workOrderNumber);
 
     setStartups(prev =>
       prev.map(s => {
@@ -366,16 +405,139 @@ function SimulationContent() {
               workOrderNumber,
               sanctionAmount: s.cost * 100000,
             },
+            deployment,
+          };
+        } else {
+          return {
+            ...s,
+            finalSelection: {
+              ...s.finalSelection,
+              isFinallySelected: false,
+            },
+            deployment: undefined,
+          };
+        }
+      })
+    );
+
+    setSelectedStartupId(target.id);
+    setManualSelectedPilotId(target.id);
+    setStage(6); // Advances to Stage 6 (Stage 07: Live Deployment & Milestone Payments)
+
+    setToast({
+      show: true,
+      message: `Pilot Work Order ${workOrderNumber} officially sanctioned to ${target.name} (₹${target.cost}L). Deployment initialized & Milestone 1 advance released. Stage 07 is now live!`,
+      type: 'success',
+    });
+  };
+
+  // ACTION: Government Approves Milestone & Releases PFMS Treasury Payment
+  const handleApproveMilestonePayment = (startupId: string, milestoneNumber: number) => {
+    const txnId = `PFMS/2026/TXN-${78400 + milestoneNumber * 123}`;
+    const utrNo = `RBIND20269824${milestoneNumber}882`;
+    const nowTime = '11:45 AM IST';
+
+    setStartups(prev =>
+      prev.map(s => {
+        if (s.id === startupId && s.deployment) {
+          const updatedMilestones = s.deployment.milestones.map(m => {
+            if (m.milestoneNumber === milestoneNumber) {
+              return {
+                ...m,
+                status: 'Disbursed' as const,
+                disbursedAt: `Today, ${nowTime}`,
+                pfmsTransactionId: txnId,
+                utrNumber: utrNo,
+                verificationOfficer: 'Shri A. K. Sharma (Joint Secretary & DDO PFMS, MoRTH)',
+              };
+            }
+            return m;
+          });
+
+          const totalDisbursed = updatedMilestones
+            .filter(m => m.status === 'Disbursed')
+            .reduce((acc, m) => acc + m.amountLakhs, 0);
+          const roundedDisbursed = Math.round(totalDisbursed * 10) / 10;
+          const remainingBalance = Math.round((s.deployment.escrowAccount.sanctionTotalLakhs - roundedDisbursed) * 10) / 10;
+
+          return {
+            ...s,
+            deployment: {
+              ...s.deployment,
+              progressPercentage: Math.min(100, s.deployment.progressPercentage + 25),
+              milestones: updatedMilestones,
+              escrowAccount: {
+                ...s.deployment.escrowAccount,
+                totalDisbursedLakhs: roundedDisbursed,
+                remainingBalanceLakhs: Math.max(0, remainingBalance),
+              },
+            },
           };
         }
         return s;
       })
     );
 
-    setStage(5);
     setToast({
       show: true,
-      message: `Pilot work order ${workOrderNumber} confirmed & awarded to ${target.name} (₹${target.cost} Lakhs). Deployment active.`,
+      message: `Milestone ${milestoneNumber} Verified & Disbursed! PFMS Ref: ${txnId} | UTR: ${utrNo}. Funds credited to startup escrow.`,
+      type: 'success',
+    });
+  };
+
+  // ACTION: Startup Submits Milestone Deliverables / Telemetry Proof
+  const handleSubmitMilestoneProof = (startupId: string, milestoneNumber: number) => {
+    setStartups(prev =>
+      prev.map(s => {
+        if (s.id === startupId && s.deployment) {
+          const updatedMilestones = s.deployment.milestones.map(m => {
+            if (m.milestoneNumber === milestoneNumber) {
+              return {
+                ...m,
+                proofSubmitted: true,
+                proofDocumentName: `Live_Corridor_Telemetry_Logs_M${milestoneNumber}.pdf (5.4 MB)`,
+                status: 'Under Verification' as const,
+              };
+            }
+            return m;
+          });
+          return {
+            ...s,
+            deployment: {
+              ...s.deployment,
+              milestones: updatedMilestones,
+            },
+          };
+        }
+        return s;
+      })
+    );
+
+    setToast({
+      show: true,
+      message: `Milestone ${milestoneNumber} telemetry logs and deliverable proof submitted to MoRTH for audit and fund release.`,
+      type: 'info',
+    });
+  };
+
+  // ACTION: Government Officer Logs Field Inspection
+  const handleAddInspection = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inspectionNote.trim()) return;
+
+    const newLog = {
+      id: `insp-${Date.now()}`,
+      date: new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }) + ' IST',
+      officer: 'Shri A. K. Sharma (Joint Secretary, MoRTH)',
+      note: inspectionNote.trim(),
+      corridor: 'NH-48 Corridor & Ring Road Junctions',
+    };
+
+    setInspectionLogs(prev => [newLog, ...prev]);
+    setInspectionNote('');
+    setToast({
+      show: true,
+      message: 'On-site field inspection audit note logged into official statutory record.',
       type: 'success',
     });
   };
@@ -762,7 +924,7 @@ function SimulationContent() {
             </div>
           </div>
 
-          {/* 9-STEP DEMO WALKTHROUGH INTERACTIVE GUIDE */}
+          {/* 10-STEP DEMO WALKTHROUGH INTERACTIVE GUIDE */}
           <div className="bg-gradient-to-r from-slate-900 via-slate-950 to-sangam-navy-900 rounded-md p-4 text-white shadow-xs space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-2.5">
               <div className="flex items-center gap-2">
@@ -774,19 +936,19 @@ function SimulationContent() {
                     SangamSetu Walkthrough Flow
                   </span>
                   <h2 className="text-xs sm:text-sm font-bold text-white">
-                    Step-by-Step 9-Stage Demo Simulation Journey
+                    Step-by-Step 10-Stage Demo Simulation Journey
                   </h2>
                 </div>
               </div>
               <div className="flex items-center gap-2 text-[11px] text-slate-300">
                 <span>Active Persona: <strong className="text-white uppercase">{currentPersona}</strong></span>
                 <span>•</span>
-                <span>Stage: <strong className="text-amber-300">0{stage + 1}/06</strong></span>
+                <span>Stage: <strong className="text-amber-300">0{stage + 1}/07</strong></span>
               </div>
             </div>
 
-            {/* 9 Step Pills / Quick Nav */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-9 gap-1.5">
+            {/* 10 Step Pills / Quick Nav */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-10 gap-1.5">
               {DEMO_STEPS.map(s => {
                 const isCurrentStep =
                   currentPersona === s.persona &&
@@ -798,7 +960,8 @@ function SimulationContent() {
                    (s.step === 6 && stage === 3 && currentPersona === 'evaluator') ||
                    (s.step === 7 && stage === 3 && currentPersona === 'evaluator') ||
                    (s.step === 8 && stage === 4 && currentPersona === 'admin') ||
-                   (s.step === 9 && (stage === 4 || stage === 5) && currentPersona === 'department'));
+                   (s.step === 9 && stage === 5 && currentPersona === 'department') ||
+                   (s.step === 10 && stage === 6));
 
                 return (
                   <button
@@ -818,7 +981,7 @@ function SimulationContent() {
                           isCurrentStep ? 'text-slate-950' : 'text-amber-400/90'
                         }`}
                       >
-                        Step 0{s.step}
+                        {s.step < 10 ? `Step 0${s.step}` : `Step ${s.step}`}
                       </span>
                       <span className={`text-[8px] font-mono px-1 rounded ${
                         isCurrentStep ? 'bg-slate-950 text-white' : 'bg-white/10 text-white/70'
@@ -835,7 +998,7 @@ function SimulationContent() {
             </div>
           </div>
 
-          {/* 6-Stage Progress Stepper & Stage Advance Actions */}
+          {/* 7-Stage Progress Stepper & Stage Advance Actions */}
           <div className="space-y-2">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
@@ -879,21 +1042,27 @@ function SimulationContent() {
                   </button>
                 )}
                 {stage === 4 && (
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      onClick={handleSendSelectionToGovt}
-                      className="px-2 py-1 rounded bg-blue-700 hover:bg-blue-800 text-white font-bold text-[11px] flex items-center gap-1 cursor-pointer shadow-xs"
-                    >
-                      <Building2 className="w-3 h-3" />
-                      <span>Send Selection to Govt</span>
-                    </button>
-                    <button
-                      onClick={() => handleConfirmAndDeploy()}
-                      className="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] flex items-center gap-1 cursor-pointer shadow-xs"
-                    >
-                      <FileCheck2 className="w-3 h-3 text-amber-300" />
-                      <span>Confirm & Begin Deployment (4→5)</span>
-                    </button>
+                  <button
+                    onClick={handleSendSelectionToGovt}
+                    className="px-2.5 py-1 rounded bg-blue-700 hover:bg-blue-800 text-white font-bold text-[11px] flex items-center gap-1 cursor-pointer shadow-xs"
+                  >
+                    <Building2 className="w-3 h-3 text-amber-300" />
+                    <span>Send Selection to Govt (Advance 4→5)</span>
+                  </button>
+                )}
+                {stage === 5 && (
+                  <button
+                    onClick={() => handleConfirmAndDeploy()}
+                    className="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] flex items-center gap-1 cursor-pointer shadow-xs"
+                  >
+                    <FileCheck2 className="w-3 h-3 text-amber-300" />
+                    <span>Confirm & Begin Deployment (Sanction 5→6)</span>
+                  </button>
+                )}
+                {stage === 6 && (
+                  <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Stage 07: Live Deployment & Milestone Payments Active</span>
                   </div>
                 )}
                 <button
@@ -906,7 +1075,7 @@ function SimulationContent() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2">
               {STAGES.map(s => {
                 const isCurrent = stage === s.step;
                 const isCompleted = stage > s.step;
@@ -1182,6 +1351,412 @@ function SimulationContent() {
                 </div>
               )}
             </div>
+
+            {/* STAGE 6 & 7: LIVE DEPLOYMENT PROCESS & MILESTONE PAYMENTS (STARTUP VIEW REFLECTION) */}
+            {stage >= 5 && (
+              <>
+                {selectedStartup.deployment ? (
+                  <div className="space-y-6">
+                    {/* Sanction Order & PFMS Escrow Card */}
+                    <div className="bg-gradient-to-br from-slate-900 via-sangam-navy-900 to-slate-950 rounded-md p-6 text-white border border-slate-800 shadow-md space-y-5">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
+                        <div className="flex items-center gap-3">
+                          <span className="p-2.5 bg-amber-400/20 text-amber-400 rounded-sm">
+                            <Award className="w-6 h-6" />
+                          </span>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="px-2 py-0.5 rounded-xs text-[10px] font-black uppercase bg-amber-400 text-slate-950">
+                                Officially Sanctioned Pilot Awardee
+                              </span>
+                              <span className="text-xs text-slate-300 font-mono">
+                                Work Order: {selectedStartup.finalSelection?.workOrderNumber}
+                              </span>
+                            </div>
+                            <h2 className="text-lg sm:text-xl font-black text-white mt-1">
+                              {selectedStartup.name} • Stage 07 Live Corridor Deployment
+                            </h2>
+                          </div>
+                        </div>
+
+                        <div className="text-right">
+                          <span className="text-[10px] text-slate-400 uppercase font-bold block">Sanctioned Amount</span>
+                          <span className="text-xl sm:text-2xl font-black text-amber-400">
+                            ₹{selectedStartup.cost}.00 Lakhs
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Escrow Account Overview Details */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                        <div className="p-3.5 bg-white/5 border border-white/10 rounded-sm space-y-1">
+                          <span className="text-[10px] text-slate-400 uppercase font-bold flex items-center gap-1">
+                            <Wallet className="w-3.5 h-3.5 text-amber-400" /> PFMS Escrow Account
+                          </span>
+                          <span className="font-mono text-xs font-bold text-white block">
+                            {selectedStartup.deployment.escrowAccount.virtualAccountNumber}
+                          </span>
+                          <span className="text-[10px] text-slate-400 block">
+                            {selectedStartup.deployment.escrowAccount.bankName} (RBI Direct)
+                          </span>
+                        </div>
+
+                        <div className="p-3.5 bg-white/5 border border-white/10 rounded-sm space-y-1">
+                          <span className="text-[10px] text-slate-400 uppercase font-bold flex items-center gap-1">
+                            <Banknote className="w-3.5 h-3.5 text-emerald-400" /> Disbursed to Date
+                          </span>
+                          <span className="text-base font-black text-emerald-400 block">
+                            ₹{selectedStartup.deployment.escrowAccount.totalDisbursedLakhs} Lakhs
+                          </span>
+                          <span className="text-[10px] text-emerald-300/80">
+                            {Math.round((selectedStartup.deployment.escrowAccount.totalDisbursedLakhs / selectedStartup.deployment.escrowAccount.sanctionTotalLakhs) * 100)}% of total released
+                          </span>
+                        </div>
+
+                        <div className="p-3.5 bg-white/5 border border-white/10 rounded-sm space-y-1">
+                          <span className="text-[10px] text-slate-400 uppercase font-bold flex items-center gap-1">
+                            <Lock className="w-3.5 h-3.5 text-blue-400" /> Escrow Balance Locked
+                          </span>
+                          <span className="text-base font-black text-blue-300 block">
+                            ₹{selectedStartup.deployment.escrowAccount.remainingBalanceLakhs} Lakhs
+                          </span>
+                          <span className="text-[10px] text-slate-400">
+                            Held in Treasury for Milestones 2-4
+                          </span>
+                        </div>
+
+                        <div className="p-3.5 bg-white/5 border border-white/10 rounded-sm space-y-1">
+                          <span className="text-[10px] text-slate-400 uppercase font-bold flex items-center gap-1">
+                            <MapPin className="w-3.5 h-3.5 text-purple-400" /> Target Corridor
+                          </span>
+                          <span className="text-xs font-bold text-white block truncate">
+                            {selectedStartup.deployment.corridorName}
+                          </span>
+                          <span className="text-[10px] text-purple-300 font-mono">
+                            MoRTH Pilot Jurisdiction
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Live Corridor Deployment Process Card */}
+                    <div className="bg-white p-5 rounded-md border border-slate-200 shadow-2xs space-y-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
+                        <div className="flex items-center gap-2">
+                          <span className="p-2 bg-blue-50 text-blue-600 rounded-sm">
+                            <Activity className="w-5 h-5" />
+                          </span>
+                          <div>
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-blue-700 bg-blue-50 px-2 py-0.5 rounded-xs">
+                              Physical & Edge Telemetry Process
+                            </span>
+                            <h3 className="text-base font-black text-sangam-navy-900 mt-0.5">
+                              Corridor Deployment Process & IoT Telemetry Health
+                            </h3>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-slate-600">Overall Deployment Progress:</span>
+                          <span className="px-2.5 py-1 rounded text-xs font-black bg-blue-100 text-blue-900 border border-blue-200">
+                            {selectedStartup.deployment.progressPercentage}%
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* 4 Process Telemetry Metrics */}
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <div className="p-3 bg-slate-50 rounded border border-slate-200 text-center">
+                          <span className="text-[10px] text-slate-500 uppercase font-bold block flex items-center justify-center gap-1">
+                            <Cpu className="w-3 h-3 text-blue-600" /> Edge Vision Units
+                          </span>
+                          <span className="text-base font-black text-slate-900">
+                            {selectedStartup.deployment.activeNodes}/{selectedStartup.deployment.totalNodes} Online
+                          </span>
+                          <span className="text-[10px] text-emerald-600 font-bold block">100% operational</span>
+                        </div>
+
+                        <div className="p-3 bg-slate-50 rounded border border-slate-200 text-center">
+                          <span className="text-[10px] text-slate-500 uppercase font-bold block flex items-center justify-center gap-1">
+                            <Activity className="w-3 h-3 text-purple-600" /> Inference Latency
+                          </span>
+                          <span className="text-base font-black text-purple-700">
+                            {selectedStartup.deployment.latencyMs}ms
+                          </span>
+                          <span className="text-[10px] text-slate-500 block">SLA Threshold: &lt;50ms</span>
+                        </div>
+
+                        <div className="p-3 bg-slate-50 rounded border border-slate-200 text-center">
+                          <span className="text-[10px] text-slate-500 uppercase font-bold block flex items-center justify-center gap-1">
+                            <Radio className="w-3 h-3 text-emerald-600" /> Corridor Uptime
+                          </span>
+                          <span className="text-base font-black text-emerald-700">
+                            {selectedStartup.deployment.uptimePercentage}%
+                          </span>
+                          <span className="text-[10px] text-slate-500 block">Real-time sync</span>
+                        </div>
+
+                        <div className="p-3 bg-slate-50 rounded border border-slate-200 text-center">
+                          <span className="text-[10px] text-slate-500 uppercase font-bold block flex items-center justify-center gap-1">
+                            <TrendingUp className="w-3 h-3 text-amber-600" /> Congestion Reduction
+                          </span>
+                          <span className="text-base font-black text-amber-700">
+                            +{selectedStartup.deployment.congestionReductionPct}%
+                          </span>
+                          <span className="text-[10px] text-slate-500 block">Peak-hour corridor gain</span>
+                        </div>
+                      </div>
+
+                      {/* 4-Phase Process Timeline */}
+                      <div className="border border-slate-200 rounded p-4 bg-slate-50/50 space-y-3">
+                        <span className="text-xs font-bold text-slate-800 uppercase tracking-wider block">
+                          Corridor Execution Lifecycle:
+                        </span>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                          <div className="p-2.5 rounded bg-emerald-50 border border-emerald-200 text-xs space-y-1">
+                            <div className="flex items-center justify-between">
+                              <span className="font-bold text-emerald-900">Phase 1: HW Mounting</span>
+                              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                            </div>
+                            <p className="text-[11px] text-emerald-800">
+                              24 edge cameras & AI controllers mounted on gantries.
+                            </p>
+                          </div>
+
+                          <div className="p-2.5 rounded bg-blue-50 border border-blue-200 text-xs space-y-1">
+                            <div className="flex items-center justify-between">
+                              <span className="font-bold text-blue-900">Phase 2: Signal Sync</span>
+                              <Sparkles className="w-4 h-4 text-blue-600" />
+                            </div>
+                            <p className="text-[11px] text-blue-800">
+                              Adaptive green wave calibration across 6 junction clusters.
+                            </p>
+                          </div>
+
+                          <div className="p-2.5 rounded bg-white border border-slate-200 text-xs space-y-1">
+                            <div className="flex items-center justify-between">
+                              <span className="font-bold text-slate-700">Phase 3: Stress Testing</span>
+                              <Clock className="w-4 h-4 text-slate-400" />
+                            </div>
+                            <p className="text-[11px] text-slate-500">
+                              90-day monsoon peak-hour stability & failover testing.
+                            </p>
+                          </div>
+
+                          <div className="p-2.5 rounded bg-white border border-slate-200 text-xs space-y-1">
+                            <div className="flex items-center justify-between">
+                              <span className="font-bold text-slate-700">Phase 4: GeM Listing</span>
+                              <Building className="w-4 h-4 text-slate-400" />
+                            </div>
+                            <p className="text-[11px] text-slate-500">
+                              National GeM commercial catalogue listing for pan-India scale.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Milestone Payment Process & Disbursal Tracker */}
+                    <div className="bg-white p-5 rounded-md border border-slate-200 shadow-2xs space-y-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
+                        <div className="flex items-center gap-2">
+                          <span className="p-2 bg-emerald-50 text-emerald-700 rounded-sm">
+                            <CreditCard className="w-5 h-5" />
+                          </span>
+                          <div>
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-xs">
+                              PFMS Milestone-Based Payment Schedule
+                            </span>
+                            <h3 className="text-base font-black text-sangam-navy-900 mt-0.5">
+                              Milestone Payment Tranches & PFMS Treasury Releases
+                            </h3>
+                          </div>
+                        </div>
+
+                        <div className="text-xs text-slate-500 font-mono">
+                          Treasury Scheme: {selectedStartup.deployment.escrowAccount.pfmsSchemeCode}
+                        </div>
+                      </div>
+
+                      {/* List of 4 Milestones */}
+                      <div className="space-y-4">
+                        {selectedStartup.deployment.milestones.map(m => {
+                          const isDisbursed = m.status === 'Disbursed';
+                          const isUnderReview = m.status === 'Under Verification';
+                          const isPending = m.status === 'Pending Verification';
+
+                          return (
+                            <div
+                              key={m.milestoneNumber}
+                              className={`p-4 rounded-md border text-xs transition-all space-y-3 ${
+                                isDisbursed
+                                  ? 'bg-emerald-50/50 border-emerald-300'
+                                  : isUnderReview
+                                  ? 'bg-amber-50/50 border-amber-300'
+                                  : isPending
+                                  ? 'bg-blue-50/40 border-blue-300'
+                                  : 'bg-slate-50 border-slate-200 opacity-80'
+                              }`}
+                            >
+                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/80 pb-2.5">
+                                <div>
+                                  <div className="flex items-center gap-2">
+                                    <span
+                                      className={`px-2 py-0.5 rounded-xs text-[10px] font-black uppercase ${
+                                        isDisbursed
+                                          ? 'bg-emerald-700 text-white'
+                                          : isUnderReview
+                                          ? 'bg-amber-600 text-white'
+                                          : isPending
+                                          ? 'bg-blue-600 text-white'
+                                          : 'bg-slate-300 text-slate-700'
+                                      }`}
+                                    >
+                                      Milestone 0{m.milestoneNumber} ({m.percentage}%)
+                                    </span>
+                                    <span className="font-bold text-slate-900 text-sm">
+                                      {m.title}
+                                    </span>
+                                  </div>
+                                  <div className="text-[11px] text-slate-500 mt-0.5">
+                                    Target Timeline: {m.targetTimeline}
+                                  </div>
+                                </div>
+
+                                <div className="text-right flex sm:flex-col items-center sm:items-end justify-between gap-1">
+                                  <span className="text-base font-black text-slate-900">
+                                    ₹{m.amountLakhs} Lakhs
+                                  </span>
+                                  <span
+                                    className={`px-2 py-0.5 rounded-xs text-[10px] font-bold ${
+                                      isDisbursed
+                                        ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                                        : isUnderReview
+                                        ? 'bg-amber-100 text-amber-800 border border-amber-300'
+                                        : isPending
+                                        ? 'bg-blue-100 text-blue-800 border border-blue-300'
+                                        : 'bg-slate-200 text-slate-600'
+                                    }`}
+                                  >
+                                    {m.status}
+                                  </span>
+                                </div>
+                              </div>
+
+                              <p className="text-slate-700 text-[11px] leading-relaxed">{m.description}</p>
+
+                              {/* Deliverables Checklist */}
+                              <div className="space-y-1">
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-600 block">
+                                  Required Statutory Deliverables:
+                                </span>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                                  {m.deliverables.map((del, dIdx) => (
+                                    <div
+                                      key={dIdx}
+                                      className="flex items-center gap-1.5 text-[11px] text-slate-700 bg-white p-1.5 rounded border border-slate-200"
+                                    >
+                                      {isDisbursed ? (
+                                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                                      ) : (
+                                        <div className="w-3.5 h-3.5 rounded-full border border-slate-400 shrink-0" />
+                                      )}
+                                      <span className="truncate">{del}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+
+                              {/* Transaction Release Metadata / Action Form */}
+                              {isDisbursed && (
+                                <div className="p-3 bg-emerald-100/70 border border-emerald-200 rounded text-[11px] space-y-1 text-emerald-950">
+                                  <div className="flex flex-wrap items-center justify-between gap-2 font-mono">
+                                    <span>
+                                      <strong>PFMS Ref:</strong> {m.pfmsTransactionId}
+                                    </span>
+                                    <span>
+                                      <strong>RBI UTR:</strong> {m.utrNumber}
+                                    </span>
+                                    <span>
+                                      <strong>Disbursed:</strong> {m.disbursedAt}
+                                    </span>
+                                  </div>
+                                  <div className="text-[10px] text-emerald-800">
+                                    Verified & Authorised by: {m.verificationOfficer}
+                                  </div>
+                                </div>
+                              )}
+
+                              {isUnderReview && (
+                                <div className="p-3 bg-amber-100/70 border border-amber-200 rounded text-[11px] space-y-2 text-amber-950">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-1.5 font-bold">
+                                      <Clock className="w-3.5 h-3.5 text-amber-700" />
+                                      <span>Deliverables & Telemetry Logs Submitted (Under Review by MoRTH)</span>
+                                    </div>
+                                    <span className="text-[10px] font-mono text-amber-800">
+                                      {m.proofDocumentName}
+                                    </span>
+                                  </div>
+                                  <p className="text-[10px] text-amber-800">
+                                    MoRTH evaluation officer is verifying corridor telemetry. Once approved in Department View, PFMS payment of ₹{m.amountLakhs}L will be credited automatically.
+                                  </p>
+                                </div>
+                              )}
+
+                              {isPending && (
+                                <div className="p-3 bg-blue-100/60 border border-blue-200 rounded text-[11px] flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-blue-950">
+                                  <div>
+                                    <div className="font-bold flex items-center gap-1.5">
+                                      <UploadCloud className="w-4 h-4 text-blue-700" />
+                                      <span>Ready to Submit Deliverables for Payment Verification</span>
+                                    </div>
+                                    <p className="text-[10px] text-blue-800 mt-0.5">
+                                      Upload corridor integration logs and audit reports to trigger Ministry payment audit.
+                                    </p>
+                                  </div>
+
+                                  <button
+                                    onClick={() => handleSubmitMilestoneProof(selectedStartup.id, m.milestoneNumber)}
+                                    className="px-3.5 py-1.5 rounded bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs flex items-center gap-1 shadow-xs cursor-pointer shrink-0"
+                                  >
+                                    <Send className="w-3.5 h-3.5 text-amber-300" />
+                                    <span>Submit Telemetry Logs for Verification</span>
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  /* Notice if inspecting another startup when someone else was awarded */
+                  <div className="p-4 bg-amber-50 border border-amber-200 rounded-md text-xs text-amber-900 flex items-start justify-between gap-3">
+                    <div className="space-y-1">
+                      <div className="font-bold flex items-center gap-1.5">
+                        <Info className="w-4 h-4 text-amber-700 shrink-0" />
+                        <span>Pilot Award Sanctioned for this Challenge</span>
+                      </div>
+                      <p className="text-[11px] text-amber-800 leading-relaxed">
+                        The Ministry has sanctioned the live corridor pilot for this procurement cycle. Switch startup view to inspect the awarded startup&apos;s active deployment dashboard and PFMS milestone payments.
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        const awarded = startups.find(s => s.finalSelection?.isFinallySelected);
+                        if (awarded) setSelectedStartupId(awarded.id);
+                      }}
+                      className="px-3 py-1.5 rounded bg-amber-700 hover:bg-amber-800 text-white font-bold text-xs whitespace-nowrap cursor-pointer shrink-0"
+                    >
+                      Switch to Awarded Startup
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
           </div>
         )}
 
@@ -1591,6 +2166,368 @@ function SimulationContent() {
                 </div>
               </div>
             </div>
+
+            {/* STAGE 6 & 7: GOVERNMENT LIVE DEPLOYMENT & PFMS MILESTONE PAYMENT DISBURSAL DASHBOARD */}
+            {stage >= 5 && (
+              <div className="space-y-6 pt-2">
+                {(() => {
+                  const awardedStartup = startups.find(s => s.finalSelection?.isFinallySelected && s.deployment) || startups.find(s => s.deployment);
+
+                  if (!awardedStartup || !awardedStartup.deployment) {
+                    return (
+                      <div className="p-5 bg-amber-50 border border-amber-200 rounded-md text-xs text-amber-900 flex items-center gap-3">
+                        <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0" />
+                        <div>
+                          <span className="font-bold block">No Pilot Awarded Yet</span>
+                          <p className="text-[11px] text-amber-800 mt-0.5">
+                            Select an eligible shortlisted candidate above and click &quot;Confirm & Begin Deployment&quot; to initialize live corridor tracking and PFMS milestone payments.
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  const d = awardedStartup.deployment;
+
+                  return (
+                    <div className="space-y-6">
+                      {/* Header Banner for Stage 07 */}
+                      <div className="bg-gradient-to-r from-sangam-navy-900 via-slate-900 to-slate-950 p-6 rounded-md text-white border border-slate-800 shadow-md space-y-4">
+                        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-white/10 pb-4">
+                          <div className="flex items-center gap-3">
+                            <span className="p-3 bg-emerald-500/20 text-emerald-400 rounded-sm">
+                              <Building2 className="w-7 h-7" />
+                            </span>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span className="px-2 py-0.5 rounded-xs text-[10px] font-black uppercase bg-emerald-400 text-slate-950">
+                                  Stage 07: Live Department Monitoring
+                                </span>
+                                <span className="text-xs text-slate-300 font-mono">
+                                  Work Order: {awardedStartup.finalSelection?.workOrderNumber}
+                                </span>
+                              </div>
+                              <h2 className="text-lg sm:text-xl font-black text-white mt-1">
+                                MoRTH Urban Corridor Pilot • {awardedStartup.name}
+                              </h2>
+                            </div>
+                          </div>
+
+                          <div className="flex flex-wrap items-center gap-3">
+                            <div className="bg-white/10 border border-white/15 px-3.5 py-2 rounded text-right">
+                              <span className="text-[10px] text-slate-300 uppercase font-bold block">Total Sanctioned Budget</span>
+                              <span className="text-lg font-black text-amber-400">
+                                ₹{awardedStartup.cost}.00 Lakhs
+                              </span>
+                            </div>
+                            <div className="bg-emerald-500/10 border border-emerald-500/30 px-3.5 py-2 rounded text-right">
+                              <span className="text-[10px] text-emerald-300 uppercase font-bold block">Treasury Disbursed</span>
+                              <span className="text-lg font-black text-emerald-400">
+                                ₹{d.escrowAccount.totalDisbursedLakhs} Lakhs
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Corridor Deployment Telemetry Grid */}
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
+                          <div className="p-3 bg-white/5 border border-white/10 rounded-sm text-center">
+                            <span className="text-[10px] text-slate-400 uppercase font-bold block">
+                              Active Edge Units
+                            </span>
+                            <span className="text-base font-black text-white block mt-0.5">
+                              {d.activeNodes}/{d.totalNodes}
+                            </span>
+                            <span className="text-[10px] text-emerald-400 font-mono">100% Gantry Online</span>
+                          </div>
+
+                          <div className="p-3 bg-white/5 border border-white/10 rounded-sm text-center">
+                            <span className="text-[10px] text-slate-400 uppercase font-bold block">
+                              Inference Latency
+                            </span>
+                            <span className="text-base font-black text-purple-300 block mt-0.5">
+                              {d.latencyMs}ms
+                            </span>
+                            <span className="text-[10px] text-slate-400 font-mono">SLA &lt;50ms Compliant</span>
+                          </div>
+
+                          <div className="p-3 bg-white/5 border border-white/10 rounded-sm text-center">
+                            <span className="text-[10px] text-slate-400 uppercase font-bold block">
+                              Corridor Uptime
+                            </span>
+                            <span className="text-base font-black text-emerald-400 block mt-0.5">
+                              {d.uptimePercentage}%
+                            </span>
+                            <span className="text-[10px] text-slate-400 font-mono">Continuous Telemetry</span>
+                          </div>
+
+                          <div className="p-3 bg-white/5 border border-white/10 rounded-sm text-center">
+                            <span className="text-[10px] text-slate-400 uppercase font-bold block">
+                              Corridor Flow Gain
+                            </span>
+                            <span className="text-base font-black text-amber-400 block mt-0.5">
+                              +{d.congestionReductionPct}%
+                            </span>
+                            <span className="text-[10px] text-amber-300 font-mono">Peak Hour Clearance</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Government PFMS Escrow & Milestone Payment Disbursal Station */}
+                      <div className="bg-white p-5 rounded-md border border-slate-200 shadow-2xs space-y-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
+                          <div className="flex items-center gap-2">
+                            <span className="p-2 bg-emerald-50 text-emerald-700 rounded-sm">
+                              <Wallet className="w-5 h-5" />
+                            </span>
+                            <div>
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-xs">
+                                Ministry PFMS Disbursement Station
+                              </span>
+                              <h3 className="text-base font-black text-sangam-navy-900 mt-0.5">
+                                Milestone Verification & Treasury Fund Releases
+                              </h3>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-slate-600 font-bold">Escrow Account:</span>
+                            <span className="text-xs font-mono font-bold text-slate-900 bg-slate-100 px-2 py-1 rounded">
+                              {d.escrowAccount.virtualAccountNumber}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Escrow Balance Metrics */}
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                          <div className="p-3 bg-slate-50 border border-slate-200 rounded text-xs">
+                            <span className="text-slate-500 uppercase font-bold text-[10px] block">
+                              Total Sanctioned Limit
+                            </span>
+                            <span className="text-base font-black text-slate-900 block mt-0.5">
+                              ₹{d.escrowAccount.sanctionTotalLakhs} Lakhs
+                            </span>
+                            <span className="text-[10px] text-slate-500">
+                              PFMS Scheme Code: {d.escrowAccount.pfmsSchemeCode}
+                            </span>
+                          </div>
+
+                          <div className="p-3 bg-emerald-50 border border-emerald-200 rounded text-xs">
+                            <span className="text-emerald-700 uppercase font-bold text-[10px] block">
+                              Total Released from Treasury
+                            </span>
+                            <span className="text-base font-black text-emerald-800 block mt-0.5">
+                              ₹{d.escrowAccount.totalDisbursedLakhs} Lakhs
+                            </span>
+                            <span className="text-[10px] text-emerald-700">
+                              Credited directly to {awardedStartup.name}
+                            </span>
+                          </div>
+
+                          <div className="p-3 bg-blue-50 border border-blue-200 rounded text-xs">
+                            <span className="text-blue-700 uppercase font-bold text-[10px] block">
+                              Escrow Balance Remaining
+                            </span>
+                            <span className="text-base font-black text-blue-900 block mt-0.5">
+                              ₹{d.escrowAccount.remainingBalanceLakhs} Lakhs
+                            </span>
+                            <span className="text-[10px] text-blue-700">
+                              Reserved for upcoming milestone tranches
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Milestone Verification & Disbursal Cards */}
+                        <div className="space-y-3 pt-2">
+                          <span className="text-xs font-bold uppercase tracking-wider text-slate-800 block">
+                            Milestone Tranches & Payment Release Actions:
+                          </span>
+
+                          {d.milestones.map(m => {
+                            const isDisbursed = m.status === 'Disbursed';
+                            const isUnderVerification = m.status === 'Under Verification';
+                            const isPending = m.status === 'Pending Verification';
+
+                            return (
+                              <div
+                                key={m.milestoneNumber}
+                                className={`p-4 rounded-md border text-xs space-y-3 transition-all ${
+                                  isDisbursed
+                                    ? 'bg-emerald-50/40 border-emerald-300'
+                                    : isUnderVerification
+                                    ? 'bg-amber-50/60 border-amber-300'
+                                    : isPending
+                                    ? 'bg-blue-50/30 border-blue-200'
+                                    : 'bg-slate-50 border-slate-200 opacity-70'
+                                }`}
+                              >
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/80 pb-2">
+                                  <div>
+                                    <div className="flex items-center gap-2">
+                                      <span
+                                        className={`px-2 py-0.5 rounded-xs text-[10px] font-black uppercase ${
+                                          isDisbursed
+                                            ? 'bg-emerald-700 text-white'
+                                            : isUnderVerification
+                                            ? 'bg-amber-600 text-white'
+                                            : isPending
+                                            ? 'bg-blue-600 text-white'
+                                            : 'bg-slate-300 text-slate-700'
+                                        }`}
+                                      >
+                                        Milestone 0{m.milestoneNumber} ({m.percentage}%)
+                                      </span>
+                                      <span className="font-bold text-slate-900 text-sm">
+                                        {m.title}
+                                      </span>
+                                    </div>
+                                    <div className="text-[11px] text-slate-500 mt-0.5">
+                                      Target Timeline: {m.targetTimeline}
+                                    </div>
+                                  </div>
+
+                                  <div className="text-right flex sm:flex-col items-center sm:items-end justify-between gap-1">
+                                    <span className="text-base font-black text-slate-900">
+                                      ₹{m.amountLakhs} Lakhs
+                                    </span>
+                                    <span
+                                      className={`px-2 py-0.5 rounded-xs text-[10px] font-bold ${
+                                        isDisbursed
+                                          ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                                          : isUnderVerification
+                                          ? 'bg-amber-100 text-amber-800 border border-amber-300'
+                                          : isPending
+                                          ? 'bg-blue-100 text-blue-800 border border-blue-300'
+                                          : 'bg-slate-200 text-slate-600'
+                                      }`}
+                                    >
+                                      {m.status}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                <p className="text-[11px] text-slate-600">{m.description}</p>
+
+                                {/* Deliverables */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                                  {m.deliverables.map((del, dIdx) => (
+                                    <div
+                                      key={dIdx}
+                                      className="flex items-center gap-1.5 text-[11px] text-slate-700 bg-white p-1.5 rounded border border-slate-200"
+                                    >
+                                      {isDisbursed ? (
+                                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                                      ) : (
+                                        <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                                      )}
+                                      <span className="truncate">{del}</span>
+                                    </div>
+                                  ))}
+                                </div>
+
+                                {/* Disbursed Receipt */}
+                                {isDisbursed && (
+                                  <div className="p-3 bg-emerald-100/70 border border-emerald-200 rounded text-[11px] space-y-1 text-emerald-950 font-mono">
+                                    <div className="flex flex-wrap items-center justify-between gap-2">
+                                      <span><strong>PFMS Ref:</strong> {m.pfmsTransactionId}</span>
+                                      <span><strong>RBI UTR:</strong> {m.utrNumber}</span>
+                                      <span><strong>Disbursed:</strong> {m.disbursedAt}</span>
+                                    </div>
+                                    <div className="text-[10px] text-emerald-800 font-sans">
+                                      Verified & Authorised by: {m.verificationOfficer}
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Payment Verification / Release Action for Ministry */}
+                                {!isDisbursed && (
+                                  <div className="p-3 bg-white border border-slate-200 rounded flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                    <div className="space-y-0.5">
+                                      <div className="font-bold text-slate-900 flex items-center gap-1.5">
+                                        <FileCheck2 className="w-4 h-4 text-sangam-blue-600" />
+                                        <span>MoRTH Statutory Payment Release Authorization</span>
+                                      </div>
+                                      <p className="text-[10px] text-slate-500">
+                                        Authorizing release will trigger direct electronic transfer of ₹{m.amountLakhs} Lakhs from RBI Escrow to startup bank account.
+                                      </p>
+                                    </div>
+
+                                    <button
+                                      onClick={() => handleApproveMilestonePayment(awardedStartup.id, m.milestoneNumber)}
+                                      className="px-4 py-2 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs cursor-pointer shrink-0"
+                                    >
+                                      <Banknote className="w-4 h-4 text-amber-300" />
+                                      <span>Approve Milestone {m.milestoneNumber} & Release ₹{m.amountLakhs}L</span>
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Field Inspection Audit Log Card */}
+                      <div className="bg-white p-5 rounded-md border border-slate-200 shadow-2xs space-y-4">
+                        <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+                          <div className="flex items-center gap-2">
+                            <span className="p-2 bg-purple-50 text-purple-700 rounded-sm">
+                              <FileSpreadsheet className="w-5 h-5" />
+                            </span>
+                            <div>
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-purple-800 bg-purple-100 px-2 py-0.5 rounded-xs">
+                                On-Site Field Audit Log
+                              </span>
+                              <h3 className="text-base font-black text-sangam-navy-900 mt-0.5">
+                                MoRTH Engineer Field Inspection Reports
+                              </h3>
+                            </div>
+                          </div>
+                          <span className="text-xs text-slate-500 font-mono">{inspectionLogs.length} Records</span>
+                        </div>
+
+                        {/* Log Entry Form */}
+                        <form onSubmit={handleAddInspection} className="flex gap-2">
+                          <input
+                            type="text"
+                            value={inspectionNote}
+                            onChange={e => setInspectionNote(e.target.value)}
+                            placeholder="Log physical field verification (e.g., 'Inspected camera node 18 on NH-48; frame rate and thermal levels within nominal threshold')..."
+                            className="flex-1 text-xs px-3 py-2 rounded border border-slate-300 focus:outline-none focus:border-sangam-blue-600"
+                          />
+                          <button
+                            type="submit"
+                            className="px-4 py-2 rounded bg-purple-700 hover:bg-purple-800 text-white font-bold text-xs flex items-center gap-1 cursor-pointer shrink-0 shadow-xs"
+                          >
+                            <Plus className="w-3.5 h-3.5" />
+                            <span>Add Field Log</span>
+                          </button>
+                        </form>
+
+                        {/* List of Inspection Logs */}
+                        <div className="space-y-2">
+                          {inspectionLogs.map(log => (
+                            <div
+                              key={log.id}
+                              className="p-3 bg-slate-50 rounded border border-slate-200 text-xs space-y-1"
+                            >
+                              <div className="flex items-center justify-between">
+                                <span className="font-bold text-slate-900">{log.officer}</span>
+                                <span className="text-[10px] text-slate-400 font-mono">{log.date}</span>
+                              </div>
+                              <p className="text-[11px] text-slate-700">{log.note}</p>
+                              <span className="text-[10px] text-purple-700 font-semibold block">
+                                Corridor: {log.corridor}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+            )}
           </div>
         )}
 

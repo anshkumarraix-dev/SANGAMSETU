@@ -1,6 +1,47 @@
-export type SimulationStage = 0 | 1 | 2 | 3 | 4 | 5;
+export type SimulationStage = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 export type SimTab = 'public' | 'admin' | 'government' | 'startup' | 'testing_org';
 export type SimPersona = 'public' | 'startup' | 'department' | 'evaluator' | 'admin';
+
+export interface MilestonePayment {
+  id: string;
+  milestoneNumber: number;
+  title: string;
+  description: string;
+  percentage: number; // e.g. 20
+  amountLakhs: number; // e.g. 9.6
+  status: 'Disbursed' | 'Under Verification' | 'Pending Verification' | 'Upcoming';
+  targetTimeline?: string;
+  deliverables: string[];
+  verificationOfficer?: string;
+  disbursedAt?: string;
+  pfmsTransactionId?: string;
+  utrNumber?: string;
+  proofSubmitted?: boolean;
+  proofDocumentName?: string;
+}
+
+export interface DeploymentProcessData {
+  corridorName: string;
+  pilotDurationMonths: number;
+  status: 'Active Field Pilot' | 'Pre-Deployment Setup' | 'Completed';
+  progressPercentage: number;
+  activeNodes: number;
+  totalNodes: number;
+  latencyMs: number;
+  uptimePercentage: number;
+  congestionReductionPct: number;
+  telemetryFeedStatus: 'Live Streaming' | 'Calibrating' | 'Offline';
+  milestones: MilestonePayment[];
+  escrowAccount: {
+    bankName: string;
+    virtualAccountNumber: string;
+    ifscCode: string;
+    pfmsSchemeCode?: string;
+    sanctionTotalLakhs: number;
+    totalDisbursedLakhs: number;
+    remainingBalanceLakhs: number;
+  };
+}
 
 export interface StartupNotification {
   id: string;
@@ -148,6 +189,7 @@ export interface EvaluationStartup {
   departmentReview: DepartmentReviewData;
   prototypeTesting: PrototypeTestingData;
   finalSelection: FinalSelectionData;
+  deployment?: DeploymentProcessData;
 }
 
 export interface SimProblem {

@@ -124,6 +124,21 @@ export function generateStartupNotifications(
       }
     }
 
+    // Stage 6: Live Deployment & Milestone Payments Release Notification
+    if (currentStage >= 6 && startup.finalSelection?.isFinallySelected) {
+      list.push({
+        id: `notif-deployment-${startup.id}`,
+        startupId: startup.id,
+        timestamp: '05 Sep 2026, 09:30 AM IST',
+        stage: 6,
+        type: 'AWARD',
+        title: 'Corridor Deployment Active & Milestone 1 Disbursed',
+        message: `Field deployment active on NH-48 corridor. Mobilization advance Tranche 1 (20% = ₹${Math.round(startup.cost * 0.2 * 10) / 10}L) has been credited to your PFMS Escrow virtual account. Milestone 2 verification is in progress.`,
+        badgeText: 'Deployment Active',
+        badgeColor: 'emerald',
+      });
+    }
+
     // Sort newest first
     notificationsMap[startup.id] = list.reverse();
   });

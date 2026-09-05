@@ -5,6 +5,8 @@ import {
   G2ValueBreakdown,
   FinalSelectionData,
   SimProblem,
+  DeploymentProcessData,
+  MilestonePayment,
 } from './types';
 
 export const SIMULATION_PROBLEM: SimProblem = {
@@ -209,6 +211,114 @@ export function computeFinalSelectionStatus(
     checklist,
     workOrderNumber: startup.finalSelection?.workOrderNumber,
     sanctionAmount: startup.finalSelection?.sanctionAmount,
+  };
+}
+
+// Helper: Generate Initial Deployment & Milestone Process Data for a Sanctioned Startup
+export function generateDefaultDeploymentData(
+  totalCostLakhs: number,
+  workOrderNumber: string = 'MORTH/DPIIT/2026/WO-7821'
+): DeploymentProcessData {
+  const m1Amount = Math.round(totalCostLakhs * 0.2 * 10) / 10;
+  const m2Amount = Math.round(totalCostLakhs * 0.3 * 10) / 10;
+  const m3Amount = Math.round(totalCostLakhs * 0.3 * 10) / 10;
+  const m4Amount = Math.round((totalCostLakhs - m1Amount - m2Amount - m3Amount) * 10) / 10;
+
+  const milestones: MilestonePayment[] = [
+    {
+      id: 'm-01',
+      milestoneNumber: 1,
+      title: 'Milestone 1: Project Mobilization & Edge Sensor Deployment',
+      description: 'Site survey, physical installation of 24 edge AI compute units on NH-48 & Ring Road corridors, and connectivity handshake.',
+      percentage: 20,
+      amountLakhs: m1Amount,
+      status: 'Disbursed',
+      targetTimeline: 'Month 1 (Days 1–30)',
+      deliverables: [
+        '24 Edge-AI Camera units mounted and geo-tagged',
+        'Secure IPsec VPN tunnel connected to Delhi Police ATCS Node',
+        'Signed Site Handover Certificate by Regional Officer',
+      ],
+      verificationOfficer: 'Shri R. K. Sharma (Superintending Engineer, MoRTH)',
+      disbursedAt: '05 Sep 2026, 10:15 AM IST',
+      pfmsTransactionId: 'PFMS/2026/TXN-88219',
+      utrNumber: 'RBIND20268821901',
+      proofSubmitted: true,
+      proofDocumentName: 'Site_Inspection_Report_24Nodes.pdf (4.2 MB)',
+    },
+    {
+      id: 'm-02',
+      milestoneNumber: 2,
+      title: 'Milestone 2: Algorithmic Calibration & Live Telemetry Stream',
+      description: 'Real-time vehicle counting, queue length estimation, and sub-50ms latency telemetry sync to MoRTH Central Command.',
+      percentage: 30,
+      amountLakhs: m2Amount,
+      status: 'Under Verification',
+      targetTimeline: 'Month 2–3 (Days 31–90)',
+      deliverables: [
+        'Live video analytics feed passing 99.5% frame rate stability',
+        'Sub-50ms inference latency on edge RL agent',
+        'Telemetry API integrated into National Highway Portal',
+      ],
+      verificationOfficer: 'Dr. Neha Verma (Joint Director, C-DAC/STQC)',
+      proofSubmitted: true,
+      proofDocumentName: 'CDAC_Telemetry_Benchmark_Report_V2.pdf (6.8 MB)',
+    },
+    {
+      id: 'm-03',
+      milestoneNumber: 3,
+      title: 'Milestone 3: Corridor Field Pilot & Congestion Reduction Benchmark',
+      description: 'Continuous 60-day dynamic adaptive signal operation across the 4 key junctions with certified 18%+ delay reduction.',
+      percentage: 30,
+      amountLakhs: m3Amount,
+      status: 'Upcoming',
+      targetTimeline: 'Month 4–5 (Days 91–150)',
+      deliverables: [
+        '60-day uninterrupted signal optimization log',
+        'Independent traffic density audit report by IIT Delhi / CRRI',
+        'Zero manual intervention safety compliance log',
+      ],
+      proofSubmitted: false,
+    },
+    {
+      id: 'm-04',
+      milestoneNumber: 4,
+      title: 'Milestone 4: Final Handover, STQC Field Audit & GeM Cataloging',
+      description: 'Final technical audit sign-off, system source code escrow deposit, and automated listing on Government e-Marketplace (GeM).',
+      percentage: 20,
+      amountLakhs: m4Amount,
+      status: 'Upcoming',
+      targetTimeline: 'Month 6 (Days 151–180)',
+      deliverables: [
+        'Final STQC Field Performance Certificate',
+        'O&M Manual and Department Staff Training Completion',
+        'GeM Innovation Catalog fast-track onboarding',
+      ],
+      proofSubmitted: false,
+    },
+  ];
+
+  return {
+    corridorName: 'NH-48 Corridor & Ring Road Junctions (Delhi-NCR)',
+    pilotDurationMonths: 6,
+    status: 'Active Field Pilot',
+    progressPercentage: 38,
+    activeNodes: 24,
+    totalNodes: 24,
+    latencyMs: 42,
+    uptimePercentage: 99.8,
+    congestionReductionPct: 19.2,
+    telemetryFeedStatus: 'Live Streaming',
+    milestones,
+    escrowAccount: {
+      bankName: 'State Bank of India (PFMS Dedicated Escrow Branch)',
+      virtualAccountNumber: `PFMS-ESCROW-${workOrderNumber.replace(/[^A-Z0-9]/g, '')}`,
+      ifscCode: 'SBIN0000691',
+      pfmsSchemeCode: 'PFMS/MORTH/INNOV-2026/TR-982',
+      sanctionTotalLakhs: totalCostLakhs,
+      totalDisbursedLakhs: m1Amount,
+      remainingBalanceLakhs: Math.round((totalCostLakhs - m1Amount) * 10) / 10,
+    },
   };
 }
 
