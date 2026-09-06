@@ -8,6 +8,7 @@ import GovernmentFooter from '@/components/layout/GovernmentFooter';
 import SimulationToast from '@/components/simulation/SimulationToast';
 import ScoreRow from '@/components/simulation/ScoreRow';
 import PersonaSwitcher from '@/components/simulation/PersonaSwitcher';
+import InteractiveAISandbox from '@/components/simulation/InteractiveAISandbox';
 import {
   SimulationStage,
   SimPersona,
@@ -130,6 +131,82 @@ function SimulationContent() {
 
   // Toast
   const [toast, setToast] = useState<{ show: boolean; message: string; type: 'success' | 'info' | 'error' } | null>(null);
+  const [isSandboxExpanded, setIsSandboxExpanded] = useState(true);
+
+  // Inject startup configured in Interactive AI Sandbox
+  const handleInjectStartupFromSandbox = (sandboxData: any) => {
+    const newId = `s-sb-${Date.now()}`;
+    const newStartup: EvaluationStartup = {
+      id: newId,
+      name: sandboxData.name || 'Sandbox Custom Startup',
+      category: sandboxData.isG1Eligible ? 'G1' : 'G2',
+      cost: sandboxData.budget || 35,
+      dpiitNumber: `DPIIT${Math.floor(10000 + Math.random() * 90000)}`,
+      solutionTitle: `${sandboxData.name} - Dynamic Traffic AI`,
+      solutionSummary: 'Custom interactive sandbox-configured solution for urban corridor decongestion.',
+      techStack: ['Python', 'OpenCV', 'PyTorch', 'FastAPI'],
+      contactEmail: `contact@${(sandboxData.name || 'startup').toLowerCase().replace(/[^a-z0-9]/g, '')}.in`,
+      eligibility: {
+        status: 'Eligible',
+        checks: [
+          { parameter: 'Startup recognition', result: 'Eligible', isPassed: true, isMandatory: true, justification: 'DPIIT certificate verified.' },
+          { parameter: 'Submission deadline', result: 'Accept', isPassed: true, isMandatory: true, justification: 'Submitted on schedule.' },
+          { parameter: 'Mandatory fields complete', result: 'Complete', isPassed: true, isMandatory: true, justification: 'All technical sections filled.' },
+          { parameter: 'Required documents uploaded', result: 'Complete', isPassed: true, isMandatory: true, justification: 'All attachments present.' },
+          { parameter: 'Challenge-specific eligibility', result: 'Eligible', isPassed: true, isMandatory: true, justification: 'ITS domain match.' },
+          { parameter: 'Conflict of interest', result: 'Clear', isPassed: true, isMandatory: true, justification: 'No conflict of interest.' },
+          { parameter: 'Duplicate submission check', result: 'Valid', isPassed: true, isMandatory: true, justification: 'Original proposal.' },
+          { parameter: 'Mandatory compliance declarations', result: 'Eligible', isPassed: true, isMandatory: true, justification: 'Compliant with DPDP Act.' },
+        ],
+      },
+      aiEvaluation: {
+        overallScore: sandboxData.overallScore,
+        confidence: 'High',
+        recommendation: sandboxData.isG1Eligible ? 'G1 candidate' : sandboxData.isG2Eligible ? 'G2 candidate' : 'Review further',
+        duplicateFlag: false,
+        complianceRiskFlag: false,
+        parameters: [],
+        strengths: ['Configured via Interactive Sandbox', 'High Problem-Solution alignment'],
+        missingInformation: [],
+        g2ValueScore: {
+          scoreComponent: Number((sandboxData.overallScore * 0.6).toFixed(1)),
+          costComponent: Number((sandboxData.costScore * 0.4).toFixed(1)),
+          total: Math.round((sandboxData.overallScore * 0.6 + sandboxData.costScore * 0.4) * 10) / 10,
+        },
+      },
+      departmentReview: {
+        decision: 'Approve for Prototype',
+        overridesAI: false,
+        overrideReason: '',
+        reviewer: 'Shri A. K. Sharma (Joint Secretary, MoRTH)',
+        reviewedAt: new Date().toISOString(),
+        notes: [],
+        auditLog: [],
+      },
+      prototypeTesting: {
+        overallResult: 'Pass',
+        failedMandatoryReason: null,
+        testedByLab: 'STQC Testing Laboratory, Delhi',
+        testCertificateId: `STQC-2026-VAL-${Math.floor(1000 + Math.random() * 9000)}`,
+        parameters: [],
+      },
+      finalSelection: {
+        isEligibleForPilot: true,
+        isFinallySelected: false,
+        blockingItems: [],
+        checklist: [],
+      },
+    };
+
+    newStartup.finalSelection = computeFinalSelectionStatus(newStartup);
+    setStartups(prev => [newStartup, ...prev]);
+    setSelectedStartupId(newId);
+    setToast({
+      show: true,
+      message: `"${sandboxData.name}" (Score: ${sandboxData.overallScore}/100) added to active simulation list!`,
+      type: 'success',
+    });
+  };
 
   // Notifications feed for all startups
   const notificationsByStartup = useMemo(() => {
@@ -1116,6 +1193,40 @@ function SimulationContent() {
               })}
             </div>
           </div>
+        </div>
+
+        {/* INTERACTIVE AI EVALUATION SANDBOX (FEATURE: SIMPLE & INTERACTIVE TUNER) */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between px-1">
+            <div className="flex items-center gap-2">
+              <span className="p-1 rounded bg-indigo-100 text-indigo-700">
+                <SlidersHorizontal className="w-4 h-4" />
+              </span>
+              <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                Live AI Scoring Sandbox & Scenario Presets
+              </span>
+            </div>
+            <button
+              onClick={() => setIsSandboxExpanded(!isSandboxExpanded)}
+              className="text-xs text-indigo-700 font-bold hover:underline flex items-center gap-1 cursor-pointer"
+            >
+              {isSandboxExpanded ? (
+                <>
+                  <span>Hide Sandbox</span>
+                  <ChevronDown className="w-3.5 h-3.5 rotate-180 transition-transform" />
+                </>
+              ) : (
+                <>
+                  <span>Open Interactive Sandbox</span>
+                  <ChevronDown className="w-3.5 h-3.5 transition-transform" />
+                </>
+              )}
+            </button>
+          </div>
+
+          {isSandboxExpanded && (
+            <InteractiveAISandbox onInjectStartup={handleInjectStartupFromSandbox} />
+          )}
         </div>
 
         {/* ========================================================= */}
