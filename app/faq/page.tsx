@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import MainNavbar from '@/components/layout/MainNavbar';
 import GovernmentFooter from '@/components/layout/GovernmentFooter';
 import { HelpCircle, ChevronDown, ChevronUp, Search, Briefcase, Landmark, ShieldCheck, Mail } from 'lucide-react';
@@ -87,20 +88,30 @@ export default function FAQPage() {
       <MainNavbar activeTab="faq" />
 
       {/* Header Banner */}
-      <div className="bg-slate-900 text-white py-8 px-4 border-b border-slate-800">
-        <div className="max-w-[1440px] mx-auto">
-          <div className="flex items-center gap-2 text-xs text-slate-400 mb-2">
+      <div className="relative bg-slate-900 text-white py-12 px-4 border-b border-slate-800 overflow-hidden">
+        <Image
+          src="/images/banner-faq.jpg"
+          alt="Technical support desk, user guide and help center collaboration"
+          fill
+          loading="lazy"
+          className="object-cover object-center opacity-70"
+          sizes="100vw"
+          referrerPolicy="no-referrer"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/85 via-slate-950/60 to-slate-950/30 pointer-events-none" />
+        <div className="relative max-w-[1440px] mx-auto z-10">
+          <div className="flex items-center gap-2 text-xs text-slate-300 mb-3">
             <Link href="/" className="hover:text-amber-400 transition-colors">Home</Link>
             <span>/</span>
             <span className="text-amber-400 font-semibold">Support & Help</span>
             <span>/</span>
-            <span className="text-slate-300">Frequently Asked Questions</span>
+            <span className="text-slate-200">Frequently Asked Questions</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white flex items-center gap-3">
-            <HelpCircle className="w-7 h-7 text-sangam-saffron-400" />
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-white flex items-center gap-3">
+            <HelpCircle className="w-8 h-8 text-sangam-saffron-400 shrink-0" />
             <span>Frequently Asked Questions (FAQ)</span>
           </h1>
-          <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-3xl leading-relaxed">
+          <p className="text-xs sm:text-sm text-slate-200 mt-2 max-w-3xl leading-relaxed">
             Statutory, operational, and financial answers for DPIIT startups, Ministry procurement officers, and empanelled testing laboratories.
           </p>
         </div>

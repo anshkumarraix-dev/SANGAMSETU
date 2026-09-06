@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
@@ -146,34 +147,50 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg border border-slate-200">
-        {/* Logo & Header */}
-        <div className="text-center">
-          <Link href="/" className="inline-flex items-center gap-2 mb-4">
-            <GovernmentEmblem color="gold" className="h-10 w-auto" />
-            <div className="text-left">
-              <div className="flex items-baseline gap-1">
-                <span className="text-xl font-black tracking-tight text-sangam-navy-900 font-serif">
-                  SANGAM<span className="text-sangam-saffron-500">SETU</span>
-                </span>
-                <span className="text-xs font-bold text-sangam-blue-700 tracking-wide">
-                  Portal
-                </span>
+      <div className="max-w-md w-full overflow-hidden bg-white rounded-2xl shadow-xl border border-slate-200">
+        {/* Contextual Visual Header Banner */}
+        <div className="relative w-full h-36 bg-slate-900 overflow-hidden">
+          <Image
+            src="/images/banner-auth.jpg"
+            alt="Government of India Ministry Headquarters Rashtrapati Bhavan Architecture"
+            fill
+            priority
+            className="object-cover object-center opacity-85"
+            sizes="(max-width: 480px) 100vw, 480px"
+            referrerPolicy="no-referrer"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/45 to-transparent flex flex-col justify-end p-5">
+            <div className="flex items-center gap-2">
+              <GovernmentEmblem color="gold" className="h-7 w-auto drop-shadow-md" />
+              <div className="text-left">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-lg font-black tracking-tight text-white font-serif drop-shadow-md">
+                    SANGAM<span className="text-sangam-saffron-400">SETU</span>
+                  </span>
+                  <span className="text-[10px] font-bold text-sky-300 tracking-wide drop-shadow-sm">
+                    SSO
+                  </span>
+                </div>
+                <p className="text-[10px] text-slate-100 font-medium drop-shadow-sm">
+                  National Innovation Procurement Gateway
+                </p>
               </div>
-              <p className="text-[10px] text-slate-600 font-medium">
-                Govt of India Startup Procurement Portal
-              </p>
             </div>
-          </Link>
-          <h2 className="text-2xl font-black text-sangam-navy-900">
-            Sign in to your account
-          </h2>
-          <p className="mt-1 text-xs text-slate-600">
-            Single Sign-On (SSO) Portal for Government & DPIIT Startups
-          </p>
+          </div>
         </div>
 
-        {/* User Type Selector */}
+        <div className="p-7 space-y-6">
+          {/* Header */}
+          <div className="text-left">
+            <h2 className="text-xl font-black text-sangam-navy-900">
+              Sign in to your account
+            </h2>
+            <p className="mt-1 text-xs text-slate-600">
+              Single Sign-On (SSO) Portal for Government & DPIIT Startups
+            </p>
+          </div>
+
+          {/* User Type Selector */}
         <div className="flex bg-slate-100 p-1 rounded-lg">
           <button
             type="button"
@@ -351,5 +368,6 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  </div>
   );
 }

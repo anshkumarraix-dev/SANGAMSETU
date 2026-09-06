@@ -34,6 +34,32 @@ export function calculateCostEffectiveness(budget: number, maxBudget: number): n
   return 50;
 }
 
+export function computeOverallAIScore(
+  fit: number,
+  tech: number,
+  innov: number,
+  impact: number,
+  cost: number,
+  scale: number,
+  team: number,
+  risk: number
+): number {
+  const raw =
+    fit * 0.20 +
+    tech * 0.15 +
+    innov * 0.15 +
+    impact * 0.15 +
+    cost * 0.15 +
+    scale * 0.10 +
+    team * 0.05 +
+    risk * 0.05;
+  return Math.round(raw * 10) / 10;
+}
+
+export function computeG2ValueScore(overallScore: number, costScore: number): number {
+  return Math.round((overallScore * 0.6 + costScore * 0.4) * 10) / 10;
+}
+
 export function evaluateProposalAI(
   proposal: Partial<Proposal>,
   challengeMaxBudget: number = 5000000

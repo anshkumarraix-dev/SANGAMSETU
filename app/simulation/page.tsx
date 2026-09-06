@@ -2,13 +2,13 @@
 
 import React, { useState, useMemo, useEffect, Suspense } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import MainNavbar from '@/components/layout/MainNavbar';
 import GovernmentFooter from '@/components/layout/GovernmentFooter';
 import SimulationToast from '@/components/simulation/SimulationToast';
 import ScoreRow from '@/components/simulation/ScoreRow';
 import PersonaSwitcher from '@/components/simulation/PersonaSwitcher';
-import InteractiveAISandbox from '@/components/simulation/InteractiveAISandbox';
 import {
   SimulationStage,
   SimPersona,
@@ -131,82 +131,6 @@ function SimulationContent() {
 
   // Toast
   const [toast, setToast] = useState<{ show: boolean; message: string; type: 'success' | 'info' | 'error' } | null>(null);
-  const [isSandboxExpanded, setIsSandboxExpanded] = useState(true);
-
-  // Inject startup configured in Interactive AI Sandbox
-  const handleInjectStartupFromSandbox = (sandboxData: any) => {
-    const newId = `s-sb-${Date.now()}`;
-    const newStartup: EvaluationStartup = {
-      id: newId,
-      name: sandboxData.name || 'Sandbox Custom Startup',
-      category: sandboxData.isG1Eligible ? 'G1' : 'G2',
-      cost: sandboxData.budget || 35,
-      dpiitNumber: `DPIIT${Math.floor(10000 + Math.random() * 90000)}`,
-      solutionTitle: `${sandboxData.name} - Dynamic Traffic AI`,
-      solutionSummary: 'Custom interactive sandbox-configured solution for urban corridor decongestion.',
-      techStack: ['Python', 'OpenCV', 'PyTorch', 'FastAPI'],
-      contactEmail: `contact@${(sandboxData.name || 'startup').toLowerCase().replace(/[^a-z0-9]/g, '')}.in`,
-      eligibility: {
-        status: 'Eligible',
-        checks: [
-          { parameter: 'Startup recognition', result: 'Eligible', isPassed: true, isMandatory: true, justification: 'DPIIT certificate verified.' },
-          { parameter: 'Submission deadline', result: 'Accept', isPassed: true, isMandatory: true, justification: 'Submitted on schedule.' },
-          { parameter: 'Mandatory fields complete', result: 'Complete', isPassed: true, isMandatory: true, justification: 'All technical sections filled.' },
-          { parameter: 'Required documents uploaded', result: 'Complete', isPassed: true, isMandatory: true, justification: 'All attachments present.' },
-          { parameter: 'Challenge-specific eligibility', result: 'Eligible', isPassed: true, isMandatory: true, justification: 'ITS domain match.' },
-          { parameter: 'Conflict of interest', result: 'Clear', isPassed: true, isMandatory: true, justification: 'No conflict of interest.' },
-          { parameter: 'Duplicate submission check', result: 'Valid', isPassed: true, isMandatory: true, justification: 'Original proposal.' },
-          { parameter: 'Mandatory compliance declarations', result: 'Eligible', isPassed: true, isMandatory: true, justification: 'Compliant with DPDP Act.' },
-        ],
-      },
-      aiEvaluation: {
-        overallScore: sandboxData.overallScore,
-        confidence: 'High',
-        recommendation: sandboxData.isG1Eligible ? 'G1 candidate' : sandboxData.isG2Eligible ? 'G2 candidate' : 'Review further',
-        duplicateFlag: false,
-        complianceRiskFlag: false,
-        parameters: [],
-        strengths: ['Configured via Interactive Sandbox', 'High Problem-Solution alignment'],
-        missingInformation: [],
-        g2ValueScore: {
-          scoreComponent: Number((sandboxData.overallScore * 0.6).toFixed(1)),
-          costComponent: Number((sandboxData.costScore * 0.4).toFixed(1)),
-          total: Math.round((sandboxData.overallScore * 0.6 + sandboxData.costScore * 0.4) * 10) / 10,
-        },
-      },
-      departmentReview: {
-        decision: 'Approve for Prototype',
-        overridesAI: false,
-        overrideReason: '',
-        reviewer: 'Shri A. K. Sharma (Joint Secretary, MoRTH)',
-        reviewedAt: new Date().toISOString(),
-        notes: [],
-        auditLog: [],
-      },
-      prototypeTesting: {
-        overallResult: 'Pass',
-        failedMandatoryReason: null,
-        testedByLab: 'STQC Testing Laboratory, Delhi',
-        testCertificateId: `STQC-2026-VAL-${Math.floor(1000 + Math.random() * 9000)}`,
-        parameters: [],
-      },
-      finalSelection: {
-        isEligibleForPilot: true,
-        isFinallySelected: false,
-        blockingItems: [],
-        checklist: [],
-      },
-    };
-
-    newStartup.finalSelection = computeFinalSelectionStatus(newStartup);
-    setStartups(prev => [newStartup, ...prev]);
-    setSelectedStartupId(newId);
-    setToast({
-      show: true,
-      message: `"${sandboxData.name}" (Score: ${sandboxData.overallScore}/100) added to active simulation list!`,
-      type: 'success',
-    });
-  };
 
   // Notifications feed for all startups
   const notificationsByStartup = useMemo(() => {
@@ -972,6 +896,31 @@ function SimulationContent() {
       </div>
 
       <main id="main-content" className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-6 space-y-6">
+        {/* Contextual Visual Header Banner */}
+        <div className="relative w-full h-44 sm:h-52 md:h-60 rounded-2xl overflow-hidden border border-slate-200 shadow-sm bg-slate-900">
+          <Image
+            src="/images/banner-simulation.jpg"
+            alt="AI algorithmic scoring, evaluation simulation and analytics data hub"
+            fill
+            loading="lazy"
+            className="object-cover object-center opacity-85 hover:scale-102 transition-transform duration-700"
+            sizes="(max-width: 1280px) 100vw, 1280px"
+            referrerPolicy="no-referrer"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-slate-950/50 to-slate-950/20 flex flex-col justify-center px-6 sm:px-10">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sangam-blue-600/90 text-white text-xs font-bold mb-2 w-fit border border-sky-400/30 backdrop-blur-xs">
+              <Scale className="w-3.5 h-3.5" />
+              <span>Multi-Persona Role Simulator</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tight drop-shadow-md">
+              Explainable AI Evaluation & Procurement Simulation
+            </h1>
+            <p className="mt-2 text-xs sm:text-sm text-slate-100 max-w-2xl leading-relaxed drop-shadow-sm font-medium">
+              Experience the end-to-end statutory journey under GFR 194 across Public, Startup, Ministry, STQC Testing Lab, and SuperAdmin viewpoints.
+            </p>
+          </div>
+        </div>
+
         {/* TOP BANNER WITH INTEGRATED PERSONA SWITCHER */}
         <div className="bg-white rounded-md border border-slate-200 p-5 shadow-2xs space-y-4">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-200 pb-4">
@@ -1193,40 +1142,6 @@ function SimulationContent() {
               })}
             </div>
           </div>
-        </div>
-
-        {/* INTERACTIVE AI EVALUATION SANDBOX (FEATURE: SIMPLE & INTERACTIVE TUNER) */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between px-1">
-            <div className="flex items-center gap-2">
-              <span className="p-1 rounded bg-indigo-100 text-indigo-700">
-                <SlidersHorizontal className="w-4 h-4" />
-              </span>
-              <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                Live AI Scoring Sandbox & Scenario Presets
-              </span>
-            </div>
-            <button
-              onClick={() => setIsSandboxExpanded(!isSandboxExpanded)}
-              className="text-xs text-indigo-700 font-bold hover:underline flex items-center gap-1 cursor-pointer"
-            >
-              {isSandboxExpanded ? (
-                <>
-                  <span>Hide Sandbox</span>
-                  <ChevronDown className="w-3.5 h-3.5 rotate-180 transition-transform" />
-                </>
-              ) : (
-                <>
-                  <span>Open Interactive Sandbox</span>
-                  <ChevronDown className="w-3.5 h-3.5 transition-transform" />
-                </>
-              )}
-            </button>
-          </div>
-
-          {isSandboxExpanded && (
-            <InteractiveAISandbox onInjectStartup={handleInjectStartupFromSandbox} />
-          )}
         </div>
 
         {/* ========================================================= */}

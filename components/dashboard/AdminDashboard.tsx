@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { useApp } from '@/context/AppContext';
 import {
   Shield,
@@ -60,8 +61,18 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-6">
       {/* Top DPIIT Administrator Header */}
-      <div className="bg-sangam-navy-900 text-white rounded-md p-6 sm:p-8 shadow-2xs border border-slate-800">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div className="relative bg-sangam-navy-900 text-white rounded-xl p-6 sm:p-8 shadow-2xs border border-slate-800 overflow-hidden">
+        <Image
+          src="/images/dash-admin.jpg"
+          alt="National security operations center and high-assurance network audit ledger"
+          fill
+          loading="lazy"
+          className="object-cover object-center opacity-75"
+          sizes="100vw"
+          referrerPolicy="no-referrer"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-sangam-navy-950/90 via-sangam-navy-950/65 to-sangam-navy-950/35 pointer-events-none" />
+        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <span className="px-3 py-1 rounded-sm bg-amber-400 text-slate-950 text-xs font-bold tracking-wide flex items-center gap-1">
@@ -81,7 +92,7 @@ export default function AdminDashboard() {
             </p>
           </div>
 
-          <div className="bg-white/10 backdrop-blur-xs p-4 rounded-sm border border-white/20 text-xs space-y-1 shrink-0">
+          <div className="bg-white/10 backdrop-blur-xs p-4 rounded-xl border border-white/20 text-xs space-y-1 shrink-0">
             <div className="font-bold text-amber-300">GFR 2017 Rule 149 Exception Engine</div>
             <div className="text-slate-300 text-[11px]">Fairlearn v0.10.0 Bias Monitor Active</div>
             <div className="text-[10px] text-emerald-300 flex items-center gap-1">

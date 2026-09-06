@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useApp } from '@/context/AppContext';
 import {
   FileText,
@@ -182,19 +183,35 @@ export default function WorkflowSection() {
   return (
     <section id="workflow" className="py-12 md:py-16 bg-white border-b border-slate-200">
       <div className="max-w-[1440px] mx-auto px-4">
-        {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
-          <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-sm bg-sangam-blue-50 text-sangam-blue-700 text-xs font-bold mb-2 border border-sangam-blue-200">
+        {/* Contextual Visual Header Banner */}
+        <div className="relative w-full h-44 sm:h-56 md:h-64 rounded-2xl overflow-hidden mb-8 border border-slate-200 shadow-sm bg-slate-900">
+          <Image
+            src="/images/banner-workflow.jpg"
+            alt="Strategic innovation workflow, digital governance and roadmap planning"
+            fill
+            loading="lazy"
+            className="object-cover object-center opacity-85 hover:scale-102 transition-transform duration-700"
+            sizes="(max-width: 1440px) 100vw, 1440px"
+            referrerPolicy="no-referrer"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-slate-950/50 to-slate-950/20 flex flex-col justify-center px-6 sm:px-10">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sangam-blue-600/90 text-white text-xs font-bold mb-2.5 w-fit border border-sky-400/30 backdrop-blur-xs">
               <ShieldCheck className="w-3.5 h-3.5" />
-              <span>National Innovation Procurement Governance</span>
+              <span>National Statutory Framework</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tight drop-shadow-md">
               The 9-Step Innovation Procurement Pathway
             </h2>
-            <p className="mt-1 text-xs sm:text-sm text-slate-600 max-w-2xl">
+            <p className="mt-2 text-xs sm:text-sm text-slate-100 max-w-2xl leading-relaxed drop-shadow-sm font-medium">
               Eliminating traditional tender friction through multi-parameter AI scoring, independent STQC lab benchmarking, and milestone-backed PFMS DBT pilot scale-up.
             </p>
+          </div>
+        </div>
+
+        {/* Section Header Controls */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+          <div className="text-xs text-slate-600 font-medium">
+            <span className="font-bold text-slate-900">Statutory Standard:</span> Governed under General Financial Rules (GFR 2017) Rule 194 & Rule 161(iv).
           </div>
 
           {/* Interactive Controls Bar */}

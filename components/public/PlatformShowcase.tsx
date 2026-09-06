@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { useApp } from '@/context/AppContext';
 import { ActiveView } from '@/lib/types';
 import {
@@ -46,6 +47,8 @@ export default function PlatformShowcase() {
       icon: Cpu,
       color: 'border-blue-200 bg-blue-50/50 text-blue-700',
       badge: '9 Challenges',
+      image: '/images/sector-governance.jpg',
+      imageAlt: 'Smart governance digital administration and citizen services',
     },
     {
       title: 'Agriculture & Water Resiliency',
@@ -53,6 +56,8 @@ export default function PlatformShowcase() {
       icon: TrendingUp,
       color: 'border-emerald-200 bg-emerald-50/50 text-emerald-700',
       badge: '14 Challenges',
+      image: '/images/sector-agriculture.jpg',
+      imageAlt: 'Agricultural drone and precision irrigation across farmlands',
     },
     {
       title: 'Healthcare & MedTech',
@@ -60,6 +65,8 @@ export default function PlatformShowcase() {
       icon: Shield,
       color: 'border-rose-200 bg-rose-50/50 text-rose-700',
       badge: '8 Challenges',
+      image: '/images/sector-healthcare.jpg',
+      imageAlt: 'Doctor using digital tablet and point-of-care medical diagnostics',
     },
     {
       title: 'Defence, Drone & Aerospace',
@@ -67,6 +74,8 @@ export default function PlatformShowcase() {
       icon: Target,
       color: 'border-amber-200 bg-amber-50/50 text-amber-700',
       badge: '11 Challenges',
+      image: '/images/sector-defence.jpg',
+      imageAlt: 'Autonomous defence drone and aerospace surveillance technology',
     },
     {
       title: 'Clean Energy & Net Zero',
@@ -74,6 +83,8 @@ export default function PlatformShowcase() {
       icon: Zap,
       color: 'border-teal-200 bg-teal-50/50 text-teal-700',
       badge: '6 Challenges',
+      image: '/images/sector-energy.jpg',
+      imageAlt: 'Solar photovoltaic panels and clean renewable energy systems',
     },
     {
       title: 'Urban Mobility & Logistics',
@@ -81,6 +92,8 @@ export default function PlatformShowcase() {
       icon: Globe2,
       color: 'border-indigo-200 bg-indigo-50/50 text-indigo-700',
       badge: '12 Challenges',
+      image: '/images/sector-mobility.jpg',
+      imageAlt: 'National highway transport network and smart urban mobility transit',
     },
   ];
 
@@ -94,6 +107,8 @@ export default function PlatformShowcase() {
       badgeColor: 'bg-sangam-blue-50 text-sangam-blue-700 border-sangam-blue-200',
       logoSrc: '/images/emblem-india.svg',
       logoAlt: 'State Emblem of India',
+      image: '/images/card-ministries.jpg',
+      imageAlt: 'Government officials and ministry leaders reviewing public innovation proposals',
       points: [
         'Post real operational bottlenecks without lengthy, rigid DPR requirements.',
         'AI evaluates proposals across 7 GFR-compliant quality & cost metrics.',
@@ -112,6 +127,8 @@ export default function PlatformShowcase() {
       badgeColor: 'bg-amber-50 text-amber-800 border-amber-200',
       logoSrc: '/images/dpiit-recognised.svg',
       logoAlt: 'Recognised by DPIIT',
+      image: '/images/card-startups.jpg',
+      imageAlt: 'DPIIT-recognized startup technology team collaborating around a laptop',
       points: [
         'Bypass traditional 3-year turnover and prior-experience tender disqualification.',
         'Win funded pilot contracts ranging from ₹10 Lakhs to ₹1 Crore+.',
@@ -130,6 +147,8 @@ export default function PlatformShowcase() {
       badgeColor: 'bg-emerald-50 text-emerald-800 border-emerald-200',
       logoSrc: '',
       logoAlt: 'Accredited Testing Labs',
+      image: '/images/card-testing-labs.jpg',
+      imageAlt: 'Lab technician testing electronic hardware and circuitry in an accredited testing facility',
       points: [
         'Empanelled network comprising STQC, C-DAC, NIELIT, and premier IIT laboratories.',
         'Validate functionality, load endurance, data residency, and CERT-In security.',
@@ -231,41 +250,56 @@ export default function PlatformShowcase() {
             return (
               <div
                 key={pillar.role}
-                className={`bg-white rounded-2xl p-6 sm:p-7 border transition-all duration-200 shadow-sm hover:shadow-md flex flex-col justify-between ${pillar.accent}`}
+                className={`bg-white rounded-2xl border overflow-hidden transition-all duration-200 shadow-sm hover:shadow-md flex flex-col justify-between ${pillar.accent}`}
               >
                 <div>
-                  <div className="flex items-center justify-between mb-5">
-                    <div className="flex items-center gap-3">
-                      <span className="p-3 rounded-xl bg-slate-50 border border-slate-200/90 text-sangam-navy-900 shadow-2xs">
-                        <Icon className="w-6 h-6" />
-                      </span>
-                      {pillar.logoSrc && (
-                        <img
-                          src={pillar.logoSrc}
-                          alt={pillar.logoAlt}
-                          className="h-9 w-auto object-contain drop-shadow-2xs"
-                          referrerPolicy="no-referrer"
-                        />
-                      )}
-                    </div>
-                    <span className={`text-[11px] font-bold px-3 py-1 rounded-full border ${pillar.badgeColor}`}>
-                      {pillar.subtitle}
-                    </span>
+                  {/* 16:9 Card Photographic Image Header with rounded top corners */}
+                  <div className="relative w-full aspect-video overflow-hidden bg-slate-100">
+                    <Image
+                      src={pillar.image}
+                      alt={pillar.imageAlt}
+                      fill
+                      loading="lazy"
+                      className="object-cover object-center hover:scale-105 transition-transform duration-500"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 400px"
+                      referrerPolicy="no-referrer"
+                    />
                   </div>
 
-                  <h4 className="text-lg font-black text-slate-900 mb-2">{pillar.title}</h4>
+                  <div className="p-6 sm:p-7">
+                    <div className="flex items-center justify-between mb-5">
+                      <div className="flex items-center gap-3">
+                        <span className="p-3 rounded-xl bg-slate-50 border border-slate-200/90 text-sangam-navy-900 shadow-2xs">
+                          <Icon className="w-6 h-6" />
+                        </span>
+                        {pillar.logoSrc && (
+                          <img
+                            src={pillar.logoSrc}
+                            alt={pillar.logoAlt}
+                            className="h-9 w-auto object-contain drop-shadow-2xs"
+                            referrerPolicy="no-referrer"
+                          />
+                        )}
+                      </div>
+                      <span className={`text-[11px] font-bold px-3 py-1 rounded-full border ${pillar.badgeColor}`}>
+                        {pillar.subtitle}
+                      </span>
+                    </div>
 
-                  <ul className="space-y-3 mt-4 text-xs sm:text-sm text-slate-600 leading-relaxed">
-                    {pillar.points.map((pt, idx) => (
-                      <li key={idx} className="flex items-start gap-2.5">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                        <span>{pt}</span>
-                      </li>
-                    ))}
-                  </ul>
+                    <h4 className="text-lg font-black text-slate-900 mb-2">{pillar.title}</h4>
+
+                    <ul className="space-y-3 mt-4 text-xs sm:text-sm text-slate-600 leading-relaxed">
+                      {pillar.points.map((pt, idx) => (
+                        <li key={idx} className="flex items-start gap-2.5">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                          <span>{pt}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
 
-                <div className="mt-8 pt-5 border-t border-slate-100">
+                <div className="px-6 pb-6 sm:px-7 sm:pb-7 pt-2">
                   <button
                     onClick={() => handleLaunchRole(pillar.targetRole)}
                     className="w-full py-3 px-4 rounded-xl bg-slate-900 hover:bg-sangam-blue-600 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs hover:shadow"
@@ -344,27 +378,51 @@ export default function PlatformShowcase() {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {sectors.map((sec, idx) => {
             const Icon = sec.icon;
             return (
               <div
                 key={idx}
                 onClick={() => handleNavigate('challenges')}
-                className="bg-white p-6 rounded-2xl border border-slate-200 hover:border-sangam-blue-400 hover:shadow-md transition-all cursor-pointer shadow-xs group"
+                className="bg-white rounded-2xl border border-slate-200 hover:border-sangam-blue-400 hover:shadow-md transition-all cursor-pointer shadow-xs group overflow-hidden flex flex-col justify-between"
               >
-                <div className="flex items-center justify-between mb-4">
-                  <span className={`p-3 rounded-xl border ${sec.color}`}>
-                    <Icon className="w-5 h-5" />
-                  </span>
-                  <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
-                    {sec.badge}
-                  </span>
+                <div>
+                  {/* 16:9 Contextual Sector Photograph */}
+                  <div className="relative w-full aspect-video overflow-hidden bg-slate-100">
+                    <Image
+                      src={sec.image}
+                      alt={sec.imageAlt}
+                      fill
+                      loading="lazy"
+                      className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 380px"
+                      referrerPolicy="no-referrer"
+                    />
+                    <div className="absolute top-3 right-3 z-10">
+                      <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-white/95 backdrop-blur-xs text-slate-800 border border-slate-200 shadow-2xs">
+                        {sec.badge}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="p-6">
+                    <div className="flex items-center gap-3 mb-3">
+                      <span className={`p-2.5 rounded-xl border ${sec.color}`}>
+                        <Icon className="w-5 h-5" />
+                      </span>
+                      <h4 className="font-bold text-base text-slate-900 group-hover:text-sangam-blue-600 transition-colors">
+                        {sec.title}
+                      </h4>
+                    </div>
+                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">{sec.desc}</p>
+                  </div>
                 </div>
-                <h4 className="font-bold text-base text-slate-900 group-hover:text-sangam-blue-600 transition-colors">
-                  {sec.title}
-                </h4>
-                <p className="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">{sec.desc}</p>
+
+                <div className="px-6 pb-6 pt-1 flex items-center text-xs font-bold text-sangam-blue-600 group-hover:text-sangam-blue-700">
+                  <span>Explore Sector Challenges</span>
+                  <ArrowRight className="w-3.5 h-3.5 ml-1.5 group-hover:translate-x-1 transition-transform" />
+                </div>
               </div>
             );
           })}

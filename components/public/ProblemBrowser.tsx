@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { useApp } from '@/context/AppContext';
 import { Challenge } from '@/lib/types';
 import {
@@ -143,22 +144,62 @@ export default function ProblemBrowser({ onApplyForChallenge }: ProblemBrowserPr
 
   const comparedChallenges = challenges.filter(c => compareIds.includes(c.id));
 
+  const getSectorImage = (sector: string) => {
+    if (sector.includes('Highway') || sector.includes('Transportation') || sector.includes('Mobility')) {
+      return { src: '/images/sector-mobility.jpg', alt: 'Transportation and national highway infrastructure' };
+    }
+    if (sector.includes('Health') || sector.includes('MedTech') || sector.includes('Diagnostics')) {
+      return { src: '/images/sector-healthcare.jpg', alt: 'Healthcare and digital diagnostics' };
+    }
+    if (sector.includes('Water') || sector.includes('Agriculture') || sector.includes('Environment')) {
+      return { src: '/images/sector-agriculture.jpg', alt: 'Agriculture, water resources and precision telemetry' };
+    }
+    if (sector.includes('Energy') || sector.includes('Power') || sector.includes('Solar')) {
+      return { src: '/images/sector-energy.jpg', alt: 'Clean renewable solar energy grid' };
+    }
+    if (sector.includes('Defence') || sector.includes('Drone') || sector.includes('Aerospace')) {
+      return { src: '/images/sector-defence.jpg', alt: 'Aerospace defence and tactical drone system' };
+    }
+    return { src: '/images/sector-governance.jpg', alt: 'Public governance and digital innovation' };
+  };
+
   return (
     <section id="problems" className="py-12 md:py-16 bg-slate-50 border-b border-slate-200">
       <div className="max-w-[1440px] mx-auto px-4">
-        {/* Section Title & Interactive Tools */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
-          <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-sm bg-sangam-blue-50 text-sangam-blue-700 text-xs font-bold mb-2 border border-sangam-blue-200">
+        {/* Contextual Visual Header Banner */}
+        <div className="relative w-full h-44 sm:h-56 md:h-64 rounded-2xl overflow-hidden mb-8 border border-slate-200 shadow-sm bg-slate-900">
+          <Image
+            src="/images/banner-challenges.jpg"
+            alt="Government challenge workshop and tech innovation proposals"
+            fill
+            loading="lazy"
+            className="object-cover object-center opacity-85 hover:scale-102 transition-transform duration-700"
+            sizes="(max-width: 1440px) 100vw, 1440px"
+            referrerPolicy="no-referrer"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-slate-950/50 to-slate-950/20 flex flex-col justify-center px-6 sm:px-10">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sangam-saffron-500 text-slate-950 text-xs font-black mb-2.5 w-fit border border-amber-300/40 backdrop-blur-xs">
               <Building2 className="w-3.5 h-3.5" />
               <span>National Innovation Demand Directory</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-              Government Innovation Challenges
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tight drop-shadow-md">
+              Government Innovation Challenges & Tenders
             </h2>
-            <p className="mt-1 text-xs sm:text-sm text-slate-600">
-              Published by Central & State Ministries with guaranteed pilot tranches under General Financial Rules (GFR 2017).
+            <p className="mt-2 text-xs sm:text-sm text-slate-100 max-w-2xl leading-relaxed drop-shadow-sm font-medium">
+              Published by Central & State Ministries with guaranteed pilot tranches under General Financial Rules (GFR 2017 Rule 161(iv)).
             </p>
+          </div>
+        </div>
+
+        {/* Section Title & Interactive Tools */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+          <div>
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+              Procurement Opportunities
+            </span>
+            <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+              Explore Active Statutory Challenges
+            </h3>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
@@ -326,10 +367,11 @@ export default function ProblemBrowser({ onApplyForChallenge }: ProblemBrowserPr
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {filteredChallenges.map(challenge => {
               const isBookmarked = bookmarkedIds.includes(challenge.id);
               const isCompared = compareIds.includes(challenge.id);
+              const secImg = getSectorImage(challenge.sector);
 
               return (
                 <div
@@ -338,51 +380,74 @@ export default function ProblemBrowser({ onApplyForChallenge }: ProblemBrowserPr
                     setActiveModalChallenge(challenge);
                     setModalTab('overview');
                   }}
-                  className="bg-white rounded-md border border-slate-200 p-4 flex flex-col justify-between hover:border-sangam-blue-500 transition-colors cursor-pointer group overflow-hidden"
+                  className="bg-white rounded-xl border border-slate-200 flex flex-col justify-between hover:border-sangam-blue-500 hover:shadow-md transition-all cursor-pointer group overflow-hidden shadow-2xs"
                 >
                   <div>
-                    {/* Ministry & Status Header */}
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <div className="text-[10px] font-bold text-sangam-blue-600 uppercase tracking-wider flex items-center gap-1 min-w-0 flex-1">
-                        <Building2 className="w-3 h-3 shrink-0" />
-                        <span className="truncate">{challenge.ministryName}</span>
-                      </div>
-                      <div className="flex items-center gap-1 shrink-0 overflow-hidden">
-                        {getStatusBadge(challenge.status)}
+                    {/* Sector Photo Header */}
+                    <div className="relative w-full h-32 overflow-hidden bg-slate-100">
+                      <Image
+                        src={secImg.src}
+                        alt={secImg.alt}
+                        fill
+                        loading="lazy"
+                        className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 380px"
+                        referrerPolicy="no-referrer"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-black/30" />
+                      
+                      {/* Top Bar on Image */}
+                      <div className="absolute top-2.5 inset-x-2.5 flex items-center justify-between z-10">
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white/90 backdrop-blur-xs text-slate-800 shadow-2xs">
+                          {challenge.sector}
+                        </span>
                         <button
                           onClick={e => toggleBookmark(challenge.id, e)}
-                          className="p-1 text-slate-400 hover:text-amber-500 transition-colors cursor-pointer shrink-0"
+                          className="p-1.5 rounded-full bg-slate-900/60 text-white hover:text-amber-400 backdrop-blur-xs transition-colors cursor-pointer"
                           title={isBookmarked ? 'Remove bookmark' : 'Bookmark challenge'}
                         >
                           {isBookmarked ? (
-                            <BookmarkCheck className="w-4 h-4 text-amber-500" />
+                            <BookmarkCheck className="w-3.5 h-3.5 text-amber-400" />
                           ) : (
-                            <Bookmark className="w-4 h-4" />
+                            <Bookmark className="w-3.5 h-3.5" />
                           )}
                         </button>
                       </div>
+
+                      {/* Status on Image Bottom */}
+                      <div className="absolute bottom-2 left-2.5 right-2.5 flex items-center justify-between z-10">
+                        <div className="text-[10px] font-bold text-white drop-shadow-sm flex items-center gap-1 min-w-0 flex-1 truncate">
+                          <Building2 className="w-3 h-3 shrink-0 text-sky-300" />
+                          <span className="truncate">{challenge.ministryName}</span>
+                        </div>
+                        <div className="shrink-0 scale-90 origin-right">
+                          {getStatusBadge(challenge.status)}
+                        </div>
+                      </div>
                     </div>
 
-                    {/* Title */}
-                    <h3 className="text-sm font-bold text-slate-900 line-clamp-2 leading-snug group-hover:text-sangam-blue-600 transition-colors">
-                      {challenge.title}
-                    </h3>
+                    <div className="p-4">
+                      {/* Title */}
+                      <h3 className="text-sm font-bold text-slate-900 line-clamp-2 leading-snug group-hover:text-sangam-blue-600 transition-colors">
+                        {challenge.title}
+                      </h3>
 
-                    {/* Problem Snippet */}
-                    <p className="text-xs text-slate-600 mt-2 line-clamp-2 leading-relaxed">
-                      {challenge.problemStatement}
-                    </p>
+                      {/* Problem Snippet */}
+                      <p className="text-xs text-slate-600 mt-2 line-clamp-2 leading-relaxed">
+                        {challenge.problemStatement}
+                      </p>
 
-                    {/* Tags */}
-                    <div className="flex flex-wrap gap-1 mt-3">
-                      {challenge.tags.slice(0, 3).map(tag => (
-                        <span
-                          key={tag}
-                          className="px-1.5 py-0.5 rounded-sm bg-slate-100 text-slate-700 text-[10px] font-semibold border border-slate-200"
-                        >
-                          #{tag}
-                        </span>
-                      ))}
+                      {/* Tags */}
+                      <div className="flex flex-wrap gap-1 mt-3">
+                        {challenge.tags.slice(0, 3).map(tag => (
+                          <span
+                            key={tag}
+                            className="px-1.5 py-0.5 rounded-sm bg-slate-100 text-slate-700 text-[10px] font-semibold border border-slate-200"
+                          >
+                            #{tag}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   </div>
 

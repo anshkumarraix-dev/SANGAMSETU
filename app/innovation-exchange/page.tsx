@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import MainNavbar from '@/components/layout/MainNavbar';
 import GovernmentFooter from '@/components/layout/GovernmentFooter';
 import InnovationExchangeNav from '@/components/innovation-exchange/InnovationExchangeNav';
@@ -39,6 +40,16 @@ export default function InnovationExchangeLandingPage() {
       <main id="main-content" className="flex-1 space-y-12 pb-16">
         {/* Hero Section */}
         <section className="bg-sangam-navy-900 text-white pt-12 pb-16 px-4 border-b border-sangam-navy-800 relative overflow-hidden">
+          <Image
+            src="/images/banner-innovation-exchange.jpg"
+            alt="Modern digital infrastructure, smart tech skyscraper architecture"
+            fill
+            loading="lazy"
+            className="object-cover object-center opacity-70"
+            sizes="100vw"
+            referrerPolicy="no-referrer"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-sangam-navy-950/85 via-sangam-navy-950/60 to-sangam-navy-950/30 pointer-events-none" />
           <div className="max-w-[1440px] mx-auto space-y-8 relative z-10">
             {/* Tag / Eyebrow */}
             <div className="flex flex-wrap items-center gap-2">

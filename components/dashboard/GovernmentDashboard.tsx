@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { useApp } from '@/context/AppContext';
 import { Challenge, Proposal, TestReport } from '@/lib/types';
 import {
@@ -155,8 +156,18 @@ export default function GovernmentDashboard() {
   return (
     <div className="space-y-6">
       {/* Top Department Header Card */}
-      <div className="bg-sangam-navy-900 text-white rounded-md p-6 sm:p-8 shadow-2xs border border-slate-800">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div className="relative bg-sangam-navy-900 text-white rounded-xl p-6 sm:p-8 shadow-2xs border border-slate-800 overflow-hidden">
+        <Image
+          src="/images/dash-ministry.jpg"
+          alt="Ministry conference boardroom, executive policy decision hub"
+          fill
+          loading="lazy"
+          className="object-cover object-center opacity-75"
+          sizes="100vw"
+          referrerPolicy="no-referrer"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-sangam-navy-950/90 via-sangam-navy-950/65 to-sangam-navy-950/35 pointer-events-none" />
+        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <span className="px-3 py-1 rounded-sm bg-emerald-400 text-slate-950 text-xs font-bold tracking-wide flex items-center gap-1">

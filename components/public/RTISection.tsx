@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import {
   FileCheck,
   Building2,
@@ -23,6 +24,31 @@ export default function RTISection() {
 
   return (
     <div className="max-w-[1440px] mx-auto px-4 py-8">
+      {/* Contextual Visual Header Banner */}
+      <div className="relative w-full h-44 sm:h-52 md:h-60 rounded-2xl overflow-hidden mb-6 border border-slate-200 shadow-sm bg-slate-900">
+        <Image
+          src="/images/banner-rti.jpg"
+          alt="Statutory compliance, legal right to information disclosure records"
+          fill
+          loading="lazy"
+          className="object-cover object-center opacity-85 hover:scale-102 transition-transform duration-700"
+          sizes="(max-width: 1440px) 100vw, 1440px"
+          referrerPolicy="no-referrer"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-slate-950/50 to-slate-950/20 flex flex-col justify-center px-6 sm:px-10">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sangam-blue-600/90 text-white text-xs font-bold mb-2.5 w-fit border border-sky-400/30 backdrop-blur-xs">
+            <Shield className="w-3.5 h-3.5" />
+            <span>Statutory Compliance • RTI Act 2005</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tight drop-shadow-md">
+            Right to Information (RTI) Transparency Portal
+          </h1>
+          <p className="mt-2 text-xs sm:text-sm text-slate-100 max-w-2xl leading-relaxed drop-shadow-sm font-medium">
+            Proactive Section 4(1)(b) disclosures, designated Central Public Information Officers (CPIO), and statutory appeal workflows.
+          </p>
+        </div>
+      </div>
+
       {/* Header */}
       <div className="bg-white border border-slate-200 rounded-md p-6 mb-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

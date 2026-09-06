@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { useApp } from '@/context/AppContext';
 import { Challenge, Proposal, Prototype, StartupProfile } from '@/lib/types';
 import {
@@ -210,8 +211,18 @@ export default function StartupDashboard({ preselectedChallenge }: StartupDashbo
   return (
     <div className="space-y-8">
       {/* Top Startup Profile Card */}
-      <div className="bg-sangam-navy-900 text-white rounded-md p-6 sm:p-8 border border-slate-800 shadow-sm">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div className="relative bg-sangam-navy-900 text-white rounded-xl p-6 sm:p-8 border border-slate-800 shadow-sm overflow-hidden">
+        <Image
+          src="/images/dash-startup.jpg"
+          alt="Startup technology lab, agile software engineering team"
+          fill
+          loading="lazy"
+          className="object-cover object-center opacity-75"
+          sizes="100vw"
+          referrerPolicy="no-referrer"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-sangam-navy-950/90 via-sangam-navy-950/65 to-sangam-navy-950/35 pointer-events-none" />
+        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <span className="px-3 py-1 rounded-sm bg-amber-400 text-slate-950 text-xs font-black tracking-wide flex items-center gap-1">
