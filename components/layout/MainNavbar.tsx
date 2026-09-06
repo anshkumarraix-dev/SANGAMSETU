@@ -95,6 +95,8 @@ export default function MainNavbar({ activeTab: propActiveTab }: MainNavbarProps
             </a>
             <span className="text-slate-600 hidden sm:inline">|</span>
             <div className="flex items-center gap-1.5 font-semibold">
+              <span className="text-amber-400 font-bold">भारत सरकार</span>
+              <span className="text-slate-400">•</span>
               <span>Government of India</span>
             </div>
             <span className="text-slate-600 hidden md:inline">|</span>
@@ -161,12 +163,9 @@ export default function MainNavbar({ activeTab: propActiveTab }: MainNavbarProps
               <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group">
                 <SangamSetuLogo variant="icon" size="sm" />
                 <div className="flex flex-col">
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="text-base sm:text-xl font-black tracking-tight text-sangam-navy-900 font-serif">
+                  <div className="flex items-baseline">
+                    <span className="text-base sm:text-xl font-black tracking-tight text-sangam-navy-900 font-sans">
                       SANGAM<span className="text-sangam-saffron-500">SETU</span>
-                    </span>
-                    <span className="text-xs sm:text-sm font-bold text-sangam-blue-700 tracking-wide">
-                      Portal
                     </span>
                   </div>
                   <span className="text-[9px] sm:text-[10px] text-slate-700 font-semibold tracking-tight">

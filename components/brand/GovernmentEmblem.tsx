@@ -110,14 +110,14 @@ export function PartnerLogosBar({ className = '' }: { className?: string }) {
       {/* G20 India */}
       <div className="hidden sm:flex items-center px-3 py-1 bg-white/95 rounded-sm border border-white/30 shadow-2xs">
         <img
-          src="/images/g20-india.png"
-          alt="G20 India 2023"
+          src="/images/g20-logo.jpg"
+          alt="G20 India"
           className="h-6 w-auto object-contain"
           referrerPolicy="no-referrer"
           onError={(e) => {
             const el = e.currentTarget;
-            if (!el.src.includes('g20-india.svg')) {
-              el.src = '/images/g20-india.svg';
+            if (el.src.includes('g20-logo.jpg')) {
+              el.src = '/images/g20-logo.png';
             }
           }}
         />

@@ -371,61 +371,7 @@ export default function PlatformShowcase() {
         </div>
       </section>
 
-      {/* 5. How It Works Quick Teaser */}
-      <section className="py-16 bg-sangam-navy-900 text-white">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6">
-          <div className="max-w-4xl mx-auto text-center">
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-bold bg-white/10 text-amber-300 border border-white/20 mb-3.5 shadow-2xs">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              Streamlined Procurement Lifecycle
-            </span>
-            <h3 className="text-2xl sm:text-3xl md:text-4xl font-black text-white">
-              From Operational Bottleneck to GeM Nationwide Rollout
-            </h3>
-            <p className="text-xs sm:text-sm md:text-base text-slate-300 mt-3 max-w-2xl mx-auto leading-relaxed">
-              SangamSetu enforces a standardized 9-step governance pipeline that turns high-risk procurement into verifiable, milestones-backed pilot contracts.
-            </p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mt-10 text-left">
-              <div className="bg-white/5 hover:bg-white/8 border border-white/10 p-5 rounded-2xl transition-all">
-                <span className="text-[11px] font-black text-amber-400 tracking-wider px-2 py-0.5 rounded-sm bg-white/10">PHASE 1</span>
-                <h4 className="font-bold text-base text-white mt-2.5">Challenge & AI Match</h4>
-                <p className="text-xs sm:text-sm text-slate-300 mt-2 leading-relaxed">
-                  Ministries publish problems; DPIIT startups submit proposals; SangamSetu AI Engine ranks top G1 (Quality) & G2 (Cost) contenders.
-                </p>
-              </div>
-
-              <div className="bg-white/5 hover:bg-white/8 border border-white/10 p-5 rounded-2xl transition-all">
-                <span className="text-[11px] font-black text-amber-400 tracking-wider px-2 py-0.5 rounded-sm bg-white/10">PHASE 2</span>
-                <h4 className="font-bold text-base text-white mt-2.5">Prototype & Lab Testing</h4>
-                <p className="text-xs sm:text-sm text-slate-300 mt-2 leading-relaxed">
-                  Shortlisted startups submit working MVPs; STQC and C-DAC laboratories conduct functional, load, and security benchmarks.
-                </p>
-              </div>
-
-              <div className="bg-white/5 hover:bg-white/8 border border-white/10 p-5 rounded-2xl transition-all">
-                <span className="text-[11px] font-black text-amber-400 tracking-wider px-2 py-0.5 rounded-sm bg-white/10">PHASE 3</span>
-                <h4 className="font-bold text-base text-white mt-2.5">Field Pilot & GeM Scale</h4>
-                <p className="text-xs sm:text-sm text-slate-300 mt-2 leading-relaxed">
-                  Government awards funded pilot contract with PFMS milestone disbursals, concluding in nationwide GeM catalogue onboarding.
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-10">
-              <button
-                onClick={() => handleNavigate('workflow')}
-                className="px-7 py-3 rounded-xl bg-sangam-saffron-500 hover:bg-sangam-saffron-600 text-slate-950 font-bold text-xs sm:text-sm inline-flex items-center gap-2 transition-all cursor-pointer shadow-sm hover:shadow active:scale-98"
-              >
-                <span>Read the Detailed 9-Step Pathway</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 6. National Statutory Accreditations & Key Initiatives Gallery */}
+      {/* 5. National Statutory Accreditations & Key Initiatives Gallery */}
       <section className="py-16 bg-white border-t border-slate-200/80">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-6">
           <div className="text-center max-w-3xl mx-auto mb-12">
@@ -509,14 +455,14 @@ export default function PlatformShowcase() {
             <div className="bg-slate-50/70 p-5 rounded-2xl border border-slate-200/80 flex flex-col items-center text-center shadow-xs hover:shadow-sm transition-all hover:bg-slate-50">
               <div className="h-20 flex items-center justify-center mb-3">
                 <img
-                  src="/images/g20-india.png"
-                  alt="G20 India 2023"
+                  src="/images/g20-logo.jpg"
+                  alt="G20 India"
                   className="h-14 w-auto object-contain"
                   referrerPolicy="no-referrer"
                   onError={(e) => {
                     const el = e.currentTarget;
-                    if (!el.src.includes('g20-india.svg')) {
-                      el.src = '/images/g20-india.svg';
+                    if (el.src.includes('g20-logo.jpg')) {
+                      el.src = '/images/g20-logo.png';
                     }
                   }}
                 />
