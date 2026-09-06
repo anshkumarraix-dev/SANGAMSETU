@@ -2,15 +2,15 @@ import { Proposal, ScoreBreakdown } from './types';
 
 /**
  * AI Scoring Engine for SangamSetu
- * Evaluates startup proposals across 8 critical dimensions:
+ * Evaluates startup proposals across 8 critical dimensions (Document Page 5 Standard):
  * 1. Problem-Solution Fit (20%)
  * 2. Technical Feasibility (15%)
  * 3. Innovation Quotient (15%)
  * 4. Impact Potential (15%)
- * 5. Team Capability (10%)
+ * 5. Cost-Effectiveness (15%)
  * 6. Scalability & Deployment (10%)
- * 7. Risk Management (8%)
- * 8. Cost-Effectiveness (7%)
+ * 7. Team Capability (5%)
+ * 8. Risk Management & Compliance (5%)
  */
 
 export interface ScoreResult {
@@ -67,12 +67,8 @@ export function evaluateProposalAI(
   if (text.includes('crore') || text.includes('citizens') || text.includes('pan-india') || text.includes('nationwide')) impactScore += 7;
   impactScore = Math.min(98, Math.max(65, impactScore));
 
-  // 5. Team Capability (10%)
-  let teamScore = 82;
-  const teamText = (proposal.teamDetails || '').toLowerCase();
-  if (teamText.includes('iit') || teamText.includes('phd') || teamText.includes('years') || teamText.includes('domain expert')) teamScore += 9;
-  if (teamText.includes('cto') || teamText.includes('lead') || teamText.includes('patents')) teamScore += 5;
-  teamScore = Math.min(96, Math.max(65, teamScore));
+  // 5. Cost-Effectiveness (15%)
+  const costScore = calculateCostEffectiveness(proposal.totalBudget || 3000000, challengeMaxBudget);
 
   // 6. Scalability (10%)
   let scaleScore = 78;
@@ -80,26 +76,30 @@ export function evaluateProposalAI(
   if (text.includes('multi-lingual') || text.includes('low bandwidth') || text.includes('offline-first')) scaleScore += 7;
   scaleScore = Math.min(96, Math.max(60, scaleScore));
 
-  // 7. Risk Management (8%)
+  // 7. Team Capability (5%)
+  let teamScore = 82;
+  const teamText = (proposal.teamDetails || '').toLowerCase();
+  if (teamText.includes('iit') || teamText.includes('phd') || teamText.includes('years') || teamText.includes('domain expert')) teamScore += 9;
+  if (teamText.includes('cto') || teamText.includes('lead') || teamText.includes('patents')) teamScore += 5;
+  teamScore = Math.min(96, Math.max(65, teamScore));
+
+  // 8. Risk Management & Compliance (5%)
   let riskScore = 77;
   const riskText = (proposal.riskAnalysis || '').toLowerCase();
   if (riskText.includes('mitigation') || riskText.includes('backup') || riskText.includes('failover')) riskScore += 8;
   if (riskText.includes('data privacy') || riskText.includes('cert-in') || riskText.includes('compliance')) riskScore += 8;
   riskScore = Math.min(95, Math.max(55, riskScore));
 
-  // 8. Cost Effectiveness (7%)
-  const costScore = calculateCostEffectiveness(proposal.totalBudget || 3000000, challengeMaxBudget);
-
-  // Overall Weighted Calculation
+  // Overall Weighted Calculation (Doc Page 5 Weights)
   const overall = Number((
     fitScore * 0.20 +
     techScore * 0.15 +
     innovScore * 0.15 +
     impactScore * 0.15 +
-    teamScore * 0.10 +
+    costScore * 0.15 +
     scaleScore * 0.10 +
-    riskScore * 0.08 +
-    costScore * 0.07
+    teamScore * 0.05 +
+    riskScore * 0.05
   ).toFixed(1));
 
   const scoreBreakdown: ScoreBreakdown = {
@@ -107,10 +107,10 @@ export function evaluateProposalAI(
     technicalFeasibility: techScore,
     innovation: innovScore,
     impactPotential: impactScore,
-    teamCapability: teamScore,
-    scalability: scaleScore,
-    riskManagement: riskScore,
     costEffectiveness: costScore,
+    scalability: scaleScore,
+    teamCapability: teamScore,
+    riskManagement: riskScore,
     overall,
   };
 
@@ -140,12 +140,14 @@ export function evaluateProposalAI(
 
   // SHAP Feature Attribution values
   const shapValues = [
-    { feature: 'Problem-Solution Alignment', impact: Number(((fitScore - 75) * 0.20).toFixed(2)), description: 'Direct relevance to government operational pain-point' },
-    { feature: 'Technical Soundness', impact: Number(((techScore - 75) * 0.15).toFixed(2)), description: 'Feasibility of technology stack & architecture' },
-    { feature: 'Innovation & IP', impact: Number(((innovScore - 75) * 0.15).toFixed(2)), description: 'Novelty of approach over legacy tenders' },
-    { feature: 'Impact & ROI', impact: Number(((impactScore - 75) * 0.15).toFixed(2)), description: 'Public value and efficiency metrics' },
-    { feature: 'Team Credentials', impact: Number(((teamScore - 75) * 0.10).toFixed(2)), description: 'Domain expertise and delivery track record' },
-    { feature: 'Budget Efficiency', impact: Number(((costScore - 75) * 0.07).toFixed(2)), description: 'Value for expenditure index' },
+    { feature: 'Problem-Solution Alignment (20%)', impact: Number(((fitScore - 75) * 0.20).toFixed(2)), description: 'Direct relevance to government operational pain-point' },
+    { feature: 'Technical Soundness (15%)', impact: Number(((techScore - 75) * 0.15).toFixed(2)), description: 'Feasibility of technology stack & architecture' },
+    { feature: 'Innovation & IP (15%)', impact: Number(((innovScore - 75) * 0.15).toFixed(2)), description: 'Novelty of approach over legacy tenders' },
+    { feature: 'Impact Potential (15%)', impact: Number(((impactScore - 75) * 0.15).toFixed(2)), description: 'Public benefit and efficiency metrics' },
+    { feature: 'Cost-Effectiveness (15%)', impact: Number(((costScore - 75) * 0.15).toFixed(2)), description: 'Value delivered against proposed cost' },
+    { feature: 'Scalability (10%)', impact: Number(((scaleScore - 75) * 0.10).toFixed(2)), description: 'Capacity for state and national expansion' },
+    { feature: 'Team Capability (5%)', impact: Number(((teamScore - 75) * 0.05).toFixed(2)), description: 'Skills and technical delivery capability' },
+    { feature: 'Risk & Compliance (5%)', impact: Number(((riskScore - 75) * 0.05).toFixed(2)), description: 'Cybersecurity, privacy, and integration mitigation' },
   ];
 
   const explanation = `Evaluated through SangamSetu Multi-Criteria ML Scoring Model. Solution scored ${overall}/100 with strongest performance in ${keyStrengths[0] || 'Technical Design'}. Recommended for ${g1Eligible ? 'G1 (Best-in-Class)' : g2Eligible ? 'G2 (Cost-Effective)' : 'General review'}.`;

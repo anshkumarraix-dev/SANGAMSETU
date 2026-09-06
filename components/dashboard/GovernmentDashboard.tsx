@@ -56,7 +56,7 @@ export default function GovernmentDashboard() {
   const [budgetMax, setBudgetMax] = useState<number>(5000000);
   const [timelineMonths, setTimelineMonths] = useState<number>(6);
   const [eligibilityCriteria, setEligibilityCriteria] = useState('DPIIT recognized startup incorporated in India.');
-  const [evaluationCriteria, setEvaluationCriteria] = useState('Problem-Solution Fit (20%), Technical Feasibility (15%), Innovation (15%), Impact (15%), Team (10%), Scalability (10%), Risk (8%), Cost (7%).');
+  const [evaluationCriteria, setEvaluationCriteria] = useState('Problem-Solution Fit (20%), Technical Feasibility (15%), Innovation (15%), Impact Potential (15%), Cost-Effectiveness (15%), Scalability (10%), Team Capability (5%), Risk & Compliance (5%).');
   const [pilotLocation, setPilotLocation] = useState('Delhi-Jaipur Expressway (NH-48) - 150 km Stretch');
   const [challengeCreatedSuccess, setChallengeCreatedSuccess] = useState(false);
 
