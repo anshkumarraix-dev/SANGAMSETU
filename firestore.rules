@@ -26,10 +26,9 @@ service cloud.firestore {
 
     // Role-based Access Control
     function isAdmin() {
-      // NOTE: Bootstrapping an admin email. In a real production scenario, 
-      // rely on an explicit admins collection or strict matching.
+      // NOTE: Bootstrapping admin verification with email_verified check to prevent spoofing
       return isSignedIn() && (
-        request.auth.token.email == 'ak9818774144@gmail.com' ||
+        (request.auth.token.email == 'ak9818774144@gmail.com' && request.auth.token.email_verified == true) ||
         (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
       );
@@ -85,6 +84,9 @@ service cloud.firestore {
             && incoming().email == existing().email
             && incoming().isApproved == existing().isApproved)
         );
+
+      // Account Deletion & DPDP Data Erasure
+      allow delete: if (isOwner(userId) || isAdmin()) && isValidId(userId);
     }
   }
 }

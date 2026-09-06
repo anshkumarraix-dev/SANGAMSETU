@@ -200,8 +200,8 @@ export default function StartupDashboard({ preselectedChallenge }: StartupDashbo
       });
       const data = await res.json();
       setGeminiAnalysisResult({ ...data, proposalId: prop.id });
-    } catch (err) {
-      console.error(err);
+    } catch {
+      console.error('[AI] Proposal analysis fetch error');
     } finally {
       setGeminiAnalysisLoading(null);
     }

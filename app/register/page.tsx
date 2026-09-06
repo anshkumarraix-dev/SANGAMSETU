@@ -65,6 +65,8 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [regAttempts, setRegAttempts] = useState<number[]>([]);
+  const [isLockedOut, setIsLockedOut] = useState(false);
 
   const generateCaptcha = () => {
     const n1 = Math.floor(Math.random() * 20) + 5;
@@ -77,6 +79,22 @@ export default function RegisterPage() {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Rate limiting: Max 5 registration attempts per 5 minutes
+    const now = Date.now();
+    const recentAttempts = regAttempts.filter((t) => now - t < 300000);
+    if (recentAttempts.length >= 5) {
+      setIsLockedOut(true);
+      setError('Registration attempt limit exceeded. Please wait 5 minutes before trying again.');
+      setTimeout(() => {
+        setIsLockedOut(false);
+        setRegAttempts([]);
+        setError(null);
+      }, 300000);
+      return;
+    }
+
+    setRegAttempts([...recentAttempts, now]);
     setError(null);
 
     // Validation checks
@@ -149,11 +167,12 @@ export default function RegisterPage() {
 
       setSuccess(true);
     } catch (err: any) {
-      console.error('Registration error:', err);
-      if (err.code === 'auth/email-already-in-use') {
+      // Sanitized: Log generic failure notice without emitting raw user credentials or full error dumps
+      console.error('[AUTH] User registration request failed');
+      if (err?.code === 'auth/email-already-in-use') {
         setError('This Organization ID is already registered on the SangamSetu portal.');
       } else {
-        setError(err.message || 'Failed to register account. Please check network connection.');
+        setError('Failed to register account. Please verify input data and network connection.');
       }
     } finally {
       setLoading(false);
@@ -598,7 +617,7 @@ export default function RegisterPage() {
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || isLockedOut}
               className="w-full flex justify-center items-center py-2.5 px-4 border border-transparent rounded-sm shadow-sm text-xs font-bold text-white bg-sangam-blue-600 hover:bg-sangam-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sangam-blue-500 disabled:opacity-70 disabled:cursor-not-allowed transition-colors cursor-pointer"
             >
               {loading ? (
@@ -606,6 +625,8 @@ export default function RegisterPage() {
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   <span>Submitting Statutory Registration...</span>
                 </>
+              ) : isLockedOut ? (
+                'Registration Throttled (5m)'
               ) : (
                 'Submit Entity Registration'
               )}

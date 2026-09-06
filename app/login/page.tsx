@@ -31,9 +31,27 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [loginAttempts, setLoginAttempts] = useState<number[]>([]);
+  const [isLockedOut, setIsLockedOut] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Rate limiting: Max 5 attempts per minute
+    const now = Date.now();
+    const recentAttempts = loginAttempts.filter((t) => now - t < 60000);
+    if (recentAttempts.length >= 5) {
+      setIsLockedOut(true);
+      setError('Too many failed authentication attempts. Please wait 60 seconds before trying again.');
+      setTimeout(() => {
+        setIsLockedOut(false);
+        setLoginAttempts([]);
+        setError(null);
+      }, 60000);
+      return;
+    }
+
+    setLoginAttempts([...recentAttempts, now]);
     setLoading(true);
     setError(null);
     setSuccess(null);
@@ -109,8 +127,9 @@ export default function LoginPage() {
         setSuccess('Login successful! Redirecting...');
         router.push('/dashboard');
       }
-    } catch (err: any) {
-      console.warn('Firebase login attempt:', err);
+    } catch {
+      // Sanitized: Do not print raw error, passwords, or emails to console
+      console.warn('[AUTH] Firebase direct authentication fallback invoked');
       // Fallback to seamless role login
       if (userType === 'government') setRole('GOVERNMENT');
       else if (userType === 'testing_org') setRole('TESTING_ORG');
@@ -306,7 +325,7 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || isLockedOut}
             className="w-full flex justify-center items-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-bold text-white bg-sangam-navy-900 hover:bg-sangam-navy-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sangam-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
           >
             {loading ? (
@@ -314,6 +333,8 @@ export default function LoginPage() {
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 Authenticating...
               </>
+            ) : isLockedOut ? (
+              'Temporarily Locked (60s)'
             ) : (
               'Sign In to Portal'
             )}

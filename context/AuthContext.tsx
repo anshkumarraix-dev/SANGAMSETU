@@ -1,8 +1,8 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User as FirebaseUser, onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { User as FirebaseUser, onAuthStateChanged, signOut as firebaseSignOut, deleteUser } from 'firebase/auth';
+import { doc, getDoc, deleteDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 
 export type UserRole = 'startup' | 'government' | 'testing_org' | 'admin';
@@ -23,6 +23,7 @@ interface AuthContextType {
   profile: UserProfile | null;
   loading: boolean;
   signOut: () => Promise<void>;
+  deleteAccount: () => Promise<boolean>;
   refreshProfile: () => Promise<void>;
 }
 
@@ -31,6 +32,7 @@ const AuthContext = createContext<AuthContextType>({
   profile: null,
   loading: true,
   signOut: async () => {},
+  deleteAccount: async () => false,
   refreshProfile: async () => {},
 });
 
@@ -50,8 +52,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else {
         setProfile(null);
       }
-    } catch (error) {
-      console.error('Error fetching user profile:', error);
+    } catch {
+      // Sanitized: Do not print raw error or user details
+      console.error('[AUTH] Failed to fetch authenticated user profile');
       setProfile(null);
     }
   };
@@ -79,13 +82,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     try {
       await firebaseSignOut(auth);
-    } catch (error) {
-      console.error('Error signing out:', error);
+    } catch {
+      console.error('[AUTH] Sign out operation failed');
+    }
+  };
+
+  const deleteAccount = async (): Promise<boolean> => {
+    if (!user) return false;
+    try {
+      const uid = user.uid;
+      // 1. Delete Firestore user profile document
+      try {
+        await deleteDoc(doc(db, 'users', uid));
+      } catch {
+        console.warn('[AUTH] Firestore user profile record cleanup skipped');
+      }
+
+      // 2. Delete Firebase Auth user
+      await deleteUser(user);
+      setUser(null);
+      setProfile(null);
+      return true;
+    } catch {
+      console.error('[AUTH] User account erasure failed');
+      return false;
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, signOut, refreshProfile }}>
+    <AuthContext.Provider value={{ user, profile, loading, signOut, deleteAccount, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );
