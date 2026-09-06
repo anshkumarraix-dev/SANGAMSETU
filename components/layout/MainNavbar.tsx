@@ -485,27 +485,6 @@ export default function MainNavbar({ activeTab: propActiveTab }: MainNavbarProps
           )}
         </div>
       </nav>
-
-      {/* 3. Statutory Trust & Compliance Strip */}
-      <div className="bg-slate-100 border-b border-slate-200 py-1 px-4 text-[11px] text-slate-700 select-none">
-        <div className="max-w-[1440px] mx-auto flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 shrink-0" />
-            <span className="font-semibold text-slate-800">
-              {language === 'en'
-                ? 'Statutory Innovation Procurement Gateway • General Financial Rules (GFR) 2017 Rules 149 & 161(iv)'
-                : 'सामान्य वित्तीय नियम (जीएफआर) 2017 नियम 149 एवं 161(iv) के अंतर्गत वैधानिक नवाचार खरीद पोर्टल'}
-            </span>
-          </div>
-          <div className="flex items-center gap-3 text-slate-600 font-medium text-[10px]">
-            <span className="hidden sm:inline">DPIIT Startup Exemption Active</span>
-            <span className="hidden sm:inline">•</span>
-            <span className="hidden md:inline">STQC / C-DAC Lab Validation</span>
-            <span className="hidden md:inline">•</span>
-            <span className="text-emerald-700 font-bold">GeM Direct Scale-Up Ready</span>
-          </div>
-        </div>
-      </div>
     </>
   );
 }

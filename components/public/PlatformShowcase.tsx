@@ -212,15 +212,15 @@ export default function PlatformShowcase() {
       </section>
 
       {/* 2. Tri-Pillar Ecosystem Value Propositions */}
-      <section className="py-14 max-w-[1440px] mx-auto px-4">
-        <div className="text-center max-w-3xl mx-auto mb-10">
+      <section className="py-16 max-w-[1440px] mx-auto px-4 sm:px-6">
+        <div className="text-center max-w-3xl mx-auto mb-12">
           <span className="text-xs font-bold text-sangam-blue-600 uppercase tracking-wider">
             Ecosystem Integration
           </span>
-          <h3 className="text-2xl sm:text-3xl font-black text-slate-900 mt-1">
+          <h3 className="text-2xl sm:text-3xl font-black text-slate-900 mt-1.5">
             Built for Every Stakeholder in Public Governance
           </h3>
-          <p className="text-sm text-slate-600 mt-2">
+          <p className="text-sm sm:text-base text-slate-600 mt-2.5">
             A cohesive three-sided marketplace aligning ministerial mandates, startup ingenuity, and rigorous lab certification.
           </p>
         </div>
@@ -231,12 +231,12 @@ export default function PlatformShowcase() {
             return (
               <div
                 key={pillar.role}
-                className={`bg-white rounded-md p-6 border transition-all duration-200 shadow-xs flex flex-col justify-between ${pillar.accent}`}
+                className={`bg-white rounded-2xl p-6 sm:p-7 border transition-all duration-200 shadow-sm hover:shadow-md flex flex-col justify-between ${pillar.accent}`}
               >
                 <div>
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center justify-between mb-5">
                     <div className="flex items-center gap-3">
-                      <span className="p-3 rounded-md bg-slate-50 border border-slate-200 text-sangam-navy-900">
+                      <span className="p-3 rounded-xl bg-slate-50 border border-slate-200/90 text-sangam-navy-900 shadow-2xs">
                         <Icon className="w-6 h-6" />
                       </span>
                       {pillar.logoSrc && (
@@ -248,16 +248,16 @@ export default function PlatformShowcase() {
                         />
                       )}
                     </div>
-                    <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-sm border ${pillar.badgeColor}`}>
+                    <span className={`text-[11px] font-bold px-3 py-1 rounded-full border ${pillar.badgeColor}`}>
                       {pillar.subtitle}
                     </span>
                   </div>
 
                   <h4 className="text-lg font-black text-slate-900 mb-2">{pillar.title}</h4>
 
-                  <ul className="space-y-2.5 mt-4 text-xs text-slate-600 leading-relaxed">
+                  <ul className="space-y-3 mt-4 text-xs sm:text-sm text-slate-600 leading-relaxed">
                     {pillar.points.map((pt, idx) => (
-                      <li key={idx} className="flex items-start gap-2">
+                      <li key={idx} className="flex items-start gap-2.5">
                         <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                         <span>{pt}</span>
                       </li>
@@ -265,13 +265,13 @@ export default function PlatformShowcase() {
                   </ul>
                 </div>
 
-                <div className="mt-6 pt-4 border-t border-slate-100">
+                <div className="mt-8 pt-5 border-t border-slate-100">
                   <button
                     onClick={() => handleLaunchRole(pillar.targetRole)}
-                    className="w-full py-2.5 px-3 rounded-sm bg-slate-900 hover:bg-sangam-blue-600 text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                    className="w-full py-3 px-4 rounded-xl bg-slate-900 hover:bg-sangam-blue-600 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs hover:shadow"
                   >
                     <span>{pillar.ctaText}</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
+                    <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -281,16 +281,16 @@ export default function PlatformShowcase() {
       </section>
 
       {/* 3. Core Architectural & Algorithmic Advantages */}
-      <section className="py-14 bg-white border-y border-slate-200">
-        <div className="max-w-[1440px] mx-auto px-4">
+      <section className="py-16 bg-white border-y border-slate-200/80">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6">
           <div className="text-center max-w-3xl mx-auto mb-12">
             <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider">
               Technological Integrity
             </span>
-            <h3 className="text-2xl sm:text-3xl font-black text-slate-900 mt-1">
+            <h3 className="text-2xl sm:text-3xl font-black text-slate-900 mt-1.5">
               Engineered for Transparent, Unbiased Public Procurement
             </h3>
-            <p className="text-sm text-slate-600 mt-2">
+            <p className="text-sm sm:text-base text-slate-600 mt-2.5">
               Combining cutting-edge artificial intelligence with statutory government compliance frameworks.
             </p>
           </div>
@@ -299,12 +299,12 @@ export default function PlatformShowcase() {
             {techFeatures.map((feat, idx) => {
               const Icon = feat.icon;
               return (
-                <div key={idx} className="bg-slate-50 p-5 rounded-md border border-slate-200">
-                  <div className="w-10 h-10 rounded-sm bg-white border border-slate-200 flex items-center justify-center text-sangam-blue-600 mb-3 shadow-2xs">
+                <div key={idx} className="bg-slate-50/70 p-6 rounded-2xl border border-slate-200/80 hover:border-slate-300 transition-all shadow-xs">
+                  <div className="w-11 h-11 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-sangam-blue-600 mb-4 shadow-2xs">
                     <Icon className="w-5 h-5" />
                   </div>
-                  <h4 className="font-bold text-sm text-slate-900 mb-2">{feat.title}</h4>
-                  <p className="text-xs text-slate-600 leading-relaxed">{feat.desc}</p>
+                  <h4 className="font-bold text-sm sm:text-base text-slate-900 mb-2">{feat.title}</h4>
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">{feat.desc}</p>
                 </div>
               );
             })}
@@ -313,8 +313,8 @@ export default function PlatformShowcase() {
       </section>
 
       {/* 4. Strategic Priority Sectors */}
-      <section className="py-14 max-w-[1440px] mx-auto px-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between max-w-6xl mx-auto mb-8 gap-6 bg-white p-6 rounded-lg border border-slate-200 shadow-2xs">
+      <section className="py-16 max-w-[1440px] mx-auto px-4 sm:px-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between max-w-6xl mx-auto mb-8 gap-6 bg-white p-6 sm:p-7 rounded-2xl border border-slate-200 shadow-sm">
           <div className="flex items-center gap-5">
             <img
               src="/images/aatmanirbhar-bharat.svg"
@@ -337,7 +337,7 @@ export default function PlatformShowcase() {
 
           <button
             onClick={() => handleNavigate('challenges')}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-sm bg-sangam-blue-50 hover:bg-sangam-blue-100 text-sangam-blue-700 text-xs font-bold border border-sangam-blue-200 transition-colors cursor-pointer shrink-0"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-sangam-blue-50 hover:bg-sangam-blue-100 text-sangam-blue-700 text-xs sm:text-sm font-bold border border-sangam-blue-200 transition-colors cursor-pointer shrink-0 shadow-2xs"
           >
             <span>View all 50+ sector challenges</span>
             <ArrowRight className="w-4 h-4" />
@@ -351,20 +351,20 @@ export default function PlatformShowcase() {
               <div
                 key={idx}
                 onClick={() => handleNavigate('challenges')}
-                className="bg-white p-5 rounded-md border border-slate-200 hover:border-sangam-blue-400 transition-all cursor-pointer shadow-xs group"
+                className="bg-white p-6 rounded-2xl border border-slate-200 hover:border-sangam-blue-400 hover:shadow-md transition-all cursor-pointer shadow-xs group"
               >
-                <div className="flex items-center justify-between mb-3">
-                  <span className={`p-2.5 rounded-sm border ${sec.color}`}>
+                <div className="flex items-center justify-between mb-4">
+                  <span className={`p-3 rounded-xl border ${sec.color}`}>
                     <Icon className="w-5 h-5" />
                   </span>
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-sm bg-slate-100 text-slate-700 border border-slate-200">
+                  <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
                     {sec.badge}
                   </span>
                 </div>
-                <h4 className="font-bold text-sm text-slate-900 group-hover:text-sangam-blue-600 transition-colors">
+                <h4 className="font-bold text-base text-slate-900 group-hover:text-sangam-blue-600 transition-colors">
                   {sec.title}
                 </h4>
-                <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">{sec.desc}</p>
+                <p className="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">{sec.desc}</p>
               </div>
             );
           })}
@@ -372,50 +372,50 @@ export default function PlatformShowcase() {
       </section>
 
       {/* 5. How It Works Quick Teaser */}
-      <section className="py-12 bg-sangam-navy-900 text-white">
-        <div className="max-w-[1440px] mx-auto px-4">
+      <section className="py-16 bg-sangam-navy-900 text-white">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6">
           <div className="max-w-4xl mx-auto text-center">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-sm text-xs font-bold bg-white/10 text-amber-300 border border-white/20 mb-3">
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-bold bg-white/10 text-amber-300 border border-white/20 mb-3.5 shadow-2xs">
               <Sparkles className="w-3.5 h-3.5 text-amber-400" />
               Streamlined Procurement Lifecycle
             </span>
-            <h3 className="text-2xl sm:text-3xl font-black text-white">
+            <h3 className="text-2xl sm:text-3xl md:text-4xl font-black text-white">
               From Operational Bottleneck to GeM Nationwide Rollout
             </h3>
-            <p className="text-xs sm:text-sm text-slate-300 mt-2 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-xs sm:text-sm md:text-base text-slate-300 mt-3 max-w-2xl mx-auto leading-relaxed">
               SangamSetu enforces a standardized 9-step governance pipeline that turns high-risk procurement into verifiable, milestones-backed pilot contracts.
             </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8 text-left">
-              <div className="bg-white/5 border border-white/10 p-4 rounded-md">
-                <span className="text-xs font-black text-amber-400">PHASE 1</span>
-                <h4 className="font-bold text-sm text-white mt-1">Challenge & AI Match</h4>
-                <p className="text-xs text-slate-300 mt-1">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mt-10 text-left">
+              <div className="bg-white/5 hover:bg-white/8 border border-white/10 p-5 rounded-2xl transition-all">
+                <span className="text-[11px] font-black text-amber-400 tracking-wider px-2 py-0.5 rounded-sm bg-white/10">PHASE 1</span>
+                <h4 className="font-bold text-base text-white mt-2.5">Challenge & AI Match</h4>
+                <p className="text-xs sm:text-sm text-slate-300 mt-2 leading-relaxed">
                   Ministries publish problems; DPIIT startups submit proposals; SangamSetu AI Engine ranks top G1 (Quality) & G2 (Cost) contenders.
                 </p>
               </div>
 
-              <div className="bg-white/5 border border-white/10 p-4 rounded-md">
-                <span className="text-xs font-black text-amber-400">PHASE 2</span>
-                <h4 className="font-bold text-sm text-white mt-1">Prototype & Lab Testing</h4>
-                <p className="text-xs text-slate-300 mt-1">
+              <div className="bg-white/5 hover:bg-white/8 border border-white/10 p-5 rounded-2xl transition-all">
+                <span className="text-[11px] font-black text-amber-400 tracking-wider px-2 py-0.5 rounded-sm bg-white/10">PHASE 2</span>
+                <h4 className="font-bold text-base text-white mt-2.5">Prototype & Lab Testing</h4>
+                <p className="text-xs sm:text-sm text-slate-300 mt-2 leading-relaxed">
                   Shortlisted startups submit working MVPs; STQC and C-DAC laboratories conduct functional, load, and security benchmarks.
                 </p>
               </div>
 
-              <div className="bg-white/5 border border-white/10 p-4 rounded-md">
-                <span className="text-xs font-black text-amber-400">PHASE 3</span>
-                <h4 className="font-bold text-sm text-white mt-1">Field Pilot & GeM Scale</h4>
-                <p className="text-xs text-slate-300 mt-1">
+              <div className="bg-white/5 hover:bg-white/8 border border-white/10 p-5 rounded-2xl transition-all">
+                <span className="text-[11px] font-black text-amber-400 tracking-wider px-2 py-0.5 rounded-sm bg-white/10">PHASE 3</span>
+                <h4 className="font-bold text-base text-white mt-2.5">Field Pilot & GeM Scale</h4>
+                <p className="text-xs sm:text-sm text-slate-300 mt-2 leading-relaxed">
                   Government awards funded pilot contract with PFMS milestone disbursals, concluding in nationwide GeM catalogue onboarding.
                 </p>
               </div>
             </div>
 
-            <div className="mt-8">
+            <div className="mt-10">
               <button
                 onClick={() => handleNavigate('workflow')}
-                className="px-6 py-2.5 rounded-sm bg-sangam-saffron-500 hover:bg-sangam-saffron-600 text-slate-950 font-bold text-xs sm:text-sm inline-flex items-center gap-2 transition-colors cursor-pointer"
+                className="px-7 py-3 rounded-xl bg-sangam-saffron-500 hover:bg-sangam-saffron-600 text-slate-950 font-bold text-xs sm:text-sm inline-flex items-center gap-2 transition-all cursor-pointer shadow-sm hover:shadow active:scale-98"
               >
                 <span>Read the Detailed 9-Step Pathway</span>
                 <ArrowRight className="w-4 h-4" />
@@ -426,23 +426,23 @@ export default function PlatformShowcase() {
       </section>
 
       {/* 6. National Statutory Accreditations & Key Initiatives Gallery */}
-      <section className="py-14 bg-white border-t border-slate-200">
-        <div className="max-w-[1440px] mx-auto px-4">
-          <div className="text-center max-w-3xl mx-auto mb-10">
+      <section className="py-16 bg-white border-t border-slate-200/80">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6">
+          <div className="text-center max-w-3xl mx-auto mb-12">
             <span className="text-xs font-bold text-sangam-blue-600 uppercase tracking-wider">
               Institutional Anchors & National Missions
             </span>
-            <h3 className="text-2xl sm:text-3xl font-black text-slate-900 mt-1">
+            <h3 className="text-2xl sm:text-3xl font-black text-slate-900 mt-1.5">
               Statutory Authority & National Partnerships
             </h3>
-            <p className="text-xs sm:text-sm text-slate-600 mt-1.5">
+            <p className="text-xs sm:text-sm text-slate-600 mt-2">
               Operating under statutory frameworks empowered by the Government of India and leading national development missions.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 max-w-6xl mx-auto">
             {/* 1. National Emblem of India */}
-            <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 flex flex-col items-center text-center shadow-2xs hover:shadow-xs transition-shadow">
+            <div className="bg-slate-50/70 p-5 rounded-2xl border border-slate-200/80 flex flex-col items-center text-center shadow-xs hover:shadow-sm transition-all hover:bg-slate-50">
               <div className="h-20 flex items-center justify-center mb-3">
                 <img
                   src="/images/emblem-india.svg"
@@ -451,14 +451,14 @@ export default function PlatformShowcase() {
                   referrerPolicy="no-referrer"
                 />
               </div>
-              <h4 className="font-extrabold text-xs text-slate-900">Government of India</h4>
-              <p className="text-[11px] text-slate-500 mt-1 leading-snug">
+              <h4 className="font-extrabold text-xs sm:text-sm text-slate-900">Government of India</h4>
+              <p className="text-[11px] text-slate-500 mt-1.5 leading-relaxed">
                 Authorized under GFR 2017 Rule 194 for public innovation procurement.
               </p>
             </div>
 
             {/* 2. DPIIT Recognised */}
-            <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 flex flex-col items-center text-center shadow-2xs hover:shadow-xs transition-shadow">
+            <div className="bg-slate-50/70 p-5 rounded-2xl border border-slate-200/80 flex flex-col items-center text-center shadow-xs hover:shadow-sm transition-all hover:bg-slate-50">
               <div className="h-20 flex items-center justify-center mb-3">
                 <img
                   src="/images/dpiit-recognised.svg"
@@ -467,14 +467,14 @@ export default function PlatformShowcase() {
                   referrerPolicy="no-referrer"
                 />
               </div>
-              <h4 className="font-extrabold text-xs text-slate-900">DPIIT Recognition</h4>
-              <p className="text-[11px] text-slate-500 mt-1 leading-snug">
+              <h4 className="font-extrabold text-xs sm:text-sm text-slate-900">DPIIT Recognition</h4>
+              <p className="text-[11px] text-slate-500 mt-1.5 leading-relaxed">
                 Full exemption from turnover and prior-experience criteria for startups.
               </p>
             </div>
 
             {/* 3. Digital India */}
-            <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 flex flex-col items-center text-center shadow-2xs hover:shadow-xs transition-shadow">
+            <div className="bg-slate-50/70 p-5 rounded-2xl border border-slate-200/80 flex flex-col items-center text-center shadow-xs hover:shadow-sm transition-all hover:bg-slate-50">
               <div className="h-20 flex items-center justify-center mb-3">
                 <img
                   src="/images/digital-india.svg"
@@ -483,14 +483,14 @@ export default function PlatformShowcase() {
                   referrerPolicy="no-referrer"
                 />
               </div>
-              <h4 className="font-extrabold text-xs text-slate-900">Digital India</h4>
-              <p className="text-[11px] text-slate-500 mt-1 leading-snug">
+              <h4 className="font-extrabold text-xs sm:text-sm text-slate-900">Digital India</h4>
+              <p className="text-[11px] text-slate-500 mt-1.5 leading-relaxed">
                 Power to Empower with paperless digital milestones and verifiable audit trails.
               </p>
             </div>
 
             {/* 4. Aatmanirbhar Bharat */}
-            <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 flex flex-col items-center text-center shadow-2xs hover:shadow-xs transition-shadow">
+            <div className="bg-slate-50/70 p-5 rounded-2xl border border-slate-200/80 flex flex-col items-center text-center shadow-xs hover:shadow-sm transition-all hover:bg-slate-50">
               <div className="h-20 flex items-center justify-center mb-3">
                 <img
                   src="/images/aatmanirbhar-bharat.svg"
@@ -499,14 +499,14 @@ export default function PlatformShowcase() {
                   referrerPolicy="no-referrer"
                 />
               </div>
-              <h4 className="font-extrabold text-xs text-slate-900">Aatmanirbhar Bharat</h4>
-              <p className="text-[11px] text-slate-500 mt-1 leading-snug">
+              <h4 className="font-extrabold text-xs sm:text-sm text-slate-900">Aatmanirbhar Bharat</h4>
+              <p className="text-[11px] text-slate-500 mt-1.5 leading-relaxed">
                 Fostering indigenous self-reliance across defence, cyber, and civil technologies.
               </p>
             </div>
 
             {/* 5. G20 India */}
-            <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 flex flex-col items-center text-center shadow-2xs hover:shadow-xs transition-shadow">
+            <div className="bg-slate-50/70 p-5 rounded-2xl border border-slate-200/80 flex flex-col items-center text-center shadow-xs hover:shadow-sm transition-all hover:bg-slate-50">
               <div className="h-20 flex items-center justify-center mb-3">
                 <img
                   src="/images/g20-india.png"
@@ -521,8 +521,8 @@ export default function PlatformShowcase() {
                   }}
                 />
               </div>
-              <h4 className="font-extrabold text-xs text-slate-900">G20 India Benchmark</h4>
-              <p className="text-[11px] text-slate-500 mt-1 leading-snug">
+              <h4 className="font-extrabold text-xs sm:text-sm text-slate-900">G20 India Benchmark</h4>
+              <p className="text-[11px] text-slate-500 mt-1.5 leading-relaxed">
                 Conforming to premier multilateral innovation procurement standards.
               </p>
             </div>
