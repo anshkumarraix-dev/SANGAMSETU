@@ -39,17 +39,13 @@ export default function HeroSection({
         <div className="flex items-center justify-center mb-6">
           <div className="flex flex-wrap items-center justify-center gap-5 sm:gap-8 md:gap-10 py-2.5 px-6 rounded-2xl bg-slate-50/90 border border-slate-200/80 shadow-xs">
             {/* 1. National Emblem of India */}
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center">
               <img
                 src="/images/emblem-india.svg"
                 alt="State Emblem of India"
                 className="h-10 sm:h-12 w-auto object-contain"
                 referrerPolicy="no-referrer"
               />
-              <div className="text-left leading-none hidden xs:block">
-                <p className="text-[11px] font-black text-slate-900">भारत सरकार</p>
-                <p className="text-[9px] font-semibold text-slate-600 mt-0.5">Govt. of India</p>
-              </div>
             </div>
 
             <div className="h-7 w-px bg-slate-200 hidden sm:block" />

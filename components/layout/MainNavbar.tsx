@@ -95,8 +95,6 @@ export default function MainNavbar({ activeTab: propActiveTab }: MainNavbarProps
             </a>
             <span className="text-slate-600 hidden sm:inline">|</span>
             <div className="flex items-center gap-1.5 font-semibold">
-              <span className="text-amber-400 font-bold">भारत सरकार</span>
-              <span className="text-slate-400">•</span>
               <span>Government of India</span>
             </div>
             <span className="text-slate-600 hidden md:inline">|</span>
